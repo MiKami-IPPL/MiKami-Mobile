@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mikami_mobile/screens/login_screen.dart';
+import 'package:mikami_mobile/screens/register_screen.dart';
+import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
 import 'package:mikami_mobile/widgets/welcome_button.dart';
 
@@ -7,11 +10,11 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CustomScaffold(
+    return CustomScaffold(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Center(
+          const Center(
             child: Text(
               'Selamat Datang!',
               style: TextStyle(
@@ -21,7 +24,7 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
           ),
-          Center(
+          const Center(
             child: Text(
               'Silahkan login untuk melanjutkan',
               style: TextStyle(
@@ -36,20 +39,26 @@ class WelcomeScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(
+                const Expanded(
                   child: WelcomeButton(
                     buttonText: 'Masuk',
+                    onTap: LoginScreen(),
+                    color: Colors.transparent,
+                    textColor: Colors.white,
                   ),
                 ),
                 Expanded(
                   child: WelcomeButton(
                     buttonText: 'Daftar',
+                    onTap: const RegisterScreen(),
+                    color: Colors.white,
+                    textColor: lightColorScheme.primary,
                   ),
                 ),
               ],
             ),
           )),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
         ],
       ),
     );

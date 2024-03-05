@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:mikami_mobile/screens/register_screen.dart';
 
 class WelcomeButton extends StatelessWidget {
-  const WelcomeButton({super.key, this.buttonText});
+  const WelcomeButton(
+      {super.key, this.buttonText, this.onTap, this.color, this.textColor});
   final String? buttonText;
+  final Widget? onTap;
+  final Color? color;
+  final Color? textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -12,22 +15,25 @@ class WelcomeButton extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (e) => const RegisterScreen(),
+            builder: (e) => onTap!,
           ),
         );
       },
       child: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
+        padding: const EdgeInsets.all(30),
+        decoration: BoxDecoration(
+          color: color!,
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(50),
           ),
         ),
         child: Text(
           buttonText!,
-          style: const TextStyle(
+          textAlign: TextAlign.center,
+          style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
+            color: textColor!,
           ),
         ),
       ),

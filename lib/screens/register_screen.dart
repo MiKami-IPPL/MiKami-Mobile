@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mikami_mobile/widgets/custom_scaffold.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -10,6 +11,8 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Text('Berhasil daftar');
+    return const CustomScaffold(
+      child: Text('Berhasil daftar'),
+    );
   }
 }
