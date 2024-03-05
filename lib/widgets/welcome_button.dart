@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mikami_mobile/screens/register_screen.dart';
 
 class WelcomeButton extends StatelessWidget {
   const WelcomeButton({super.key, this.buttonText});
@@ -7,7 +8,14 @@ class WelcomeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (e) => const RegisterScreen(),
+          ),
+        );
+      },
       child: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
