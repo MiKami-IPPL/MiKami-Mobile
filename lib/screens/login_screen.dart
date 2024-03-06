@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:mikami_mobile/screens/register_screen.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
 
@@ -91,18 +94,25 @@ class _LoginScreenState extends State<LoginScreen> {
                                       rememberMe = value!;
                                     });
                                   }),
-                              const Text('Remember Me')
+                              const Text('Ingat Saya')
                             ],
                           ),
+                          //lupa password
+                          GestureDetector(
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Chat admin untuk lupa password?')));
+                            },
+                            child: const Text(
+                              'Lupa password?',
+                              style: TextStyle(
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ),
                         ],
-                      ),
-                      GestureDetector(
-                        child: Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: lightColorScheme.primary),
-                        ),
                       ),
                       const SizedBox(
                         height: 20,
@@ -111,13 +121,50 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            if (_formLoginKey.currentState!.validate()) {
+                            if (_formLoginKey.currentState!.validate() &&
+                                rememberMe) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text('Processing Data')));
                             }
                           },
                           child: const Text('Masuk'),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Masuk sebagai tamu'),
+                          Icon(
+                            Icons.arrow_forward,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (e) => const RegisterScreen()));
+                        },
+                        child: RichText(
+                          text: const TextSpan(
+                            text: 'Belum punya akun? ',
+                            style: TextStyle(color: Colors.black),
+                            children: <TextSpan>[
+                              TextSpan(
+                                  text: 'Daftar',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                            ],
+                          ),
                         ),
                       ),
                     ],
