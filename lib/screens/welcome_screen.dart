@@ -23,21 +23,21 @@ class WelcomeScreen extends StatelessWidget {
                 child: Center(
                   child: RichText(
                     textAlign: TextAlign.center,
-                    text: TextSpan(
+                    text: const TextSpan(
                       children: [
                         TextSpan(
                             text: 'Selamat Datang!\n',
                             style: TextStyle(
                               fontSize: 35.0,
                               fontWeight: FontWeight.w600,
-                              color: lightColorScheme.primary,
+                              color: Color.fromARGB(255, 46, 36, 5),
                             )),
                         TextSpan(
                             text:
                                 '\nDengan Aplikasi ini anda dapat membuka cakrawala komik\n\n',
                             style: TextStyle(
                               fontSize: 20,
-                              color: lightColorScheme.primary,
+                              color: Color.fromARGB(255, 46, 36, 5),
                               // height: 0,
                             ))
                       ],
