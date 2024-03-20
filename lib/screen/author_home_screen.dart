@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mikami_mobile/screen/author_withdrawal_screen.dart';
 import 'author_manage_screen.dart';
 import 'author_verify_screen.dart';
 import 'author_history_screen.dart';
@@ -92,7 +93,7 @@ class AuthorScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AuthorHistory(),
+                              builder: (context) => AuthorWithdrawal(),
                             ),
                           );
                         },
@@ -119,8 +120,8 @@ class AuthorScreen extends StatelessWidget {
           children: [
             Image.asset(
               imagePath,
-              width: 50, // Adjust the width as needed
-              height: 50, // Adjust the height as needed
+              width: 50, 
+              height: 50, 
             ),
             SizedBox(height: 5),
             Text(

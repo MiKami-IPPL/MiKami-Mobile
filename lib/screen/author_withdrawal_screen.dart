@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class AuthorHistory extends StatelessWidget {
-  const AuthorHistory({super.key});
+class AuthorWithdrawal extends StatelessWidget {
+  const AuthorWithdrawal({super.key});
 
   @override
   Widget build(BuildContext context) {

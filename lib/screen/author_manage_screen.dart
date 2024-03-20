@@ -41,7 +41,7 @@ class ManageScreen extends StatelessWidget {
                     'Lihat Daftar Komik, Hapus Komik, Tambahkan Komik baru',
                     style: TextStyle(
                       fontSize: 16.0,
-                      color: Colors.grey,
+                      color: Colors.white,
                     ),
                   ),
                 ],

@@ -41,20 +41,20 @@ class ComicVerify extends StatelessWidget {
                     'Dapatkan keuntungan untuk setiap chapter dari Komik yang telah diverifikasi',
                     style: TextStyle(
                       fontSize: 16.0,
-                      color: Colors.grey,
+                      color: Colors.white,
                     ),
                   ),
                 ],
               ),
             ),
             DefaultTabController(
-              length: 2, // Number of tabs
+              length: 2,
               child: Column(
                 children: [
                   Container(
-                    color: Colors.white, // Set TabBar background color
+                    color: Colors.white, 
                     child: TabBar(
-                      indicatorColor: Colors.red, // Change the color of the tab indicator here
+                      indicatorColor: Colors.red, 
                       tabs: [
                         Tab(text: 'Verified'),
                         Tab(text: 'Not Verified'),
@@ -64,7 +64,7 @@ class ComicVerify extends StatelessWidget {
                   SizedBox(
                     height: MediaQuery.of(context).size.height - 200,
                     child: Container(
-                      color: Colors.white, // Set TabBarView background color
+                      color: Colors.white, 
                       child: TabBarView(
                         children: [
                           ListView.builder(
@@ -99,7 +99,7 @@ class ComicVerify extends StatelessWidget {
                                     ),
                                     trailing: PopupMenuButton<String>(
                                       onSelected: (String choice) {
-                                        // Handle menu item selection
+                                       
                                         if (choice == 'Lihat Daftar Chapter') {
                                           // Do something
                                         } else if (choice == 'Hapus Komik') {
@@ -118,12 +118,11 @@ class ComicVerify extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                  Divider(), // Add a Divider
+                                  Divider(), 
                                 ],
                               );
                             },
                           ),
-                          // Content for Pending tab
                           ListView.builder(
                             itemCount: ListDataProvider.getUnverifiedList().length,
                             itemBuilder: (BuildContext context, int index) {
@@ -175,7 +174,7 @@ class ComicVerify extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                  Divider(), // Add a Divider
+                                  Divider(),
                                 ],
                               );
                             },
@@ -192,11 +191,11 @@ class ComicVerify extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Add onPressed action here
+          
         },
         shape: StadiumBorder(),
         child: Icon(Icons.add),
-        backgroundColor: Colors.amber, // Customize button color
+        backgroundColor: Colors.amber, 
       ),
     );
   }
