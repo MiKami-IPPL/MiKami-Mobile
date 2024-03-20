@@ -3,7 +3,7 @@ import 'package:mikami_mobile/screens/welcome_screen.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
