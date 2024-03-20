@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mikami_mobile/screen/author_home_screen.dart';
 import 'chapter_list.dart';
 
 class FirstPage extends StatefulWidget {
@@ -17,7 +18,7 @@ class _FirstPageState extends State<FirstPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.amber[300],
         title: const Text('Midumb'),
       ),
       body: Center(
@@ -32,7 +33,7 @@ class _FirstPageState extends State<FirstPage> {
                   children: [
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue[300],
+                        backgroundColor: Colors.amber[300],
                         foregroundColor: Colors.white,
                       ),
                       onPressed: () {
@@ -44,6 +45,20 @@ class _FirstPageState extends State<FirstPage> {
                       },
                       child: Text('Chapter List'),
                     ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber[300],
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => AuthorScreen(),
+                          ),
+                        );
+                      },
+                      child: Text('Author Screen'),
+                    ),
                   ],
                 ),
               )
@@ -53,7 +68,7 @@ class _FirstPageState extends State<FirstPage> {
                     _isClicked = !_isClicked;
                   });
                 },
-                child: _isClicked == false ? Image.asset('images/hannahCover.jpg') : Image.asset('images/halaman1.jpg'),
+                child: _isClicked == false ? Image.asset('assets/images/hannahCover.jpg') : Image.asset('assets/images/halaman1.jpg'),
               ),
       ),
       bottomNavigationBar: BottomNavigationBar(
