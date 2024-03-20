@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:mikami_mobile/screens/forgot_password_screen.dart';
 import 'package:mikami_mobile/screens/register_screen.dart';
 import 'package:mikami_mobile/screens/tamu_screen.dart';
 import 'package:mikami_mobile/theme/theme.dart';
@@ -132,10 +133,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           //lupa password
                           GestureDetector(
                             onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text(
-                                          'Chat admin untuk lupa password?')));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (e) => const ForgotScreen()));
                             },
                             child: Text(
                               'Lupa password?',
