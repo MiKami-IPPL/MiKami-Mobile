@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mikami_mobile/screens/login_screen.dart';
+import 'package:mikami_mobile/screens/tamu_screen.dart';
+import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -12,6 +14,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formRegisterKey = GlobalKey<FormState>();
+  bool agree = false;
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
@@ -39,97 +42,160 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Text('Daftar Akun Baru',
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+                  Text('Daftar Akun Baru',
+                      style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.w900,
+                          color: lightColorScheme.primary)),
                   const SizedBox(
-                    height: 20,
+                    height: 40,
                   ),
                   TextFormField(
                     validator: (value) =>
                         value!.isEmpty ? 'Masukkan nama' : null,
-                    decoration: const InputDecoration(
-                        label: Text('Nama'),
-                        hintText: 'Masukkan nama',
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            borderSide: BorderSide(color: Colors.grey))),
+                    decoration: InputDecoration(
+                      label: const Text('Nama Lengkap'),
+                      hintText: 'Masukkan nama lengkap',
+                      hintStyle: const TextStyle(
+                        color: Colors.black26,
+                      ),
+                      border: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          color: Colors.black12, // Default border color
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          color: Colors.black12, // Default border color
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
                     style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 25,
                   ),
                   TextFormField(
                     validator: (value) =>
                         value!.isEmpty ? 'Masukkan email' : null,
-                    decoration: const InputDecoration(
-                        label: Text('Email'),
-                        hintText: 'Masukkan email',
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            borderSide: BorderSide(color: Colors.grey))),
+                    decoration: InputDecoration(
+                      label: const Text('Email'),
+                      hintText: 'Masukkan email',
+                      hintStyle: const TextStyle(
+                        color: Colors.black26,
+                      ),
+                      border: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          color: Colors.black12, // Default border color
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          color: Colors.black12, // Default border color
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
                     style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 25,
                   ),
                   TextFormField(
                     obscureText: true,
                     obscuringCharacter: "*",
                     validator: (value) =>
                         value!.isEmpty ? 'Masukkan password' : null,
-                    decoration: const InputDecoration(
-                        label: Text('Password'),
-                        hintText: 'Masukkan password',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                          borderSide: BorderSide(color: Colors.grey),
-                        )),
+                    decoration: InputDecoration(
+                      label: const Text('Password'),
+                      hintText: 'Enter Password',
+                      hintStyle: const TextStyle(
+                        color: Colors.black26,
+                      ),
+                      border: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          color: Colors.black12, // Default border color
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          color: Colors.black12, // Default border color
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
                     style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 25,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
                         children: [
-                          Checkbox(value: false, onChanged: (value) {}),
+                          Checkbox(
+                              value: agree,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  agree = value!;
+                                });
+                              },
+                              activeColor: lightColorScheme.primary),
                           const Text('Saya setuju dengan EULA'),
                         ],
                       ),
                     ],
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 25,
                   ),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        if (_formRegisterKey.currentState!.validate()) {
+                        if (_formRegisterKey.currentState!.validate() &&
+                            agree) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Processing Data')));
+                        } else if (!agree) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Anda harus menyetujui EULA')));
                         }
                       },
                       child: const Text('Daftar'),
                     ),
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 25,
                   ),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Masuk sebagai tamu'),
-                      Icon(
-                        Icons.arrow_forward,
-                      ),
-                    ],
+                  GestureDetector(
+                    //navigasi ke tamu screen
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (e) => const TamuScreen(),
+                        ),
+                      );
+                    },
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Masuk sebagai tamu'),
+                        Icon(
+                          Icons.arrow_forward,
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 30,
                   ),
                   //sudah punya akun
                   GestureDetector(
@@ -141,10 +207,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       );
                     },
-                    child: const Text(
-                      'Sudah punya akun? Masuk disini',
-                      style: TextStyle(
-                        color: Colors.blue,
+                    child: RichText(
+                      text: const TextSpan(
+                        text: 'Sudah punya akun? ',
+                        style: TextStyle(color: Colors.black),
+                        children: <TextSpan>[
+                          TextSpan(
+                              text: 'Masuk Disini',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.lightBlue,
+                              )),
+                        ],
                       ),
                     ),
                   ),

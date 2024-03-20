@@ -12,53 +12,65 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomScaffold(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Center(
-            child: Text(
-              'Selamat Datang!',
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          const Center(
-            child: Text(
-              'Silahkan login untuk melanjutkan',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.white,
-              ),
-            ),
-          ),
           Flexible(
-              child: Align(
-            alignment: Alignment.bottomRight,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Expanded(
-                  child: WelcomeButton(
-                    buttonText: 'Masuk',
-                    onTap: LoginScreen(),
-                    color: Colors.transparent,
-                    textColor: Colors.white,
+              flex: 6,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 0,
+                  horizontal: 40.0,
+                ),
+                child: Center(
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                            text: 'Selamat Datang!\n',
+                            style: TextStyle(
+                              fontSize: 35.0,
+                              fontWeight: FontWeight.w600,
+                              color: lightColorScheme.primary,
+                            )),
+                        TextSpan(
+                            text:
+                                '\nDengan Aplikasi ini anda dapat membuka cakrawala komik\n\n',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: lightColorScheme.primary,
+                              // height: 0,
+                            ))
+                      ],
+                    ),
                   ),
                 ),
-                Expanded(
-                  child: WelcomeButton(
-                    buttonText: 'Daftar',
-                    onTap: const RegisterScreen(),
-                    color: Colors.white,
-                    textColor: lightColorScheme.primary,
+              )),
+          const Flexible(
+            flex: 1,
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: WelcomeButton(
+                      buttonText: 'Masuk',
+                      onTap: LoginScreen(),
+                      color: Colors.transparent,
+                      textColor: Colors.black,
+                    ),
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: WelcomeButton(
+                      buttonText: 'Daftar',
+                      onTap: RegisterScreen(),
+                      color: Colors.white,
+                      textColor: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          )),
-          const SizedBox(height: 20),
+          ),
         ],
       ),
     );

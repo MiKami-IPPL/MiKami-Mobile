@@ -1,7 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:mikami_mobile/screens/register_screen.dart';
+import 'package:mikami_mobile/screens/tamu_screen.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
 
@@ -43,44 +43,69 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text('Masuk ke Akun Anda',
+                      Text('Masuk ke Akun Anda',
                           style: TextStyle(
-                              fontSize: 30, fontWeight: FontWeight.bold)),
+                              fontSize: 30,
+                              fontWeight: FontWeight.w900,
+                              color: lightColorScheme.primary)),
                       const SizedBox(
                         height: 20,
                       ),
                       TextFormField(
                         validator: (value) =>
                             value!.isEmpty ? 'Masukkan email' : null,
-                        decoration: const InputDecoration(
-                            label: Text('Email'),
-                            hintText: 'Masukkan email',
-                            border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                                borderSide: BorderSide(color: Colors.grey))),
+                        decoration: InputDecoration(
+                          label: const Text('Email'),
+                          hintText: 'Enter Email',
+                          hintStyle: const TextStyle(
+                            color: Colors.black26,
+                          ),
+                          border: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.black12, // Default border color
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.black12, // Default border color
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
                         style: const TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 25,
                       ),
                       TextFormField(
                         obscureText: true,
                         obscuringCharacter: "*",
                         validator: (value) =>
                             value!.isEmpty ? 'Masukkan password' : null,
-                        decoration: const InputDecoration(
-                            label: Text('Password'),
-                            hintText: 'Masukkan password',
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                              borderSide: BorderSide(color: Colors.grey),
-                            )),
+                        decoration: InputDecoration(
+                          label: const Text('Password'),
+                          hintText: 'Enter Password',
+                          hintStyle: const TextStyle(
+                            color: Colors.black26,
+                          ),
+                          border: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.black12, // Default border color
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.black12, // Default border color
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
                         style: const TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 25,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -88,13 +113,20 @@ class _LoginScreenState extends State<LoginScreen> {
                           Row(
                             children: [
                               Checkbox(
-                                  value: rememberMe,
-                                  onChanged: (bool? value) {
-                                    setState(() {
-                                      rememberMe = value!;
-                                    });
-                                  }),
-                              const Text('Ingat Saya')
+                                value: rememberMe,
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    rememberMe = value!;
+                                  });
+                                },
+                                activeColor: lightColorScheme.primary,
+                              ),
+                              const Text(
+                                'Ingat Saya',
+                                style: TextStyle(
+                                  color: Colors.black45,
+                                ),
+                              )
                             ],
                           ),
                           //lupa password
@@ -105,17 +137,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                       content: Text(
                                           'Chat admin untuk lupa password?')));
                             },
-                            child: const Text(
+                            child: Text(
                               'Lupa password?',
                               style: TextStyle(
-                                color: Colors.blue,
+                                fontWeight: FontWeight.bold,
+                                color: lightColorScheme.primary,
                               ),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 25,
                       ),
                       SizedBox(
                         width: double.infinity,
@@ -132,16 +165,24 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 25,
                       ),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('Masuk sebagai tamu'),
-                          Icon(
-                            Icons.arrow_forward,
-                          ),
-                        ],
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (e) => const TamuScreen()));
+                        },
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('Masuk sebagai tamu'),
+                            Icon(
+                              Icons.arrow_forward,
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(
                         height: 20,
@@ -162,6 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   text: 'Daftar',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
+                                    color: Colors.lightBlue,
                                   )),
                             ],
                           ),
