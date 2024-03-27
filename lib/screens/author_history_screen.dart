@@ -8,10 +8,10 @@ class AuthorHistory extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.amber[300], // Set Scaffold background color
       appBar: AppBar(
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: Colors.white,
         ),
-        titleTextStyle: TextStyle(
+        titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 20,
         ),
@@ -22,12 +22,12 @@ class AuthorHistory extends StatelessWidget {
           children: [
             Container(
               color: Colors.amber[300],
-              padding: EdgeInsets.all(16.0),
-              child: Column(
+              padding: const EdgeInsets.all(16.0),
+              child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Riwayat Pendapatan',
+                    'Riwayat Aktivitas',
                     style: TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
@@ -36,7 +36,7 @@ class AuthorHistory extends StatelessWidget {
                   ),
                   SizedBox(height: 8.0),
                   Text(
-                    'Coin yang didapatkan dari setiap chapter dapat diuangkan!',
+                    'Lihat segala aktivitas kamu disini',
                     style: TextStyle(
                       fontSize: 16.0,
                       color: Colors.white,
@@ -56,7 +56,7 @@ class ListTileSubtitle extends StatelessWidget {
   final String line1;
   final String line2;
 
-  const ListTileSubtitle({required this.line1, required this.line2});
+  const ListTileSubtitle({super.key, required this.line1, required this.line2});
 
   @override
   Widget build(BuildContext context) {
@@ -65,14 +65,14 @@ class ListTileSubtitle extends StatelessWidget {
       children: [
         Text(
           line1,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14.0,
             color: Colors.black54,
           ),
         ),
         Text(
           line2,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14.0,
             color: Colors.black54,
           ),
