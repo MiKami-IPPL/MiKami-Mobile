@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:mikami_mobile/screens/main_menu.dart';
+import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,19 +30,23 @@ class LoginController extends GetxService {
 
       http.Response response =
           await http.post(url, body: jsonEncode(body), headers: headers);
-      print(response.body);
-
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
-        print(json['status']);
         if (json['status'] == 'success') {
           emailController.clear();
           passwordController.clear();
           var token = json['data']['token'];
-          print(token);
           final SharedPreferences? prefs = await _prefs;
           await prefs?.setString('token', token);
-          print("berhasil login");
+          Get.off(HomeScreen());
+          Get.showSnackbar(GetSnackBar(
+            title: "Sukses",
+            message: 'Login berhasil',
+            icon: Icon(Icons.check_circle, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.secondary,
+          ));
         } else {
           print(json['status'] + json['message']);
         }

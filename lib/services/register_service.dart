@@ -2,16 +2,15 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:mikami_mobile/screens/login_screen.dart';
+import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterController extends GetxController {
   TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController age = TextEditingController();
-
-  // final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   Future<void> registerWithEmail() async {
     try {
@@ -26,19 +25,24 @@ class RegisterController extends GetxController {
         'password': password.text,
         'age': age.text,
       };
-      // print(body);
       http.Response response =
           await http.post(url, body: jsonEncode(body), headers: headers);
-      print(response.body);
       if (response.statusCode == 201) {
         final json = jsonDecode(response.body);
-        print(json['status']);
         if (json['status'] == 'success') {
           name.clear();
           email.clear();
           password.clear();
           age.clear();
-          print("berhasil mendaftar");
+          Get.off(LoginScreen());
+          Get.showSnackbar(GetSnackBar(
+            title: "Sukses",
+            message: 'Registrasi berhasil, silahkan login',
+            icon: Icon(Icons.check_circle, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.secondary,
+          ));
         } else {
           print(json['status'] + json['message']);
         }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mikami_mobile/screens/forgot_password_screen.dart';
+import 'package:mikami_mobile/screens/main_menu.dart';
 import 'package:mikami_mobile/screens/register_screen.dart';
 import 'package:mikami_mobile/screens/tamu_screen.dart';
 import 'package:mikami_mobile/services/login_service.dart';
@@ -168,10 +170,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (e) => const TamuScreen()));
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (e) => HomeScreen()));
                         },
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
