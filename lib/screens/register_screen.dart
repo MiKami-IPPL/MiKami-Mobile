@@ -6,8 +6,7 @@ import 'package:mikami_mobile/screens/tamu_screen.dart';
 import 'package:mikami_mobile/services/register_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:quickalert/quickalert.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -19,7 +18,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   RegisterController registerController = Get.put(RegisterController());
   final _formRegisterKey = GlobalKey<FormState>();
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  // final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   bool agree = false;
   @override

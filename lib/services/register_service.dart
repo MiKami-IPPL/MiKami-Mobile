@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterController extends GetxController {
   TextEditingController name = TextEditingController();
@@ -11,7 +11,7 @@ class RegisterController extends GetxController {
   TextEditingController password = TextEditingController();
   TextEditingController age = TextEditingController();
 
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  // final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   Future<void> registerWithEmail() async {
     try {
