@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/login_screen.dart';
 import 'package:mikami_mobile/screens/tamu_screen.dart';
+import 'package:mikami_mobile/services/register_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:quickalert/quickalert.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -13,7 +17,10 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  RegisterController registerController = Get.put(RegisterController());
   final _formRegisterKey = GlobalKey<FormState>();
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
   bool agree = false;
   @override
   Widget build(BuildContext context) {
@@ -51,6 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     height: 40,
                   ),
                   TextFormField(
+                    controller: registerController.name,
                     validator: (value) =>
                         value!.isEmpty ? 'Masukkan nama' : null,
                     decoration: InputDecoration(
@@ -78,6 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     height: 25,
                   ),
                   TextFormField(
+                    controller: registerController.email,
                     validator: (value) =>
                         value!.isEmpty ? 'Masukkan email' : null,
                     decoration: InputDecoration(
@@ -105,6 +114,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     height: 25,
                   ),
                   TextFormField(
+                    controller: registerController.age,
+                    // obscureText: true,
+                    // obscuringCharacter: "*",
+                    validator: (value) =>
+                        value!.isEmpty ? 'Masukkan umur' : null,
+                    decoration: InputDecoration(
+                      label: const Text('Umur'),
+                      hintText: 'Enter Password',
+                      hintStyle: const TextStyle(
+                        color: Colors.black26,
+                      ),
+                      border: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          color: Colors.black12, // Default border color
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          color: Colors.black12, // Default border color
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  TextFormField(
+                    controller: registerController.password,
                     obscureText: true,
                     obscuringCharacter: "*",
                     validator: (value) =>
@@ -157,17 +197,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        if (_formRegisterKey.currentState!.validate() &&
-                            agree) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Processing Data')));
-                        } else if (!agree) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Anda harus menyetujui EULA')));
-                        }
-                      },
+                      onPressed: () => registerController.registerWithEmail(),
                       child: const Text('Daftar'),
                     ),
                   ),
