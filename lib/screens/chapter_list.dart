@@ -35,7 +35,6 @@ class ChapterScreen extends StatelessWidget {
                 ],
                 flexibleSpace: FlexibleSpaceBar(
                   title: RichText(
-                    
                     text: const TextSpan(
                       children: [
                         TextSpan(
@@ -63,7 +62,7 @@ class ChapterScreen extends StatelessWidget {
               SliverPersistentHeader(
                 delegate: _SliverAppBarDelegate(
                   const TabBar(
-                    indicatorColor: Colors.red, 
+                    indicatorColor: Colors.red,
                     tabs: [
                       Tab(text: 'Preview'),
                       Tab(text: 'Chapter List'),
@@ -158,7 +157,6 @@ class ChapterScreen extends StatelessWidget {
             'Hannah baru saja menikah dengan Nala. Suaminya itu unggul dalam segala aspek rumah tangga!, inilah kisah pasangan baru nikah.',
             style: TextStyle(
               fontSize: 13.0,
-
             ),
           ),
         ],

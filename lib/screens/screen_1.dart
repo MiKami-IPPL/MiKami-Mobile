@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mikami_mobile/screen/author_home_screen.dart';
+import 'package:mikami_mobile/screens/author_home_screen.dart';
 import 'chapter_list.dart';
 
 class FirstPage extends StatefulWidget {
@@ -68,7 +68,9 @@ class _FirstPageState extends State<FirstPage> {
                     _isClicked = !_isClicked;
                   });
                 },
-                child: _isClicked == false ? Image.asset('assets/images/hannahCover.jpg') : Image.asset('assets/images/halaman1.jpg'),
+                child: _isClicked == false
+                    ? Image.asset('assets/images/hannahCover.jpg')
+                    : Image.asset('assets/images/halaman1.jpg'),
               ),
       ),
       bottomNavigationBar: BottomNavigationBar(

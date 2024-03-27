@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mikami_mobile/screen/author_withdrawal_screen.dart';
+import 'package:mikami_mobile/screens/author_withdrawal_screen.dart';
 import 'author_manage_screen.dart';
 import 'author_verify_screen.dart';
 import 'author_history_screen.dart';
@@ -13,27 +13,27 @@ class AuthorScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.amber[300],
         iconTheme: IconThemeData(
-          color: Colors.white, 
+          color: Colors.white,
         ),
       ),
       backgroundColor: Colors.amber[300],
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 20), 
+          SizedBox(height: 20),
           Padding(
-            padding: EdgeInsets.only(right: 25, left: 25), 
+            padding: EdgeInsets.only(right: 25, left: 25),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(15.0), 
+              borderRadius: BorderRadius.circular(15.0),
               child: Image.asset(
-                'assets/images/bannerAuthor.png', 
-                width: 400, 
-                height: 150, 
-                fit: BoxFit.cover, 
+                'assets/images/bannerAuthor.png',
+                width: 400,
+                height: 150,
+                fit: BoxFit.cover,
               ),
             ),
           ),
-          SizedBox(height: 20), 
+          SizedBox(height: 20),
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.only(
@@ -109,8 +109,7 @@ class AuthorScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuButton(
-      String imagePath, String label, VoidCallback onTap) {
+  Widget _buildMenuButton(String imagePath, String label, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Card(
@@ -120,8 +119,8 @@ class AuthorScreen extends StatelessWidget {
           children: [
             Image.asset(
               imagePath,
-              width: 50, 
-              height: 50, 
+              width: 50,
+              height: 50,
             ),
             SizedBox(height: 5),
             Text(
@@ -134,5 +133,3 @@ class AuthorScreen extends StatelessWidget {
     );
   }
 }
-
-

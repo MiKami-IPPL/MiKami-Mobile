@@ -6,4 +6,7 @@ class ApiEndPoints {
 class _AuthEndPoints {
   final String loginEmail = 'login';
   final String registerEmail = 'register';
+  final String getGenres = 'genre';
+  final String getComics = 'comics';
+  final String getCoins = 'coins';
 }
