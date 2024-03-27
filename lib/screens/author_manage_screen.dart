@@ -8,24 +8,24 @@ class ManageScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.amber[300], // Set Scaffold background color
+      backgroundColor: Colors.amber[300],
       appBar: AppBar(
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: Colors.white,
         ),
-        titleTextStyle: TextStyle(
+        titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 20,
         ),
-        backgroundColor: Colors.amber[300], // Set AppBar background color
+        backgroundColor: Colors.amber[300],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             Container(
               color: Colors.amber[300],
-              padding: EdgeInsets.all(16.0),
-              child: Column(
+              padding: const EdgeInsets.all(16.0),
+              child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -48,13 +48,13 @@ class ManageScreen extends StatelessWidget {
               ),
             ),
             DefaultTabController(
-              length: 2, // Number of tabs
+              length: 2,
               child: Column(
                 children: [
                   Container(
-                    color: Colors.white, // Set TabBar background color
-                    child: TabBar(
-                      indicatorColor: Colors.red, // Change the color of the tab indicator here
+                    color: Colors.white,
+                    child: const TabBar(
+                      indicatorColor: Colors.red,
                       tabs: [
                         Tab(text: 'Published'),
                         Tab(text: 'Pending'),
@@ -64,7 +64,7 @@ class ManageScreen extends StatelessWidget {
                   SizedBox(
                     height: MediaQuery.of(context).size.height - 200,
                     child: Container(
-                      color: Colors.white, // Set TabBarView background color
+                      color: Colors.white,
                       child: TabBarView(
                         children: [
                           ListView.builder(
@@ -74,7 +74,7 @@ class ManageScreen extends StatelessWidget {
                               return Column(
                                 children: [
                                   ListTile(
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                                     leading: Container(
                                       width: 70,
                                       height: 70,
@@ -88,7 +88,7 @@ class ManageScreen extends StatelessWidget {
                                       itemData.title,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 18.0,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -99,11 +99,10 @@ class ManageScreen extends StatelessWidget {
                                     ),
                                     trailing: PopupMenuButton<String>(
                                       onSelected: (String choice) {
-                                        // Handle menu item selection
                                         if (choice == 'Lihat Daftar Chapter') {
                                           // Do something
                                         } else if (choice == 'Hapus Komik') {
-                                          // Do something else
+                                          _showConfirmationDialog(context, itemData.title); // Show confirmation dialog
                                         }
                                       },
                                       itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -118,13 +117,12 @@ class ManageScreen extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                  Divider(), // Add a Divider
+                                  const Divider(), // Add a Divider
                                 ],
                               );
                             },
                           ),
-                          // Content for Pending tab
-                          Center(
+                          const Center(
                             child: Text('Tidak ada komik yang sedang ditunda'),
                           ),
                         ],
@@ -141,10 +139,37 @@ class ManageScreen extends StatelessWidget {
         onPressed: () {
           // Add onPressed action here
         },
-        shape: StadiumBorder(),
-        child: Icon(Icons.add),
-        backgroundColor: Colors.amber, // Customize button color
+        shape: const StadiumBorder(),
+        backgroundColor: Colors.amber,
+        child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  void _showConfirmationDialog(BuildContext context, String comicTitle) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Konfirmasi Hapus"),
+          content: Text("Apakah Anda yakin ingin menghapus komik '$comicTitle'?"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text("Batal"),
+            ),
+            TextButton(
+              onPressed: () {
+                // Perform delete action here
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text("Hapus"),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -162,14 +187,14 @@ class ListTileSubtitle extends StatelessWidget {
       children: [
         Text(
           line1,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14.0,
             color: Colors.black54,
           ),
         ),
         Text(
           line2,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14.0,
             color: Colors.black54,
           ),

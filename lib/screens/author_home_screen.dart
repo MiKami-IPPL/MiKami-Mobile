@@ -12,17 +12,17 @@ class AuthorScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.amber[300],
-        iconTheme: IconThemeData(
-          color: Colors.white,
+        iconTheme: const IconThemeData(
+          color: Colors.white, 
         ),
       ),
       backgroundColor: Colors.amber[300],
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 20),
+          const SizedBox(height: 20), 
           Padding(
-            padding: EdgeInsets.only(right: 25, left: 25),
+            padding: const EdgeInsets.only(right: 25, left: 25), 
             child: ClipRRect(
               borderRadius: BorderRadius.circular(15.0),
               child: Image.asset(
@@ -33,10 +33,10 @@ class AuthorScreen extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20), 
           Expanded(
             child: ClipRRect(
-              borderRadius: BorderRadius.only(
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(15.0),
                 topRight: Radius.circular(15.0),
               ),
@@ -57,7 +57,7 @@ class AuthorScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ManageScreen(),
+                              builder: (context) => const ManageScreen(),
                             ),
                           );
                         },
@@ -69,7 +69,7 @@ class AuthorScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ComicVerify(),
+                              builder: (context) => const ComicVerify(),
                             ),
                           );
                         },
@@ -81,7 +81,7 @@ class AuthorScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AuthorHistory(),
+                              builder: (context) => const AuthorHistory(),
                             ),
                           );
                         },
@@ -93,7 +93,7 @@ class AuthorScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AuthorWithdrawal(),
+                              builder: (context) => const AuthorWithdrawal(),
                             ),
                           );
                         },
@@ -122,10 +122,10 @@ class AuthorScreen extends StatelessWidget {
               width: 50,
               height: 50,
             ),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             Text(
               label,
-              style: TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16),
             ),
           ],
         ),

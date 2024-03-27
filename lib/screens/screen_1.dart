@@ -39,11 +39,11 @@ class _FirstPageState extends State<FirstPage> {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => ChapterScreen(),
+                            builder: (context) => const ChapterScreen(),
                           ),
                         );
                       },
-                      child: Text('Chapter List'),
+                      child: const Text('Chapter List'),
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -53,11 +53,11 @@ class _FirstPageState extends State<FirstPage> {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => AuthorScreen(),
+                            builder: (context) => const AuthorScreen(),
                           ),
                         );
                       },
-                      child: Text('Author Screen'),
+                      child: const Text('Author Screen'),
                     ),
                   ],
                 ),

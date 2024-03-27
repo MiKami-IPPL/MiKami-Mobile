@@ -30,14 +30,14 @@ class WelcomeScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 35.0,
                               fontWeight: FontWeight.w600,
-                              color: lightColorScheme.primary,
+                              color: Colors.black,
                             )),
                         TextSpan(
                             text:
                                 '\nDengan Aplikasi ini anda dapat membuka cakrawala komik\n\n',
                             style: TextStyle(
                               fontSize: 20,
-                              color: lightColorScheme.primary,
+                              color: Colors.black,
                               // height: 0,
                             ))
                       ],

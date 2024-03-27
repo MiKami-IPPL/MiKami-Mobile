@@ -8,10 +8,10 @@ class AuthorWithdrawal extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.amber[300], // Set Scaffold background color
       appBar: AppBar(
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: Colors.white,
         ),
-        titleTextStyle: TextStyle(
+        titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 20,
         ),
@@ -22,8 +22,8 @@ class AuthorWithdrawal extends StatelessWidget {
           children: [
             Container(
               color: Colors.amber[300],
-              padding: EdgeInsets.all(16.0),
-              child: Column(
+              padding: const EdgeInsets.all(16.0),
+              child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -65,14 +65,14 @@ class ListTileSubtitle extends StatelessWidget {
       children: [
         Text(
           line1,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14.0,
             color: Colors.black54,
           ),
         ),
         Text(
           line2,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14.0,
             color: Colors.black54,
           ),
