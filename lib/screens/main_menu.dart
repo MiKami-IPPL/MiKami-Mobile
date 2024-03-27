@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'comic_favorite_screen.dart';
 import 'author_home_screen.dart';
 
@@ -10,7 +11,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentSlide = 0;
-
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,15 +129,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                   MenuCard(icon: Icons.monetization_on, label: 'Top Up'),
-                  MenuCard(icon: Icons.account_circle, label: 'Profil'),
+                  MenuCard(
+                    icon: Icons.account_circle,
+                    label: 'Profil',
+                    onTap: () async {
+                      final SharedPreferences prefs = await _prefs;
+                      print(prefs.getString('token'));
+                    },
+                  ),
                   MenuCard(
                     icon: Icons.auto_stories_sharp,
                     label: 'Menu Author',
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => AuthorScreen()),
+                        MaterialPageRoute(builder: (context) => AuthorScreen()),
                       );
                     },
                   ),

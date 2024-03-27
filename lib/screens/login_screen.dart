@@ -170,6 +170,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       GestureDetector(
                         onTap: () {
+                          Get.showSnackbar(GetSnackBar(
+                            title: "Info",
+                            message: 'Sukes masuk sebagai tamu',
+                            icon: const Icon(Icons.info, color: Colors.white),
+                            duration: const Duration(seconds: 5),
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: lightColorScheme.secondary,
+                          ));
                           Navigator.push(context,
                               MaterialPageRoute(builder: (e) => HomeScreen()));
                         },
