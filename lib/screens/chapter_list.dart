@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'read_screen.dart';
 
-class ChapterScreen extends StatelessWidget {
-  const ChapterScreen({Key? key}) : super(key: key);
+class ChapterList extends StatelessWidget {
+  const ChapterList({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

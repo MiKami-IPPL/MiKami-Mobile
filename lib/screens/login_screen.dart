@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/forgot_password_screen.dart';
-import 'package:mikami_mobile/screens/main_menu.dart';
+import 'package:mikami_mobile/screens/home_screen.dart';
 import 'package:mikami_mobile/screens/register_screen.dart';
 import 'package:mikami_mobile/screens/tamu_screen.dart';
 import 'package:mikami_mobile/services_api/login_service.dart';

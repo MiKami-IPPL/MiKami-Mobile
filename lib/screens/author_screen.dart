@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/author_withdrawal_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'author_manage_screen.dart';
-import 'author_verify_screen.dart';
+import 'author_comic_verify.dart';
 import 'author_history_screen.dart';
 
 class AuthorScreen extends StatefulWidget {
@@ -65,7 +65,7 @@ class _AuthorScreenState extends State<AuthorScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const ManageScreen(),
+                              builder: (context) => const AuthorManage(),
                             ),
                           );
                         },

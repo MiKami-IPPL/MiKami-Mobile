@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mikami_mobile/model/list_item_data.dart';
 import 'package:mikami_mobile/model/list_data_provider.dart';
 
-class ManageScreen extends StatelessWidget {
-  const ManageScreen({Key? key}) : super(key: key);
+class AuthorManage extends StatelessWidget {
+  const AuthorManage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

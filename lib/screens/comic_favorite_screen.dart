@@ -3,8 +3,8 @@ import 'package:mikami_mobile/model/list_item_data.dart';
 import 'package:mikami_mobile/model/list_data_provider.dart';
 import 'chapter_list.dart';
 
-class FavoriteScreen extends StatelessWidget {
-  const FavoriteScreen({Key? key});
+class ComicFavorite extends StatelessWidget {
+  const ComicFavorite({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +83,7 @@ class FavoriteScreen extends StatelessWidget {
                               if (choice == 'Lihat Daftar Chapter') {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (context) => const ChapterScreen(),
+                                    builder: (context) => const ChapterList(),
                                   ),
                                 );
                               } else if (choice == 'Hapus Dari Favorit') {
