@@ -3,7 +3,6 @@ import 'package:mikami_mobile/screens/main_menu.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/welcome_screen.dart';
 import 'package:mikami_mobile/theme/theme.dart';
-import 'screens/screen_1.dart';
 
 void main() {
   runApp(MyApp());
