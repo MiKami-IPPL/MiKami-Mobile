@@ -38,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-<<<<<<< Updated upstream
                           FutureBuilder(
                             future: _prefs,
                             builder: (context, snapshot) {
@@ -68,15 +67,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 return CircularProgressIndicator();
                               }
                             },
-=======
-                          Text(
-                            'Hello, Midoputra!',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
->>>>>>> Stashed changes
                           ),
                           CircleAvatar(
                             radius: 35,
