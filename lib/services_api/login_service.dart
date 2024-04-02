@@ -37,13 +37,17 @@ class LoginController extends GetxService {
       final json = jsonDecode(response.body);
       if (response.statusCode == 200) {
         if (json['status'] == 'success') {
-          // emailController.clear();
-          // passwordController.clear();
-          var token = json['data']['token'];
+          emailController.clear();
+          passwordController.clear();
           final SharedPreferences? prefs = await _prefs;
-          await prefs?.setString('token', token);
-          Get.off(() => HomeScreen());
-          profilecontroller.getProfile();
+          prefs?.clear();
+          await prefs?.setString('token', json['data']['token']);
+          await profilecontroller.getProfile();
+          if (prefs?.getString('role') == 'author') {
+            Get.off(() => AuthorScreen());
+          } else if (prefs?.getString('role') == 'user') {
+            Get.off(() => HomeScreen());
+          }
           Get.showSnackbar(GetSnackBar(
             title: "Sukses",
             message: 'Login berhasil',

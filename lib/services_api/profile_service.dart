@@ -14,7 +14,7 @@ class ProfileController extends GetxController {
       Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Profile);
   Future<void> logout() async {
     final SharedPreferences? prefs = await _prefs;
-    await prefs?.remove('token');
+    await prefs?.clear();
     Get.offAll(() => LoginScreen());
   }
 
@@ -23,27 +23,39 @@ class ProfileController extends GetxController {
   }
 
   Future<void> getProfile() async {
-    final SharedPreferences? prefs = await _prefs;
-    var token = prefs?.getString('token');
-    if (token == null) {
-      Get.offAll(() => LoginScreen());
-    } else {
-      //get data nama profile
-      var header = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      };
-      http.Response response = await http.get(Url, headers: header);
-      if (response.statusCode == 200) {
+    try {
+      final SharedPreferences? prefs = await _prefs;
+      var token = prefs?.getString('token');
+      if (token == null) {
+        Get.offAll(() => LoginScreen());
+      } else {
+        //get data nama profile
+        var header = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        };
+        http.Response response = await http.get(Url, headers: header);
+
         final json = jsonDecode(response.body);
-        if (json['status'] == 'success') {
-          print(json['data']);
-          prefs?.setString('name', json['data']['name']);
-          prefs?.setString('email', json['data']['email']);
-          prefs?.setString('role', json['data']['role']);
-          prefs?.setInt('age', json['data']['age']);
-          prefs?.setInt('remainingAds', json['data']['remainingAds']);
+        if (response.statusCode == 200) {
+          if (json['status'] == 'success') {
+            print(json['data']);
+            await prefs?.setString('name', json['data']['name']);
+            await prefs?.setString('email', json['data']['email']);
+            await prefs?.setString('role', json['data']['role']);
+            await prefs?.setInt('age', json['data']['age']);
+            await prefs?.setInt('remainingAds', json['data']['remainingAds']);
+          } else {
+            Get.showSnackbar(GetSnackBar(
+              title: json['status'],
+              message: json['message'],
+              icon: Icon(Icons.error, color: Colors.white),
+              duration: const Duration(seconds: 5),
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: lightColorScheme.error,
+            ));
+          }
         } else {
           Get.showSnackbar(GetSnackBar(
             title: json['status'],
@@ -54,16 +66,9 @@ class ProfileController extends GetxController {
             backgroundColor: lightColorScheme.error,
           ));
         }
-      } else {
-        Get.showSnackbar(GetSnackBar(
-          title: 'Error',
-          message: 'Terjadi kesalahan',
-          icon: Icon(Icons.error, color: Colors.white),
-          duration: const Duration(seconds: 5),
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: lightColorScheme.error,
-        ));
       }
+    } catch (e) {
+      print(e.toString());
     }
   }
 }
