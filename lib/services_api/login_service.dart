@@ -6,6 +6,7 @@ import 'package:get/get_navigation/get_navigation.dart';
 import 'package:http/http.dart' as http;
 import 'package:mikami_mobile/screens/author_home_screen.dart';
 import 'package:mikami_mobile/screens/main_menu.dart';
+import 'package:mikami_mobile/services_api/profile_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +15,7 @@ class LoginController extends GetxService {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  ProfileController profilecontroller = Get.put(ProfileController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   Future<void> loginWithEmail() async {
@@ -22,8 +24,8 @@ class LoginController extends GetxService {
         'Content-Type': 'application/json',
       };
 
-      var url = Uri.parse(
-          ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.loginEmail);
+      var url =
+          Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Login);
 
       Map body = {
         'email': emailController.text.trim(),
@@ -40,7 +42,8 @@ class LoginController extends GetxService {
           var token = json['data']['token'];
           final SharedPreferences? prefs = await _prefs;
           await prefs?.setString('token', token);
-          Get.off(() => AuthorScreen());
+          Get.off(() => HomeScreen());
+          profilecontroller.getProfile();
           Get.showSnackbar(GetSnackBar(
             title: "Sukses",
             message: 'Login berhasil',

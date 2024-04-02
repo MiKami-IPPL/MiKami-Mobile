@@ -33,17 +33,41 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Hello, Midoputra!', 
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
+                      //make async function to get the name from shared preferences (prefs)
+                      FutureBuilder(
+                        future: _prefs,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            final SharedPreferences prefs =
+                                snapshot.data as SharedPreferences;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Halo, ${prefs.getString('name')}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  'Anda memiliki ${prefs.getInt('remainingAds')} iklan tersisa',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else {
+                            return CircularProgressIndicator();
+                          }
+                        },
                       ),
+
                       CircleAvatar(
                         radius: 30,
-                        backgroundImage: AssetImage('assets/images/seulgi.jpg'), 
+                        backgroundImage: AssetImage('assets/images/seulgi.jpg'),
                       ),
                     ],
                   ),
@@ -56,14 +80,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    height: 40, 
+                    height: 40,
                     child: TextFormField(
-                      style: TextStyle(
-                          fontSize: 14), 
+                      style: TextStyle(fontSize: 14),
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16.0,
-                            vertical: 8.0), 
+                            horizontal: 16.0, vertical: 8.0),
                         hintText: 'Isi Judul Komik yang ingin dibaca',
                         prefixIcon: Icon(Icons.search),
                         border: OutlineInputBorder(

@@ -17,8 +17,8 @@ class RegisterController extends GetxController {
       var headers = {
         'Content-Type': 'application/json',
       };
-      var url = Uri.parse(
-          ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.registerEmail);
+      var url =
+          Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Register);
       Map body = {
         'name': name.text,
         'email': email.text.trim(),
