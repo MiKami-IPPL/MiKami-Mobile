@@ -19,21 +19,50 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.all(8.0),
+              child: Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Hello, Midoputra!', 
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundImage: AssetImage('assets/images/seulgi.jpg'), 
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 20),
                   SizedBox(
-                    height: 40, // Adjust the height here as needed
+                    height: 40, 
                     child: TextFormField(
                       style: TextStyle(
-                          fontSize: 14), // Adjust the font size here as needed
+                          fontSize: 14), 
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.symmetric(
                             horizontal: 16.0,
-                            vertical: 8.0), // Adjust the padding here as needed
+                            vertical: 8.0), 
                         hintText: 'Isi Judul Komik yang ingin dibaca',
                         prefixIcon: Icon(Icons.search),
                         border: OutlineInputBorder(
@@ -308,18 +337,16 @@ class RoundedImageWithText extends StatelessWidget {
         Container(
           width: 100,
           height: 40, // Adjust the height as needed
-          child: Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
           ),
         ),
       ],

@@ -49,7 +49,7 @@ class ReadScreen extends StatelessWidget {
 
 class ComicPage extends StatelessWidget {
   final List<String> comicImages = [
-    'assets/images/halaman1.jpg',
+    'assets/images/halaman1.webp',
     'assets/images/halaman2.jpg',
     'assets/images/halaman3.jpg',
     'assets/images/halaman4.jpg',
