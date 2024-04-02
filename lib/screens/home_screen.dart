@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/chapter_list.dart';
+import 'package:mikami_mobile/screens/topup_screen.dart';
 import 'package:mikami_mobile/services_api/profile_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -114,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ],
                                 ),
                                 GestureDetector(
-                                  onTap: () => Get.to(ChapterList()),
+                                  onTap: () => Get.to(TopupScreen()),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
