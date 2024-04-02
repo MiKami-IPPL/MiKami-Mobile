@@ -22,6 +22,53 @@ class ProfileController extends GetxController {
     Get.toNamed('/change-password');
   }
 
+  Future<void> getCoin() async {
+    try {
+      final SharedPreferences? prefs = await _prefs;
+      var token = prefs?.getString('token');
+
+      if (token == null) {
+        Get.offAll(() => LoginScreen());
+      } else {
+        //get data nama profile
+        var header = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        };
+        http.Response response = await http.get(Url, headers: header);
+
+        final json = jsonDecode(response.body);
+        if (response.statusCode == 200) {
+          if (json['status'] == 'success') {
+            print(json['data']);
+            await prefs?.setInt('coin', json['data']['coin']);
+          } else {
+            Get.showSnackbar(GetSnackBar(
+              title: json['status'],
+              message: json['message'],
+              icon: Icon(Icons.error, color: Colors.white),
+              duration: const Duration(seconds: 5),
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: lightColorScheme.error,
+            ));
+          }
+        } else {
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.error,
+          ));
+        }
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   Future<void> getProfile() async {
     try {
       final SharedPreferences? prefs = await _prefs;
@@ -41,6 +88,7 @@ class ProfileController extends GetxController {
         if (response.statusCode == 200) {
           if (json['status'] == 'success') {
             print(json['data']);
+            await prefs?.setInt('id', json['data']['id']);
             await prefs?.setString('name', json['data']['name']);
             await prefs?.setString('email', json['data']['email']);
             await prefs?.setString('role', json['data']['role']);
