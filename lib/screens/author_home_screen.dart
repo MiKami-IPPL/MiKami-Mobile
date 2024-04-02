@@ -1,28 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/author_withdrawal_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'author_manage_screen.dart';
 import 'author_verify_screen.dart';
 import 'author_history_screen.dart';
 
-class AuthorScreen extends StatelessWidget {
-  const AuthorScreen({Key? key});
+class AuthorScreen extends StatefulWidget {
+  const AuthorScreen({super.key});
 
+  @override
+  State<AuthorScreen> createState() => _AuthorScreenState();
+}
+
+class _AuthorScreenState extends State<AuthorScreen> {
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.amber[300],
         iconTheme: const IconThemeData(
-          color: Colors.white, 
+          color: Colors.white,
         ),
       ),
       backgroundColor: Colors.amber[300],
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20), 
+          const SizedBox(height: 20),
           Padding(
-            padding: const EdgeInsets.only(right: 25, left: 25), 
+            padding: const EdgeInsets.only(right: 25, left: 25),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(15.0),
               child: Image.asset(
@@ -33,7 +41,7 @@ class AuthorScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 20), 
+          const SizedBox(height: 20),
           Expanded(
             child: ClipRRect(
               borderRadius: const BorderRadius.only(
@@ -78,12 +86,8 @@ class AuthorScreen extends StatelessWidget {
                         'assets/images/history.png',
                         "Riwayat",
                         () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AuthorHistory(),
-                            ),
-                          );
+                          //use getx to navigate to history screen
+                          Get.to(() => const AuthorHistory());
                         },
                       ),
                       _buildMenuButton(

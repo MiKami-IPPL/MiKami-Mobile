@@ -4,7 +4,7 @@ import 'package:mikami_mobile/screens/forgot_password_screen.dart';
 import 'package:mikami_mobile/screens/main_menu.dart';
 import 'package:mikami_mobile/screens/register_screen.dart';
 import 'package:mikami_mobile/screens/tamu_screen.dart';
-import 'package:mikami_mobile/services/login_service.dart';
+import 'package:mikami_mobile/services_api/login_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
@@ -161,7 +161,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () => loginController.loginWithEmail(),
+                          onPressed: () {
+                            if (_formLoginKey.currentState!.validate()) {
+                              loginController.loginWithEmail();
+                            }
+                          },
                           child: const Text('Masuk'),
                         ),
                       ),

@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_navigation/get_navigation.dart';
 import 'package:http/http.dart' as http;
+import 'package:mikami_mobile/screens/author_home_screen.dart';
 import 'package:mikami_mobile/screens/main_menu.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
@@ -30,15 +32,15 @@ class LoginController extends GetxService {
 
       http.Response response =
           await http.post(url, body: jsonEncode(body), headers: headers);
+      final json = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
         if (json['status'] == 'success') {
-          emailController.clear();
-          passwordController.clear();
+          // emailController.clear();
+          // passwordController.clear();
           var token = json['data']['token'];
           final SharedPreferences? prefs = await _prefs;
           await prefs?.setString('token', token);
-          Get.off(HomeScreen());
+          Get.off(() => AuthorScreen());
           Get.showSnackbar(GetSnackBar(
             title: "Sukses",
             message: 'Login berhasil',
@@ -48,16 +50,24 @@ class LoginController extends GetxService {
             backgroundColor: lightColorScheme.secondary,
           ));
         } else {
-          print(json['status'] + json['message']);
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.error,
+          ));
         }
       } else {
-        Get.snackbar(
-          'Error',
-          'Terjadi kesalahan saat login',
+        Get.showSnackbar(GetSnackBar(
+          title: json['status'],
+          message: json['message'],
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+          backgroundColor: lightColorScheme.error,
+        ));
       }
     } catch (e) {
       print(e.toString());

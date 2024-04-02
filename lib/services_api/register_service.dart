@@ -27,8 +27,9 @@ class RegisterController extends GetxController {
       };
       http.Response response =
           await http.post(url, body: jsonEncode(body), headers: headers);
+
+      final json = jsonDecode(response.body);
       if (response.statusCode == 201) {
-        final json = jsonDecode(response.body);
         if (json['status'] == 'success') {
           name.clear();
           email.clear();
@@ -44,16 +45,24 @@ class RegisterController extends GetxController {
             backgroundColor: lightColorScheme.secondary,
           ));
         } else {
-          print(json['status'] + json['message']);
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+          ));
         }
       } else {
-        Get.snackbar(
-          'Error',
-          'Terjadi kesalahan saat mendaftar',
+        Get.showSnackbar(GetSnackBar(
+          title: json['status'],
+          message: json['message'],
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+        ));
       }
     } catch (e) {
       print(e.toString());

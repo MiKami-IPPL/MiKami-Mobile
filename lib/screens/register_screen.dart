@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/login_screen.dart';
 import 'package:mikami_mobile/screens/tamu_screen.dart';
-import 'package:mikami_mobile/services/register_service.dart';
+import 'package:mikami_mobile/services_api/register_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
@@ -86,6 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   TextFormField(
                     controller: registerController.email,
+                    keyboardType: TextInputType.emailAddress,
                     validator: (value) =>
                         value!.isEmpty ? 'Masukkan email' : null,
                     decoration: InputDecoration(
@@ -114,13 +115,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   TextFormField(
                     controller: registerController.age,
+                    keyboardType: TextInputType.number,
+
                     // obscureText: true,
                     // obscuringCharacter: "*",
                     validator: (value) =>
                         value!.isEmpty ? 'Masukkan umur' : null,
                     decoration: InputDecoration(
                       label: const Text('Umur'),
-                      hintText: 'Enter Password',
+                      hintText: 'Masukkan Umur',
                       hintStyle: const TextStyle(
                         color: Colors.black26,
                       ),
@@ -196,7 +199,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => registerController.registerWithEmail(),
+                      onPressed: () {
+                        if (_formRegisterKey.currentState!.validate() &&
+                            agree == true) {
+                          registerController.registerWithEmail();
+                        } else {
+                          registerController.password.clear();
+                          Get.snackbar(
+                            'Error', 'Isi semua form dan setujui EULA',
+                            snackPosition: SnackPosition.BOTTOM,
+                            //show snack bar for 3 seconds
+                            duration: const Duration(seconds: 3),
+                            backgroundColor: lightColorScheme.error,
+                            colorText: lightColorScheme.onError,
+                          );
+                        }
+                      },
                       child: const Text('Daftar'),
                     ),
                   ),
