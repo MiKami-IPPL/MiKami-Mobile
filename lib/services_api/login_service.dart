@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:http/http.dart' as http;
-import 'package:mikami_mobile/screens/author_screen.dart';
 import 'package:mikami_mobile/screens/home_screen.dart';
 import 'package:mikami_mobile/services_api/profile_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
@@ -37,16 +36,14 @@ class LoginController extends GetxService {
       final json = jsonDecode(response.body);
       if (response.statusCode == 200) {
         if (json['status'] == 'success') {
-          emailController.clear();
-          passwordController.clear();
+          // emailController.clear();
+          // passwordController.clear();
           final SharedPreferences? prefs = await _prefs;
+          prefs?.clear();
           await prefs?.setString('token', json['data']['token']);
           await profilecontroller.getProfile();
-          if (prefs?.getString('role') == 'author') {
-            Get.off(() => AuthorScreen());
-          } else if (prefs?.getString('role') == 'user') {
-            Get.off(() => HomeScreen());
-          }
+          await profilecontroller.getCoin();
+          Get.off(HomeScreen());
           Get.showSnackbar(GetSnackBar(
             title: "Sukses",
             message: 'Login berhasil',

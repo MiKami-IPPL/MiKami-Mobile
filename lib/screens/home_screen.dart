@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:get/get.dart';
+import 'package:mikami_mobile/screens/chapter_list.dart';
+import 'package:mikami_mobile/services_api/profile_service.dart';
+import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'comic_favorite_screen.dart';
 import 'author_screen.dart';
@@ -12,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentSlide = 0;
+  ProfileController profileController = ProfileController();
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   @override
@@ -19,32 +24,32 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.amber[300],
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          FutureBuilder(
-                            future: _prefs,
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                final SharedPreferences prefs =
-                                    snapshot.data as SharedPreferences;
-                                return Column(
+        child: FutureBuilder(
+          future: _prefs,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final SharedPreferences prefs =
+                  snapshot.data as SharedPreferences;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
@@ -62,325 +67,316 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     ),
                                   ],
-                                );
-                              } else {
-                                return CircularProgressIndicator();
-                              }
-                            },
-                          ),
-                          CircleAvatar(
-                            radius: 35,
-                            backgroundImage:
-                                AssetImage('assets/images/seulgi.jpg'),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => LoginScreen(),
                                 ),
-                              );
-                            },
-                            child: Text(
-                              'Change Account',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.blue,
-                              ),
+                                CircleAvatar(
+                                  radius: 35,
+                                  backgroundImage:
+                                      AssetImage('assets/images/seulgi.jpg'),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      // baris coin
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.monetization_on,
-                                color: Colors.amber,
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                'Your Coins:',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black,
+                            SizedBox(height: 10),
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                GestureDetector(
+                                  onTap: () => profileController.logout(),
+                                  child: Text(
+                                    'logout',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AuthorScreen(),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Colors.amber,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 6),
-                                child: Row(
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            // baris coin
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
                                   children: [
+                                    Icon(
+                                      Icons.monetization_on,
+                                      color: lightColorScheme.primary,
+                                    ),
+                                    SizedBox(width: 4),
                                     Text(
-                                      '100',
+                                      'Koin anda:',
                                       style: TextStyle(
                                         fontSize: 16,
-                                        fontWeight: FontWeight.bold,
                                         color: Colors.black,
                                       ),
                                     ),
-                                    SizedBox(width: 4),
-                                    Image.asset(
-                                      'assets/images/koin_mikami.png',
-                                      width: 20,
-                                      height: 20,
-                                    ),
                                   ],
                                 ),
+                                GestureDetector(
+                                  onTap: () => Get.to(ChapterList()),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      color: Colors.amber,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 6),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            prefs.getInt('coin').toString(),
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          SizedBox(width: 4),
+                                          Image.asset(
+                                            'assets/images/koin_mikami.png',
+                                            width: 20,
+                                            height: 20,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 40,
+                          child: TextFormField(
+                            style: TextStyle(fontSize: 14),
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 8.0),
+                              hintText: 'Isi Judul Komik yang ingin dibaca',
+                              prefixIcon: Icon(Icons.search),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Theme.of(context).primaryColor,
+                                    width: 2.0),
+                                borderRadius: BorderRadius.circular(30.0),
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        SizedBox(height: 15),
+                        Text(
+                          'Jelajahi Komik Yang Sedang Hangat!',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  CarouselSlider(
+                    options: CarouselOptions(
+                      height: 200.0,
+                      enableInfiniteScroll: true,
+                      autoPlay: true,
+                      autoPlayInterval: Duration(seconds: 3),
+                      autoPlayAnimationDuration: Duration(milliseconds: 800),
+                      pauseAutoPlayOnTouch: true,
+                      viewportFraction: 1.0,
+                      enlargeCenterPage: false,
+                      scrollDirection: Axis.horizontal,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _currentSlide = index;
+                        });
+                      },
+                    ),
+                    items: [
+                      'assets/images/maxlevel_banner.jpg',
+                      'assets/images/secondlife_banner.png',
+                      'assets/images/solev_banner.jpg',
+                    ].map((String imagePath) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Container(
+                            width: MediaQuery.of(context).size.width,
+                            margin: EdgeInsets.symmetric(horizontal: 5.0),
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(8.0),
+                              image: DecorationImage(
+                                image: AssetImage(imagePath),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      for (int i = 0; i < 3; i++)
+                        IndicatorDot(isActive: i == _currentSlide),
                     ],
                   ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 40,
-                    child: TextFormField(
-                      style: TextStyle(fontSize: 14),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 8.0),
-                        hintText: 'Isi Judul Komik yang ingin dibaca',
-                        prefixIcon: Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Theme.of(context).primaryColor,
-                              width: 2.0),
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 15),
-                  Text(
-                    'Jelajahi Komik Yang Sedang Hangat!',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            CarouselSlider(
-              options: CarouselOptions(
-                height: 200.0,
-                enableInfiniteScroll: true,
-                autoPlay: true,
-                autoPlayInterval: Duration(seconds: 3),
-                autoPlayAnimationDuration: Duration(milliseconds: 800),
-                pauseAutoPlayOnTouch: true,
-                viewportFraction: 1.0,
-                enlargeCenterPage: false,
-                scrollDirection: Axis.horizontal,
-                onPageChanged: (index, reason) {
-                  setState(() {
-                    _currentSlide = index;
-                  });
-                },
-              ),
-              items: [
-                'assets/images/maxlevel_banner.jpg',
-                'assets/images/secondlife_banner.png',
-                'assets/images/solev_banner.jpg',
-              ].map((String imagePath) {
-                return Builder(
-                  builder: (BuildContext context) {
-                    return Container(
-                      width: MediaQuery.of(context).size.width,
-                      margin: EdgeInsets.symmetric(horizontal: 5.0),
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(8.0),
-                        image: DecorationImage(
-                          image: AssetImage(imagePath),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    );
-                  },
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                for (int i = 0; i < 3; i++)
-                  IndicatorDot(isActive: i == _currentSlide),
-              ],
-            ),
-            SizedBox(height: 20),
-            Container(
-              height: 100, // Adjust the height of the menu row
-              color: Colors.amber[600], // Set the background color
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  SizedBox(width: 10), // Add some space at the beginning
-                  MenuCard(
-                    icon: Icons.favorite,
-                    label: 'Komik Favorit',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ComicFavorite()),
-                      );
-                    },
-                  ),
-                  MenuCard(icon: Icons.monetization_on, label: 'Top Up'),
-                  MenuCard(icon: Icons.account_circle, label: 'Profil'),
-                  MenuCard(
-                    icon: Icons.auto_stories_sharp,
-                    label: 'Menu Author',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => AuthorScreen()),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Rekomendasi Untukmu',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
+                  SizedBox(height: 20),
                   Container(
-                    height: 200, // Adjust the height of the row
+                    height: 100, // Adjust the height of the menu row
+                    color: Colors.amber[600], // Set the background color
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children: [
                         SizedBox(width: 10), // Add some space at the beginning
-                        RoundedImageWithText(
-                          imagePath: 'assets/images/solev_poster.png',
-                          text: 'Solo Leveling',
+                        MenuCard(
+                          icon: Icons.favorite,
+                          label: 'Komik Favorit',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ComicFavorite()),
+                            );
+                          },
                         ),
-                        RoundedImageWithText(
-                          imagePath: 'assets/images/maxlevel_poster.jpg',
-                          text: 'Max Level Hero',
-                        ),
-                        RoundedImageWithText(
-                          imagePath: 'assets/images/secondlife_poster.jpg',
-                          text: 'Second Life Ranker',
-                        ),
-                        RoundedImageWithText(
-                          imagePath: 'assets/images/beginning_poster.jpg',
-                          text: 'The Beginning After The End',
-                        ),
+                        MenuCard(icon: Icons.monetization_on, label: 'Top Up'),
+                        MenuCard(icon: Icons.account_circle, label: 'Profil'),
+                        if (prefs.getString('role') == 'author')
+                          MenuCard(
+                            icon: Icons.auto_stories_sharp,
+                            label: 'Menu Author',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AuthorScreen()),
+                              );
+                            },
+                          ),
                       ],
-                    ),
-                  ),
-                  Text(
-                    'Penuh Aksi',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Container(
-                    height: 200,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        SizedBox(width: 10),
-                        RoundedImageWithText(
-                          imagePath: 'assets/images/solev_poster.png',
-                          text: 'Solo Leveling',
-                        ),
-                        RoundedImageWithText(
-                          imagePath: 'assets/images/maxlevel_poster.jpg',
-                          text: 'Max Level Hero',
-                        ),
-                        RoundedImageWithText(
-                          imagePath: 'assets/images/secondlife_poster.jpg',
-                          text: 'Second Life Ranker',
-                        ),
-                        RoundedImageWithText(
-                          imagePath: 'assets/images/beginning_poster.jpg',
-                          text: 'The Beginning After the End',
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Promo Hari Ini',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(right: 5, left: 5),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15.0),
-                      child: Image.asset(
-                        'assets/images/menuBanner.png',
-                        width: 400,
-                        height: 150,
-                        fit: BoxFit.cover,
-                      ),
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Rekomendasi Untukmu',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Container(
+                          height: 200, // Adjust the height of the row
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            children: [
+                              SizedBox(
+                                  width: 10), // Add some space at the beginning
+                              RoundedImageWithText(
+                                imagePath: 'assets/images/solev_poster.png',
+                                text: 'Solo Leveling',
+                              ),
+                              RoundedImageWithText(
+                                imagePath: 'assets/images/maxlevel_poster.jpg',
+                                text: 'Max Level Hero',
+                              ),
+                              RoundedImageWithText(
+                                imagePath:
+                                    'assets/images/secondlife_poster.jpg',
+                                text: 'Second Life Ranker',
+                              ),
+                              RoundedImageWithText(
+                                imagePath: 'assets/images/beginning_poster.jpg',
+                                text: 'The Beginning After The End',
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          'Penuh Aksi',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Container(
+                          height: 200,
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            children: [
+                              SizedBox(width: 10),
+                              RoundedImageWithText(
+                                imagePath: 'assets/images/solev_poster.png',
+                                text: 'Solo Leveling',
+                              ),
+                              RoundedImageWithText(
+                                imagePath: 'assets/images/maxlevel_poster.jpg',
+                                text: 'Max Level Hero',
+                              ),
+                              RoundedImageWithText(
+                                imagePath:
+                                    'assets/images/secondlife_poster.jpg',
+                                text: 'Second Life Ranker',
+                              ),
+                              RoundedImageWithText(
+                                imagePath: 'assets/images/beginning_poster.jpg',
+                                text: 'The Beginning After the End',
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          'Promo Hari Ini',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 5, left: 5),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(15.0),
+                            child: Image.asset(
+                              'assets/images/menuBanner.png',
+                              width: 400,
+                              height: 150,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
-              ),
-            ),
-          ],
+              );
+            } else {
+              return CircularProgressIndicator();
+            }
+          },
         ),
       ),
     );

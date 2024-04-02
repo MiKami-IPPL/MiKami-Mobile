@@ -10,8 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileController extends GetxController {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  var Url =
-      Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Profile);
+
   Future<void> logout() async {
     final SharedPreferences? prefs = await _prefs;
     await prefs?.clear();
@@ -24,13 +23,14 @@ class ProfileController extends GetxController {
 
   Future<void> getCoin() async {
     try {
+      var Url =
+          Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Coins);
       final SharedPreferences? prefs = await _prefs;
       var token = prefs?.getString('token');
 
       if (token == null) {
         Get.offAll(() => LoginScreen());
       } else {
-        //get data nama profile
         var header = {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -41,8 +41,11 @@ class ProfileController extends GetxController {
         final json = jsonDecode(response.body);
         if (response.statusCode == 200) {
           if (json['status'] == 'success') {
-            print(json['data']);
-            await prefs?.setInt('coin', json['data']['coin']);
+            if (json['data'][0]['amount'] == null) {
+              await prefs?.setInt('coin', 0);
+            } else {
+              await prefs?.setInt('coin', json['data'][0]['amount']);
+            }
           } else {
             Get.showSnackbar(GetSnackBar(
               title: json['status'],
@@ -71,6 +74,8 @@ class ProfileController extends GetxController {
 
   Future<void> getProfile() async {
     try {
+      var Url =
+          Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Profile);
       final SharedPreferences? prefs = await _prefs;
       var token = prefs?.getString('token');
       if (token == null) {
