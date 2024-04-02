@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
-import 'package:mikami_mobile/screens/chapter_list.dart';
+import 'package:get/get_navigation/get_navigation.dart';
+import 'package:mikami_mobile/screens/login_screen.dart';
 import 'package:mikami_mobile/screens/topup_screen.dart';
+import 'package:mikami_mobile/services_api/login_service.dart';
 import 'package:mikami_mobile/services_api/profile_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'comic_favorite_screen.dart';
 import 'author_screen.dart';
-import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -17,11 +18,40 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentSlide = 0;
-  ProfileController profileController = ProfileController();
+  ProfileController profileController = Get.put(ProfileController());
+  LoginController loginController = Get.put(LoginController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   @override
   Widget build(BuildContext context) {
+    //return route to login screen if user is not logged in
+    return FutureBuilder(
+      future: loginController.isLogin(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data == false) {
+            //use return login screen and snackbar if user is not logged in use children
+
+            Get.showSnackbar(GetSnackBar(
+              title: 'Peringatan',
+              message: 'Anda belum login',
+              icon: Icon(Icons.error, color: Colors.white),
+              duration: const Duration(seconds: 3),
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: lightColorScheme.error,
+            ));
+            return LoginScreen();
+          } else {
+            return HomeWidget();
+          }
+        } else {
+          return CircularProgressIndicator();
+        }
+      },
+    );
+  }
+
+  Widget HomeWidget() {
     return Scaffold(
       backgroundColor: Colors.amber[300],
       body: SingleChildScrollView(
@@ -56,14 +86,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Text(
                                       'Halo, ${prefs.getString('name')}',
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 22,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     Text(
                                       'Anda memiliki ${prefs.getInt('remainingAds')} iklan tersisa',
                                       style: TextStyle(
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         color: Colors.grey,
                                       ),
                                     ),
@@ -87,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     'logout',
                                     style: TextStyle(
                                       fontSize: 16,
-                                      color: Colors.blue,
+                                      color: lightColorScheme.secondary,
                                     ),
                                   ),
                                 ),
@@ -108,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Text(
                                       'Koin anda:',
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 25,
                                         color: Colors.black,
                                       ),
                                     ),
@@ -119,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
-                                      color: Colors.amber,
+                                      color: lightColorScheme.onPrimary,
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
@@ -129,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           Text(
                                             prefs.getInt('coin').toString(),
                                             style: TextStyle(
-                                              fontSize: 16,
+                                              fontSize: 25,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.black,
                                             ),
@@ -137,8 +167,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                           SizedBox(width: 4),
                                           Image.asset(
                                             'assets/images/koin_mikami.png',
-                                            width: 20,
-                                            height: 20,
+                                            width: 30,
+                                            height: 30,
                                           ),
                                         ],
                                       ),

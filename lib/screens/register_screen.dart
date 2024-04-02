@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:mikami_mobile/screens/home_screen.dart';
 import 'package:mikami_mobile/screens/login_screen.dart';
 import 'package:mikami_mobile/screens/tamu_screen.dart';
+import 'package:mikami_mobile/services_api/login_service.dart';
 import 'package:mikami_mobile/services_api/register_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
@@ -17,12 +19,30 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   RegisterController registerController = Get.put(RegisterController());
+  LoginController loginController = Get.put(LoginController());
   final _formRegisterKey = GlobalKey<FormState>();
   // final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   bool agree = false;
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: loginController.isLogin(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data == false) {
+            return RegisterWidget();
+          } else {
+            return LoginScreen();
+          }
+        } else {
+          return CircularProgressIndicator();
+        }
+      },
+    );
+  }
+
+  Widget RegisterWidget() {
     return CustomScaffold(
         child: Column(children: [
       const Expanded(

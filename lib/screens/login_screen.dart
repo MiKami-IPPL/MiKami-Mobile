@@ -17,11 +17,29 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   LoginController loginController = Get.put(LoginController());
-  // final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   final _formLoginKey = GlobalKey<FormState>();
   bool rememberMe = false;
+
   @override
   Widget build(BuildContext context) {
+    //return route to home screen if user already login
+    return FutureBuilder(
+      future: loginController.isLogin(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data == false) {
+            return LoginWidget();
+          } else {
+            return HomeScreen();
+          }
+        } else {
+          return CircularProgressIndicator();
+        }
+      },
+    );
+  }
+
+  Widget LoginWidget() {
     return CustomScaffold(
       child: Column(
         children: [
@@ -138,12 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           //lupa password
                           GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (e) => const ForgotScreen()));
-                            },
+                            onTap: () => Get.to(() => ForgotScreen()),
                             child: Text(
                               'Lupa password?',
                               style: TextStyle(
@@ -160,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formLoginKey.currentState!.validate()) {
                               loginController.loginWithEmail();
                             }
@@ -173,16 +186,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Get.showSnackbar(GetSnackBar(
-                            title: "Info",
-                            message: 'Sukes masuk sebagai tamu',
-                            icon: const Icon(Icons.info, color: Colors.white),
-                            duration: const Duration(seconds: 5),
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: lightColorScheme.secondary,
-                          ));
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (e) => HomeScreen()));
+                          Get.to(() => HomeScreen());
+                          Get.snackbar('ILEGAL',
+                              'Mencoba masuk ke home screen tanpa login',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: lightColorScheme.primary,
+                              colorText: Colors.white);
                         },
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,

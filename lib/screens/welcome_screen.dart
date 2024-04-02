@@ -1,14 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:mikami_mobile/screens/home_screen.dart';
 import 'package:mikami_mobile/screens/login_screen.dart';
 import 'package:mikami_mobile/screens/register_screen.dart';
+import 'package:mikami_mobile/services_api/login_service.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
 import 'package:mikami_mobile/widgets/welcome_button.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
 
   @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  LoginController loginController = Get.put(LoginController());
+  @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: loginController.isLogin(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data == false) {
+            return welcomeWidget();
+          } else {
+            return LoginScreen();
+          }
+        } else {
+          return CircularProgressIndicator();
+        }
+      },
+    );
+  }
+
+  Widget welcomeWidget() {
     return CustomScaffold(
       child: Column(
         children: [
@@ -53,7 +80,7 @@ class WelcomeScreen extends StatelessWidget {
                   Expanded(
                     child: WelcomeButton(
                       buttonText: 'Masuk',
-                      onTap: LoginScreen(),
+                      onTap: (LoginScreen()),
                       color: Colors.transparent,
                       textColor: Colors.black,
                     ),

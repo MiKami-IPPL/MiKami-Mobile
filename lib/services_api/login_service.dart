@@ -17,6 +17,17 @@ class LoginController extends GetxService {
   ProfileController profilecontroller = Get.put(ProfileController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
+  Future<bool> isLogin() async {
+    final SharedPreferences? prefs = await _prefs;
+    var token = prefs?.getString('token');
+    print(token);
+    if (token == null) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   Future<void> loginWithEmail() async {
     try {
       var headers = {
@@ -36,14 +47,14 @@ class LoginController extends GetxService {
       final json = jsonDecode(response.body);
       if (response.statusCode == 200) {
         if (json['status'] == 'success') {
-          // emailController.clear();
-          // passwordController.clear();
+          emailController.clear();
+          passwordController.clear();
           final SharedPreferences? prefs = await _prefs;
           prefs?.clear();
-          await prefs?.setString('token', json['data']['token']);
+          prefs?.setString('token', json['data']['token']);
           await profilecontroller.getProfile();
           await profilecontroller.getCoin();
-          Get.off(HomeScreen());
+          Get.offAll(() => HomeScreen());
           Get.showSnackbar(GetSnackBar(
             title: "Sukses",
             message: 'Login berhasil',

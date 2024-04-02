@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/theme/theme.dart';
-import 'payment_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class TopupScreen extends StatelessWidget {
+class TopupScreen extends StatefulWidget {
   @override
+  State<TopupScreen> createState() => _TopupScreenState();
+}
+
+class _TopupScreenState extends State<TopupScreen> {
+  @override
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.amber[300],
+        backgroundColor: lightColorScheme.primary,
         iconTheme: const IconThemeData(
           color: Colors.white,
         ),
       ),
-      backgroundColor: Colors.amber[300],
+      backgroundColor: lightColorScheme.primary,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -30,55 +36,65 @@ class TopupScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.monetization_on,
-                              color: Colors.amber,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              'Your Coins:',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Colors.amber,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
-                            child: Row(
+                    FutureBuilder(
+                        future: _prefs,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            final SharedPreferences prefs =
+                                snapshot.data as SharedPreferences;
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  '100',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.monetization_on,
+                                      color: lightColorScheme.primary,
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Koin Anda:',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: lightColorScheme.onPrimary,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 6),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          prefs.getInt('coin').toString(),
+                                          style: TextStyle(
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        SizedBox(width: 4),
+                                        Image.asset(
+                                          'assets/images/koin_mikami.png',
+                                          width: 30,
+                                          height: 30,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                                SizedBox(width: 4),
-                                Image.asset(
-                                  'assets/images/koin_mikami.png',
-                                  width: 20,
-                                  height: 20,
-                                ),
                               ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                            );
+                          } else {
+                            return const CircularProgressIndicator();
+                          }
+                        }),
                   ],
                 ),
               ),

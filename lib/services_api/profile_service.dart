@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mikami_mobile/screens/login_screen.dart';
+import 'package:mikami_mobile/screens/welcome_screen.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,8 +14,9 @@ class ProfileController extends GetxController {
 
   Future<void> logout() async {
     final SharedPreferences? prefs = await _prefs;
-    await prefs?.clear();
-    Get.offAll(() => LoginScreen());
+    prefs?.clear();
+    print(prefs?.getString('token'));
+    Get.offAll(() => WelcomeScreen());
   }
 
   Future<void> changePassword() async {
@@ -42,9 +44,9 @@ class ProfileController extends GetxController {
         if (response.statusCode == 200) {
           if (json['status'] == 'success') {
             if (json['data'][0]['amount'] == null) {
-              await prefs?.setInt('coin', 0);
+              prefs?.setInt('coin', 0);
             } else {
-              await prefs?.setInt('coin', json['data'][0]['amount']);
+              prefs?.setInt('coin', json['data'][0]['amount']);
             }
           } else {
             Get.showSnackbar(GetSnackBar(
@@ -92,8 +94,6 @@ class ProfileController extends GetxController {
         final json = jsonDecode(response.body);
         if (response.statusCode == 200) {
           if (json['status'] == 'success') {
-            print(json['data']);
-            await prefs?.setInt('id', json['data']['id']);
             await prefs?.setString('name', json['data']['name']);
             await prefs?.setString('email', json['data']['email']);
             await prefs?.setString('role', json['data']['role']);
