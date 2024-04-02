@@ -40,7 +40,6 @@ class LoginController extends GetxService {
           emailController.clear();
           passwordController.clear();
           final SharedPreferences? prefs = await _prefs;
-          prefs?.clear();
           await prefs?.setString('token', json['data']['token']);
           await profilecontroller.getProfile();
           if (prefs?.getString('role') == 'author') {
