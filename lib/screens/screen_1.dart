@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mikami_mobile/screens/author_home_screen.dart';
+import 'package:mikami_mobile/screens/author_screen.dart';
 import 'chapter_list.dart';
 
 class FirstPage extends StatefulWidget {
@@ -39,7 +39,7 @@ class _FirstPageState extends State<FirstPage> {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => const ChapterScreen(),
+                            builder: (context) => const ChapterList(),
                           ),
                         );
                       },

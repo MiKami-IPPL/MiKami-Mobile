@@ -8,7 +8,7 @@ class ComicVerify extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.amber[300], // Set Scaffold background color
+      backgroundColor: Colors.amber[300], 
       appBar: AppBar(
         iconTheme: const IconThemeData(
           color: Colors.white,
@@ -17,7 +17,7 @@ class ComicVerify extends StatelessWidget {
           color: Colors.white,
           fontSize: 20,
         ),
-        backgroundColor: Colors.amber[300], // Set AppBar background color
+        backgroundColor: Colors.amber[300],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -155,7 +155,6 @@ class ComicVerify extends StatelessWidget {
                                     ),
                                     trailing: PopupMenuButton<String>(
                                       onSelected: (String choice) {
-                                        // Handle menu item selection
                                         if (choice == 'Lihat Daftar Chapter') {
                                           // Do something
                                         } else if (choice == 'Hapus Komik') {
