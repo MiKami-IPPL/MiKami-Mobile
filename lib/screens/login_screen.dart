@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/forgot_password_screen.dart';
 import 'package:mikami_mobile/screens/home_screen.dart';
 import 'package:mikami_mobile/screens/register_screen.dart';
-import 'package:mikami_mobile/screens/tamu_screen.dart';
 import 'package:mikami_mobile/services_api/login_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';

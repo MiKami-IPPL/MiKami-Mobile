@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:mikami_mobile/screens/register_screen.dart';
-import 'package:mikami_mobile/screens/tamu_screen.dart';
-import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
 
 class ForgotScreen extends StatefulWidget {
