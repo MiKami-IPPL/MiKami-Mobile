@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:mikami_mobile/screens/login_screen.dart';
+import 'package:mikami_mobile/screens/profile_screen.dart';
 import 'package:mikami_mobile/screens/topup_screen.dart';
 import 'package:mikami_mobile/services_api/login_service.dart';
 import 'package:mikami_mobile/services_api/profile_service.dart';
@@ -86,23 +87,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Text(
                                       'Halo, ${prefs.getString('name')}',
                                       style: TextStyle(
-                                        fontSize: 22,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     Text(
                                       'Anda memiliki ${prefs.getInt('remainingAds')} iklan tersisa',
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 12,
                                         color: Colors.grey,
                                       ),
                                     ),
                                   ],
                                 ),
-                                CircleAvatar(
-                                  radius: 35,
-                                  backgroundImage:
-                                      AssetImage('assets/images/seulgi.jpg'),
+                                GestureDetector(
+                                  onTap: () => Get.to(ProfileScreen()),
+                                  child: CircleAvatar(
+                                    radius: 35,
+                                    backgroundImage:
+                                        AssetImage('assets/images/seulgi.jpg'),
+                                  ),
                                 ),
                               ],
                             ),
@@ -138,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Text(
                                       'Koin anda:',
                                       style: TextStyle(
-                                        fontSize: 25,
+                                        fontSize: 20,
                                         color: Colors.black,
                                       ),
                                     ),
@@ -159,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           Text(
                                             prefs.getInt('coin').toString(),
                                             style: TextStyle(
-                                              fontSize: 25,
+                                              fontSize: 20,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.black,
                                             ),
@@ -287,8 +291,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                         ),
-                        MenuCard(icon: Icons.monetization_on, label: 'Top Up'),
-                        MenuCard(icon: Icons.account_circle, label: 'Profil'),
+                        MenuCard(
+                          icon: Icons.monetization_on,
+                          label: 'Top Up',
+                          onTap: () => Get.to(TopupScreen()),
+                        ),
+                        MenuCard(
+                          icon: Icons.account_circle,
+                          label: 'Profil',
+                          onTap: () => Get.to(ProfileScreen()),
+                        ),
                         if (prefs.getString('role') == 'author')
                           MenuCard(
                             icon: Icons.auto_stories_sharp,
