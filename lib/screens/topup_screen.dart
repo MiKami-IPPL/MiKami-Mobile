@@ -9,7 +9,6 @@ class TopupScreen extends StatefulWidget {
 }
 
 class _TopupScreenState extends State<TopupScreen> {
-  @override
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   Widget build(BuildContext context) {
     return Scaffold(
