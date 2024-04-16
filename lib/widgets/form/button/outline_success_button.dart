@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hyper_ui/core.dart';
+import 'package:mikami_mobile/theme/theme.dart';
 
 class QOutlineSuccessButton extends StatelessWidget {
   const QOutlineSuccessButton({
@@ -12,6 +12,8 @@ class QOutlineSuccessButton extends StatelessWidget {
   final Function onPressed;
   final double? width;
 
+  get lastTap => null;
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -19,20 +21,25 @@ class QOutlineSuccessButton extends StatelessWidget {
       height: 48,
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          foregroundColor: primaryColor,
+          foregroundColor: lightColorScheme.primary,
           side: BorderSide(
-            color: primaryColor,
+            color: lightColorScheme.primary,
           ),
         ),
         onPressed: () {
-          if (tapProtected) return;
+          if (
+              //tapProtected
+              DateTime.now()
+                      .difference(lastTap ?? DateTime.now())
+                      .inMilliseconds <
+                  500) return;
           onPressed();
         },
         child: Text(
           label,
           style: TextStyle(
             fontSize: 16,
-            color: primaryColor,
+            color: lightColorScheme.primary,
           ),
         ),
       ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hyper_ui/shared/util/tap_handler/tap_handler.dart';
 
 class QOutlineDangerButton extends StatelessWidget {
   const QOutlineDangerButton({
@@ -11,6 +10,8 @@ class QOutlineDangerButton extends StatelessWidget {
   final String label;
   final Function onPressed;
   final double? width;
+
+  get lastTap => null;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,12 @@ class QOutlineDangerButton extends StatelessWidget {
           ),
         ),
         onPressed: () {
-          if (tapProtected) return;
+          if (
+              //tapProtected
+              DateTime.now()
+                      .difference(lastTap ?? DateTime.now())
+                      .inMilliseconds <
+                  500) return;
           onPressed();
         },
         child: Text(

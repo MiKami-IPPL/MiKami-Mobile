@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hyper_ui/core.dart';
+import 'package:mikami_mobile/theme/theme.dart';
 
 class QActionButtonWithOptions extends StatelessWidget {
   const QActionButtonWithOptions({
@@ -14,6 +14,8 @@ class QActionButtonWithOptions extends StatelessWidget {
   final Function onPressed;
   final Function onOptionPressed;
 
+  get lastTap => null;
+
   @override
   Widget build(BuildContext context) {
     const padding = 20.0;
@@ -27,7 +29,7 @@ class QActionButtonWithOptions extends StatelessWidget {
               height: 48,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
+                  backgroundColor: lightColorScheme.primary,
                 ),
                 onPressed: () => onPressed(),
                 child: Text(
@@ -51,7 +53,12 @@ class QActionButtonWithOptions extends StatelessWidget {
                 foregroundColor: const Color(0xff545d58),
               ),
               onPressed: () {
-                if (tapProtected) return;
+                if (
+                    //tap protection
+                    DateTime.now()
+                            .difference(lastTap ?? DateTime.now())
+                            .inMilliseconds <
+                        500) return;
                 onOptionPressed();
               },
               child: Icon(

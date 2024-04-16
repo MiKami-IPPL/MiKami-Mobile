@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hyper_ui/shared/theme/theme_config.dart';
 import 'package:intl/intl.dart';
 
 class QNumberField extends StatefulWidget {
@@ -60,7 +59,7 @@ class _QNumberFieldState extends State<QNumberField> {
         bottom: 12,
       ),
       constraints: BoxConstraints(
-        minHeight: inputHeight,
+        minHeight: 60,
       ),
       child: TextFormField(
         controller: controller,

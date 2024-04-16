@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:hyper_ui/core.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 
 class QCard extends StatelessWidget {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mikami_mobile/theme/theme.dart';
-// import 'package:hyper_ui/core.dart';
 
 class QAutoComplete extends StatefulWidget {
   const QAutoComplete({
@@ -122,8 +121,7 @@ class _QAutoCompleteState extends State<QAutoComplete> {
                             Container(
                               clipBehavior: Clip.antiAlias,
                               decoration: BoxDecoration(
-                                color: Theme.of(Get.currentContext!)
-                                    .scaffoldBackgroundColor,
+                                color: lightColorScheme.background,
                                 borderRadius: const BorderRadius.all(
                                   Radius.circular(12),
                                 ),

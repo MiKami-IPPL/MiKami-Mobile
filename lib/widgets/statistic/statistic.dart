@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hyper_ui/core.dart';
+import 'package:mikami_mobile/theme/theme.dart';
 
 class QStatistic extends StatelessWidget {
   const QStatistic({
@@ -48,7 +48,7 @@ class QStatistic extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: color ?? primaryColor,
+                color: color ?? lightColorScheme.primary,
                 borderRadius: const BorderRadius.all(
                   Radius.circular(
                     8,

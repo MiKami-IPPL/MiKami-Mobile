@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hyper_ui/shared/util/tap_handler/tap_handler.dart';
 
 class QOutlineIconButton extends StatelessWidget {
   const QOutlineIconButton({
@@ -13,6 +12,8 @@ class QOutlineIconButton extends StatelessWidget {
   final IconData icon;
   final Function onPressed;
   final double? width;
+
+  get lastTap => null;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +39,12 @@ class QOutlineIconButton extends StatelessWidget {
           ),
         ),
         onPressed: () {
-          if (tapProtected) return;
+          if (
+              //tapProtected
+              DateTime.now()
+                      .difference(lastTap ?? DateTime.now())
+                      .inMilliseconds <
+                  500) return;
           onPressed();
         },
       ),

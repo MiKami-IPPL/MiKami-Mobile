@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hyper_ui/shared/util/tap_handler/tap_handler.dart';
 
 Widget FloatingAction({
   required Function onPressed,
@@ -7,7 +6,11 @@ Widget FloatingAction({
   return FloatingActionButton(
     heroTag: UniqueKey(),
     onPressed: () {
-      if (tapProtected) return;
+      var lastTap = null;
+      if (
+          //tapProtected
+          DateTime.now().difference(lastTap ?? DateTime.now()).inMilliseconds <
+              500) return;
       onPressed();
     },
     child: const Icon(Icons.add),

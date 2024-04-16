@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hyper_ui/core.dart';
 
 class ListItem2 extends StatelessWidget {
   const ListItem2({
@@ -16,6 +15,8 @@ class ListItem2 extends StatelessWidget {
   final Function? onTap;
   final Color? color;
   final bool separator;
+  
+  get disabledColor => null;
 
   @override
   Widget build(BuildContext context) {

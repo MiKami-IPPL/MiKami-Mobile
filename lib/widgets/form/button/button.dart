@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hyper_ui/core.dart';
+import 'package:mikami_mobile/theme/theme.dart';
 
 class QButton extends StatefulWidget {
   const QButton({
@@ -12,7 +12,7 @@ class QButton extends StatefulWidget {
     this.sufixIcon,
     this.color,
     this.spaceBetween = false,
-    this.size = ThemeSize.md,
+    this.size = ThemeSize.medium,
     this.fontSize,
     this.enabled = true,
   });
@@ -30,6 +30,15 @@ class QButton extends StatefulWidget {
 
   @override
   State<QButton> createState() => _QButtonState();
+}
+
+class ThemeSize {
+  final double scaleFactor;
+  const ThemeSize(this.scaleFactor);
+
+  static const small = ThemeSize(0.8);
+  static const medium = ThemeSize(1.0);
+  static const large = ThemeSize(1.2);
 }
 
 class _QButtonState extends State<QButton> {
@@ -54,11 +63,16 @@ class _QButtonState extends State<QButton> {
       height: widgetHeight,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              widget.enabled ? (widget.color ?? primaryColor) : disabledColor,
+          backgroundColor: widget.enabled
+              ? (widget.color ?? lightColorScheme.primary)
+              : Colors.transparent,
         ),
         onPressed: () {
-          if (tapProtected) return;
+          if (
+              //tap protected
+              lastTap != null &&
+                  DateTime.now().difference(lastTap!) <
+                      const Duration(milliseconds: 500)) return;
           widget.enabled ? widget.onPressed() : {};
         },
         child: Row(

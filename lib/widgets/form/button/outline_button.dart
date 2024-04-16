@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hyper_ui/shared/theme/theme_config.dart';
-import 'package:hyper_ui/shared/util/tap_handler/tap_handler.dart';
+import 'package:mikami_mobile/theme/theme.dart';
 
 class QOutlineButton extends StatelessWidget {
   const QOutlineButton({
@@ -13,6 +12,8 @@ class QOutlineButton extends StatelessWidget {
   final Function onPressed;
   final double? width;
 
+  get lastTap => null;
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -22,19 +23,24 @@ class QOutlineButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.green,
           side: BorderSide(
-            color: primaryColor,
+            color: lightColorScheme.primary,
             width: 2,
           ),
         ),
         onPressed: () {
-          if (tapProtected) return;
+          if (
+              //tapProtected
+              DateTime.now()
+                      .difference(lastTap ?? DateTime.now())
+                      .inMilliseconds <
+                  500) return;
           onPressed();
         },
         child: Text(
           label,
           style: TextStyle(
             fontSize: 16,
-            color: primaryColor,
+            color: lightColorScheme.primary,
           ),
         ),
       ),

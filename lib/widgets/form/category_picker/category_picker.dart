@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hyper_ui/shared/theme/theme_config.dart';
+import 'package:mikami_mobile/theme/theme.dart';
 
 class QCategoryPicker extends StatefulWidget {
   const QCategoryPicker({
@@ -142,7 +142,9 @@ class _QCategoryPickerState extends State<QCategoryPicker> {
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                color: selected ? primaryColor : disabledColor,
+                                color: selected
+                                    ? lightColorScheme.primary
+                                    : Colors.transparent,
                                 borderRadius: const BorderRadius.all(
                                   Radius.circular(12),
                                 ),
@@ -153,8 +155,9 @@ class _QCategoryPickerState extends State<QCategoryPicker> {
                                     item['label'],
                                     style: TextStyle(
                                       fontSize: 10,
-                                      color:
-                                          selected ? Colors.white : textColor,
+                                      color: selected
+                                          ? lightColorScheme.primary
+                                          : lightColorScheme.onPrimary,
                                     ),
                                   ),
                                   const SizedBox(

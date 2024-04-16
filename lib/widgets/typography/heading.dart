@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hyper_ui/core.dart';
+import 'package:mikami_mobile/theme/theme.dart';
 
 class HeadingWidget extends StatelessWidget {
   const HeadingWidget({
@@ -22,7 +22,9 @@ class HeadingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: alternativeStyles ? primaryColor.withOpacity(0.1) : null,
+        color: alternativeStyles
+            ? lightColorScheme.primary.withOpacity(0.1)
+            : null,
       ),
       padding: alternativeStyles
           ? const EdgeInsets.symmetric(
@@ -38,7 +40,7 @@ class HeadingWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: titleFontSize,
                 fontWeight: FontWeight.bold,
-                color: alternativeStyles ? primaryColor : null,
+                color: alternativeStyles ? lightColorScheme.primary : null,
               ),
             ),
           ),
@@ -54,7 +56,7 @@ class HeadingWidget extends StatelessWidget {
                 subtitle!,
                 style: TextStyle(
                   fontSize: subtitleFontSize,
-                  color: primaryColor,
+                  color: lightColorScheme.primary,
                 ),
               ),
             ),
