@@ -28,6 +28,66 @@ class LoginController extends GetxService {
     }
   }
 
+  Future<void> loginTamu() async {
+    try {
+      var headers = {
+        'Content-Type': 'application/json',
+      };
+
+      var url =
+          Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Login);
+
+      Map body = {
+        'email': 'tamu@mikami.com',
+        'password': 'tamu',
+      };
+
+      http.Response response =
+          await http.post(url, body: jsonEncode(body), headers: headers);
+      final json = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        if (json['status'] == 'success') {
+          emailController.clear();
+          passwordController.clear();
+          final SharedPreferences? prefs = await _prefs;
+          prefs?.clear();
+          prefs?.setString('token', json['data']['token']);
+          await profilecontroller.getProfile();
+          await profilecontroller.getCoin();
+          Get.offAll(() => HomeScreen());
+          Get.showSnackbar(GetSnackBar(
+            title: "Sukses",
+            message: 'Login berhasil',
+            icon: Icon(Icons.check_circle, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.secondary,
+          ));
+        } else {
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.error,
+          ));
+        }
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: json['status'],
+          message: json['message'],
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.error,
+        ));
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   Future<void> loginWithEmail() async {
     try {
       var headers = {

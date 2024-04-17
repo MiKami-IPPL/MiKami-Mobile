@@ -185,13 +185,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 25,
                       ),
                       GestureDetector(
-                        onTap: () {
-                          Get.to(() => HomeScreen());
-                          Get.snackbar('ILEGAL',
-                              'Mencoba masuk ke home screen tanpa login',
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: lightColorScheme.primary,
-                              colorText: Colors.white);
+                        onTap: () async {
+                          await loginController.loginTamu();
                         },
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,

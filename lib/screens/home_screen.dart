@@ -32,7 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
         if (snapshot.hasData) {
           if (snapshot.data == false) {
             //use return login screen and snackbar if user is not logged in use children
-
             Get.showSnackbar(GetSnackBar(
               title: 'Peringatan',
               message: 'Anda belum login',
@@ -148,37 +147,38 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ],
                                 ),
-                                GestureDetector(
-                                  onTap: () => Get.to(TopupScreen()),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      color: lightColorScheme.onPrimary,
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 6),
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                            prefs.getInt('coin').toString(),
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
+                                if (prefs.getString('name') != 'tamu')
+                                  GestureDetector(
+                                    onTap: () => Get.to(TopupScreen()),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: lightColorScheme.onPrimary,
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 6),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              prefs.getInt('coin').toString(),
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
                                             ),
-                                          ),
-                                          SizedBox(width: 4),
-                                          Image.asset(
-                                            'assets/images/koin_mikami.png',
-                                            width: 30,
-                                            height: 30,
-                                          ),
-                                        ],
+                                            SizedBox(width: 4),
+                                            Image.asset(
+                                              'assets/images/koin_mikami.png',
+                                              width: 30,
+                                              height: 30,
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
                               ],
                             ),
                           ],
@@ -291,11 +291,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                         ),
-                        MenuCard(
-                          icon: Icons.monetization_on,
-                          label: 'Top Up',
-                          onTap: () => Get.to(TopupScreen()),
-                        ),
+
                         MenuCard(
                           icon: Icons.account_circle,
                           label: 'Profil',
@@ -312,6 +308,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                     builder: (context) => AuthorScreen()),
                               );
                             },
+                          ),
+                        if (prefs.getString('name') != 'tamu')
+                          MenuCard(
+                            icon: Icons.monetization_on,
+                            label: 'Top Up',
+                            onTap: () => Get.to(TopupScreen()),
                           ),
                       ],
                     ),

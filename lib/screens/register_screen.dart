@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/login_screen.dart';
-import 'package:mikami_mobile/screens/tamu_screen.dart';
 import 'package:mikami_mobile/services_api/login_service.dart';
 import 'package:mikami_mobile/services_api/register_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
@@ -242,13 +241,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   GestureDetector(
                     //navigasi ke tamu screen
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (e) => const TamuScreen(),
-                        ),
-                      );
+                    onTap: () async {
+                      await loginController.loginTamu();
                     },
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
