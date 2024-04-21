@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:http/http.dart' as http;
 import 'package:mikami_mobile/screens/home_screen.dart';
 import 'package:mikami_mobile/services_api/profile_service.dart';
@@ -20,7 +19,6 @@ class LoginController extends GetxService {
   Future<bool> isLogin() async {
     final SharedPreferences? prefs = await _prefs;
     var token = prefs?.getString('token');
-    print(token);
     if (token == null) {
       return false;
     } else {

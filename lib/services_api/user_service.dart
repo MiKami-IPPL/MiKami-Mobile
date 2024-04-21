@@ -11,12 +11,10 @@ class UserController extends GetxController {
   TextEditingController searchController = TextEditingController();
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
-  Future<void> searchKomik() async {
+  Future<void> searchAllKomik() async {
     try {
-      var Url = Uri.parse(ApiEndPoints.baseUrl +
-          ApiEndPoints.authEndPoints.Comics +
-          "/" +
-          searchController.text);
+      var Url =
+          Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics);
       final SharedPreferences? prefs = await _prefs;
       var token = prefs?.getString('token');
       if (token == null) {
@@ -26,14 +24,34 @@ class UserController extends GetxController {
         var header = {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          // 'Authorization': 'Bearer $token',
+          'Authorization': 'Bearer $token',
         };
         http.Response response = await http.get(Url, headers: header);
 
         final json = jsonDecode(response.body);
         if (response.statusCode == 200) {
           if (json['status'] == 'success') {
-            print("ada data");
+            //set data to prefs
+            // prefs?.clear();
+
+            prefs?.setInt('dataKomik[Max]', json['data'].length);
+            for (var i = 0; i < json['data'].length; i++) {
+              prefs?.setString(
+                  'dataKomik[$i][title]', jsonEncode(json['data'][i]['title']));
+              prefs?.setString('dataKomik[$i][description]',
+                  jsonEncode(json['data'][i]['description']));
+              prefs?.setString(
+                  'dataKomik[$i][price]', jsonEncode(json['data'][i]['price']));
+              String genres = '';
+              for (var j = 0; j < json['data'][i]['genres'].length; j++) {
+                genres +=
+                    json['data'][i]['genres'][j]['name'].toString() + ', ';
+              }
+              prefs?.setString('dataKomik[$i][genres]', genres);
+            }
+            // prefs?.setString('dataKomik', jsonEncode(json['data']));
+            // print(json['data'][0]['genres'][1]);
+            // print(prefs?.getString('dataKomik[0][genres]'));
           } else {
             Get.showSnackbar(GetSnackBar(
               title: json['status'],

@@ -104,6 +104,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       TextFormField(
                         controller: loginController.passwordController,
+                        onFieldSubmitted: (Null) async {
+                          await loginController.login();
+                        },
                         obscureText: true,
                         obscuringCharacter: "*",
                         validator: (value) =>
