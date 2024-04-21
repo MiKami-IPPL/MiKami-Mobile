@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:mikami_mobile/screens/login_screen.dart';
 import 'package:mikami_mobile/screens/profile_screen.dart';
+import 'package:mikami_mobile/screens/search_screen.dart';
 import 'package:mikami_mobile/screens/topup_screen.dart';
 import 'package:mikami_mobile/services_api/login_service.dart';
 import 'package:mikami_mobile/services_api/profile_service.dart';
@@ -194,6 +195,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         SizedBox(
                           height: 40,
                           child: TextFormField(
+                            //when user tap on search bar, navigate to search screen
+                            onTap: () => Get.to(() => SearchScreen()),
+                            readOnly: true,
+
                             style: TextStyle(fontSize: 14),
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.symmetric(

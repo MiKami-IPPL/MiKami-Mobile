@@ -28,7 +28,7 @@ class LoginController extends GetxService {
     }
   }
 
-  Future<void> loginTamu() async {
+  Future<void> loginTamuLoading() async {
     try {
       var headers = {
         'Content-Type': 'application/json',
@@ -146,5 +146,31 @@ class LoginController extends GetxService {
     } catch (e) {
       print(e.toString());
     }
+  }
+
+  //make getsnack to show loading when login
+  Future<void> login() async {
+    Get.showSnackbar(GetSnackBar(
+      title: "Loading",
+      message: 'Please wait...',
+      icon: Icon(Icons.check_circle, color: Colors.white),
+      duration: const Duration(seconds: 5),
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: lightColorScheme.secondary,
+    ));
+    await loginWithEmail();
+  }
+
+  //make getsnack to show loading when tamu login
+  Future<void> loginTamu() async {
+    Get.showSnackbar(GetSnackBar(
+      title: "Loading",
+      message: 'Please wait...',
+      icon: Icon(Icons.check_circle, color: Colors.white),
+      duration: const Duration(seconds: 5),
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: lightColorScheme.secondary,
+    ));
+    await loginTamuLoading();
   }
 }

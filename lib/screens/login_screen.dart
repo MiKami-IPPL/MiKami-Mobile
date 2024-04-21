@@ -175,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: ElevatedButton(
                           onPressed: () async {
                             if (_formLoginKey.currentState!.validate()) {
-                              loginController.loginWithEmail();
+                              loginController.login();
                             }
                           },
                           child: const Text('Masuk'),
