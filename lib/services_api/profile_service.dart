@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:mikami_mobile/screens/login_screen.dart';
 import 'package:mikami_mobile/screens/welcome_screen.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
@@ -14,9 +13,24 @@ class ProfileController extends GetxController {
 
   Future<void> logout() async {
     final SharedPreferences? prefs = await _prefs;
-    prefs?.clear();
-    print(prefs?.getString('token'));
-    Get.offAll(() => WelcomeScreen());
+    if (prefs?.getString('name') == 'tamu') {
+      prefs?.clear();
+      Get.offAll(() => WelcomeScreen());
+    } else {
+      //show dialog
+      Get.defaultDialog(
+        title: 'Logout',
+        middleText: 'Are you sure want to logout?',
+        textConfirm: 'Yes',
+        textCancel: 'No',
+        confirmTextColor: Colors.white,
+        buttonColor: lightColorScheme.primary,
+        onConfirm: () async {
+          prefs?.clear();
+          Get.offAll(() => WelcomeScreen());
+        },
+      );
+    }
   }
 
   Future<void> changePassword() async {
@@ -30,44 +44,30 @@ class ProfileController extends GetxController {
       final SharedPreferences? prefs = await _prefs;
       var token = prefs?.getString('token');
 
-      if (token == null) {
-        Get.offAll(() => LoginScreen());
-      } else {
-        var header = {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-        };
-        http.Response response = await http.get(Url, headers: header);
+      var header = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+      http.Response response = await http.get(Url, headers: header);
 
-        final json = jsonDecode(response.body);
-        if (response.statusCode == 200) {
-          if (json['status'] == 'success') {
-            if (json['data'][0]['amount'] == null) {
-              prefs?.setInt('coin', 0);
-            } else {
-              prefs?.setInt('coin', json['data'][0]['amount']);
-            }
-          } else {
-            Get.showSnackbar(GetSnackBar(
-              title: json['status'],
-              message: json['message'],
-              icon: Icon(Icons.error, color: Colors.white),
-              duration: const Duration(seconds: 5),
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: lightColorScheme.error,
-            ));
-          }
+      final json = jsonDecode(response.body);
+
+      if (json['status'] == 'success') {
+        if (json['data'][0]['amount'] == null) {
+          prefs?.setInt('coin', 0);
         } else {
-          Get.showSnackbar(GetSnackBar(
-            title: json['status'],
-            message: json['message'],
-            icon: Icon(Icons.error, color: Colors.white),
-            duration: const Duration(seconds: 5),
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: lightColorScheme.error,
-          ));
+          prefs?.setInt('coin', json['data'][0]['amount']);
         }
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: json['status'],
+          message: json['message'],
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.error,
+        ));
       }
     } catch (e) {
       print(e.toString());
@@ -80,45 +80,33 @@ class ProfileController extends GetxController {
           Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Profile);
       final SharedPreferences? prefs = await _prefs;
       var token = prefs?.getString('token');
-      if (token == null) {
-        Get.offAll(() => LoginScreen());
-      } else {
-        //get data nama profile
-        var header = {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-        };
-        http.Response response = await http.get(Url, headers: header);
 
-        final json = jsonDecode(response.body);
-        if (response.statusCode == 200) {
-          if (json['status'] == 'success') {
-            await prefs?.setString('name', json['data']['name']);
-            await prefs?.setString('email', json['data']['email']);
-            await prefs?.setString('role', json['data']['role']);
-            await prefs?.setInt('age', json['data']['age']);
-            await prefs?.setInt('remainingAds', json['data']['remainingAds']);
-          } else {
-            Get.showSnackbar(GetSnackBar(
-              title: json['status'],
-              message: json['message'],
-              icon: Icon(Icons.error, color: Colors.white),
-              duration: const Duration(seconds: 5),
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: lightColorScheme.error,
-            ));
-          }
-        } else {
-          Get.showSnackbar(GetSnackBar(
-            title: json['status'],
-            message: json['message'],
-            icon: Icon(Icons.error, color: Colors.white),
-            duration: const Duration(seconds: 5),
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: lightColorScheme.error,
-          ));
-        }
+      //get data nama profile
+      var header = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+      http.Response response = await http.get(Url, headers: header);
+
+      final json = jsonDecode(response.body);
+
+      if (json['status'] == 'success') {
+        prefs?.setString('name', json['data']['name']);
+        prefs?.setString('email', json['data']['email']);
+        prefs?.setString('role', json['data']['role']);
+        prefs?.setInt('age', json['data']['age']);
+        prefs?.setInt('remainingAds', json['data']['remainingAds']);
+        await getCoin();
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: json['status'],
+          message: json['message'],
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.error,
+        ));
       }
     } catch (e) {
       print(e.toString());

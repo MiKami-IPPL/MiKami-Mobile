@@ -29,31 +29,21 @@ class RegisterController extends GetxController {
           await http.post(url, body: jsonEncode(body), headers: headers);
 
       final json = jsonDecode(response.body);
-      if (response.statusCode == 201) {
-        if (json['status'] == 'success') {
-          name.clear();
-          email.clear();
-          password.clear();
-          age.clear();
-          Get.off(LoginScreen());
-          Get.showSnackbar(GetSnackBar(
-            title: "Sukses",
-            message: 'Registrasi berhasil, silahkan login',
-            icon: Icon(Icons.check_circle, color: Colors.white),
-            duration: const Duration(seconds: 5),
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: lightColorScheme.secondary,
-          ));
-        } else {
-          Get.showSnackbar(GetSnackBar(
-            title: json['status'],
-            message: json['message'],
-            icon: Icon(Icons.error, color: Colors.white),
-            duration: const Duration(seconds: 5),
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-          ));
-        }
+
+      if (json['status'] == 'success') {
+        name.clear();
+        email.clear();
+        password.clear();
+        age.clear();
+        Get.off(LoginScreen());
+        Get.showSnackbar(GetSnackBar(
+          title: "Sukses",
+          message: 'Registrasi berhasil, silahkan login',
+          icon: Icon(Icons.check_circle, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.secondary,
+        ));
       } else {
         Get.showSnackbar(GetSnackBar(
           title: json['status'],

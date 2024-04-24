@@ -206,10 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (e) => const RegisterScreen()));
+                          Get.to(() => RegisterScreen());
                         },
                         child: RichText(
                           text: const TextSpan(

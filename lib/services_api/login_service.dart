@@ -20,6 +20,7 @@ class LoginController extends GetxService {
     final SharedPreferences? prefs = await _prefs;
     var token = prefs?.getString('token');
     if (token == null) {
+      prefs?.clear();
       return false;
     } else {
       return true;
@@ -43,40 +44,30 @@ class LoginController extends GetxService {
       http.Response response =
           await http.post(url, body: jsonEncode(body), headers: headers);
       final json = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        if (json['status'] == 'success') {
-          emailController.clear();
-          passwordController.clear();
-          final SharedPreferences? prefs = await _prefs;
-          prefs?.clear();
-          prefs?.setString('token', json['data']['token']);
-          await profilecontroller.getProfile();
-          await profilecontroller.getCoin();
-          Get.offAll(() => HomeScreen());
-          Get.showSnackbar(GetSnackBar(
-            title: "Sukses",
-            message: 'Login berhasil',
-            icon: Icon(Icons.check_circle, color: Colors.white),
-            duration: const Duration(seconds: 5),
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: lightColorScheme.secondary,
-          ));
-        } else {
-          Get.showSnackbar(GetSnackBar(
-            title: json['status'],
-            message: json['message'],
-            icon: Icon(Icons.error, color: Colors.white),
-            duration: const Duration(seconds: 5),
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: lightColorScheme.error,
-          ));
-        }
+
+      if (json['status'] == 'success') {
+        emailController.clear();
+        passwordController.clear();
+        final SharedPreferences? prefs = await _prefs;
+        prefs?.clear();
+        prefs?.setString('token', json['data']['token']);
+        Get.offAll(() => HomeScreen());
+
+        await profilecontroller.getProfile();
+        Get.showSnackbar(GetSnackBar(
+          title: "Sukses",
+          message: 'Login berhasil',
+          icon: Icon(Icons.check_circle, color: Colors.white),
+          duration: const Duration(seconds: 2),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.secondary,
+        ));
       } else {
         Get.showSnackbar(GetSnackBar(
           title: json['status'],
           message: json['message'],
           icon: Icon(Icons.error, color: Colors.white),
-          duration: const Duration(seconds: 5),
+          duration: const Duration(seconds: 2),
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: lightColorScheme.error,
         ));
@@ -103,40 +94,30 @@ class LoginController extends GetxService {
       http.Response response =
           await http.post(url, body: jsonEncode(body), headers: headers);
       final json = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        if (json['status'] == 'success') {
-          emailController.clear();
-          passwordController.clear();
-          final SharedPreferences? prefs = await _prefs;
-          prefs?.clear();
-          prefs?.setString('token', json['data']['token']);
-          await profilecontroller.getProfile();
-          await profilecontroller.getCoin();
-          Get.offAll(() => HomeScreen());
-          Get.showSnackbar(GetSnackBar(
-            title: "Sukses",
-            message: 'Login berhasil',
-            icon: Icon(Icons.check_circle, color: Colors.white),
-            duration: const Duration(seconds: 5),
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: lightColorScheme.secondary,
-          ));
-        } else {
-          Get.showSnackbar(GetSnackBar(
-            title: json['status'],
-            message: json['message'],
-            icon: Icon(Icons.error, color: Colors.white),
-            duration: const Duration(seconds: 5),
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: lightColorScheme.error,
-          ));
-        }
+
+      if (json['status'] == 'success') {
+        emailController.clear();
+        passwordController.clear();
+        final SharedPreferences? prefs = await _prefs;
+        prefs?.clear();
+        prefs?.setString('token', json['data']['token']);
+        Get.offAll(() => HomeScreen());
+
+        await profilecontroller.getProfile();
+        Get.showSnackbar(GetSnackBar(
+          title: "Sukses",
+          message: 'Login berhasil',
+          icon: Icon(Icons.check_circle, color: Colors.white),
+          duration: const Duration(seconds: 2),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.secondary,
+        ));
       } else {
         Get.showSnackbar(GetSnackBar(
           title: json['status'],
           message: json['message'],
           icon: Icon(Icons.error, color: Colors.white),
-          duration: const Duration(seconds: 5),
+          duration: const Duration(seconds: 2),
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: lightColorScheme.error,
         ));
@@ -152,11 +133,11 @@ class LoginController extends GetxService {
       title: "Loading",
       message: 'Please wait...',
       icon: Icon(Icons.check_circle, color: Colors.white),
-      duration: const Duration(seconds: 5),
       snackPosition: SnackPosition.BOTTOM,
+      duration: Duration(seconds: 1),
       backgroundColor: lightColorScheme.secondary,
     ));
-    await loginWithEmail();
+    loginWithEmail();
   }
 
   //make getsnack to show loading when tamu login
@@ -165,10 +146,10 @@ class LoginController extends GetxService {
       title: "Loading",
       message: 'Please wait...',
       icon: Icon(Icons.check_circle, color: Colors.white),
-      duration: const Duration(seconds: 5),
       snackPosition: SnackPosition.BOTTOM,
+      duration: Duration(seconds: 1),
       backgroundColor: lightColorScheme.secondary,
     ));
-    await loginTamuLoading();
+    loginTamuLoading();
   }
 }

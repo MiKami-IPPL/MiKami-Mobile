@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
-import 'package:mikami_mobile/screens/login_screen.dart';
 import 'package:mikami_mobile/screens/profile_screen.dart';
 import 'package:mikami_mobile/screens/search_screen.dart';
 import 'package:mikami_mobile/screens/topup_screen.dart';
+import 'package:mikami_mobile/screens/welcome_screen.dart';
 import 'package:mikami_mobile/services_api/login_service.dart';
 import 'package:mikami_mobile/services_api/profile_service.dart';
 import 'package:mikami_mobile/services_api/user_service.dart';
@@ -34,29 +34,13 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data == false) {
-            //use return login screen and snackbar if user is not logged in use children
-            Get.showSnackbar(GetSnackBar(
-              title: 'Peringatan',
-              message: 'Anda belum login',
-              icon: Icon(Icons.error, color: Colors.white),
-              duration: const Duration(seconds: 3),
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: lightColorScheme.error,
-            ));
-            return LoginScreen();
+            // profileController.logout();
+            return WelcomeScreen();
           } else {
             return HomeWidget();
           }
         } else {
-          return GetSnackBar(
-            title: 'Peringatan',
-            message: 'Anda belum login',
-            icon: Icon(Icons.error, color: Colors.white),
-            duration: const Duration(seconds: 3),
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: lightColorScheme.error,
-          );
-          // return CircularProgressIndicator();
+          return CircularProgressIndicator();
         }
       },
     );
@@ -128,9 +112,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ],
                             ),
-
-                            // SizedBox(height: 10),
-                            // baris coin
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -240,7 +221,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               Get.to(() => SearchScreen());
                             },
                             readOnly: true,
-
                             style: TextStyle(fontSize: 14),
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.symmetric(
@@ -338,7 +318,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                         ),
-
                         MenuCard(
                           icon: Icons.account_circle,
                           label: 'Profil',

@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:mikami_mobile/model/list_item_data.dart';
 import 'package:mikami_mobile/model/list_data_provider.dart';
+import 'package:mikami_mobile/screens/author_add_comic.dart';
+import 'package:mikami_mobile/services_api/author_service.dart';
 
-class AuthorManage extends StatelessWidget {
-  const AuthorManage({Key? key}) : super(key: key);
+class AuthorManage extends StatefulWidget {
+  const AuthorManage({super.key});
 
+  @override
+  State<AuthorManage> createState() => _AuthorManageState();
+}
+
+class _AuthorManageState extends State<AuthorManage> {
+  AuthorController authorController = Get.put(AuthorController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,13 +77,16 @@ class AuthorManage extends StatelessWidget {
                       child: TabBarView(
                         children: [
                           ListView.builder(
-                            itemCount: ListDataProvider.getPublishedList().length,
+                            itemCount:
+                                ListDataProvider.getPublishedList().length,
                             itemBuilder: (BuildContext context, int index) {
-                              ListItemData itemData = ListDataProvider.getPublishedList()[index];
+                              ListItemData itemData =
+                                  ListDataProvider.getPublishedList()[index];
                               return Column(
                                 children: [
                                   ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0, vertical: 12.0),
                                     leading: Container(
                                       width: 70,
                                       height: 70,
@@ -102,10 +114,14 @@ class AuthorManage extends StatelessWidget {
                                         if (choice == 'Lihat Daftar Chapter') {
                                           // Do something
                                         } else if (choice == 'Hapus Komik') {
-                                          _showConfirmationDialog(context, itemData.title); // Show confirmation dialog
+                                          _showConfirmationDialog(
+                                              context,
+                                              itemData
+                                                  .title); // Show confirmation dialog
                                         }
                                       },
-                                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                                      itemBuilder: (BuildContext context) =>
+                                          <PopupMenuEntry<String>>[
                                         const PopupMenuItem<String>(
                                           value: 'Lihat Daftar Chapter',
                                           child: Text('Lihat Daftar Chapter'),
@@ -137,6 +153,8 @@ class AuthorManage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          authorController.getGenre();
+          Get.to(() => AddComic()); // Add onPressed action here
           // Add onPressed action here
         },
         shape: const StadiumBorder(),
@@ -152,7 +170,8 @@ class AuthorManage extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Konfirmasi Hapus"),
-          content: Text("Apakah Anda yakin ingin menghapus komik '$comicTitle'?"),
+          content:
+              Text("Apakah Anda yakin ingin menghapus komik '$comicTitle'?"),
           actions: <Widget>[
             TextButton(
               onPressed: () {

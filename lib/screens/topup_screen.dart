@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mikami_mobile/screens/payment_screen.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -131,7 +132,7 @@ class _TopupScreenState extends State<TopupScreen> {
                         'assets/images/koin_mikami.png',
                         "10 Koin",
                         () {
-                          Get.to(() => TopupScreen());
+                          Get.to(() => PaymentScreen());
                         },
                       ),
                       _buildMenuButton(

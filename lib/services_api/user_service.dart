@@ -13,8 +13,9 @@ class UserController extends GetxController {
 
   Future<void> searchAllKomik() async {
     try {
-      var Url =
-          Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics);
+      var Url = Uri.parse(ApiEndPoints.baseUrl +
+          ApiEndPoints.authEndPoints.Comics +
+          '?item=100');
       final SharedPreferences? prefs = await _prefs;
       var token = prefs?.getString('token');
       if (token == null) {
@@ -29,39 +30,38 @@ class UserController extends GetxController {
         http.Response response = await http.get(Url, headers: header);
 
         final json = jsonDecode(response.body);
-        if (response.statusCode == 200) {
-          if (json['status'] == 'success') {
-            //set data to prefs
-            // prefs?.clear();
 
-            prefs?.setInt('dataKomik[Max]', json['data'].length);
-            for (var i = 0; i < json['data'].length; i++) {
-              prefs?.setString(
-                  'dataKomik[$i][title]', jsonEncode(json['data'][i]['title']));
-              prefs?.setString('dataKomik[$i][description]',
-                  jsonEncode(json['data'][i]['description']));
-              prefs?.setString(
-                  'dataKomik[$i][price]', jsonEncode(json['data'][i]['price']));
-              String genres = '';
-              for (var j = 0; j < json['data'][i]['genres'].length; j++) {
-                genres +=
-                    json['data'][i]['genres'][j]['name'].toString() + ', ';
-              }
-              prefs?.setString('dataKomik[$i][genres]', genres);
+        if (json['status'] == 'success') {
+          print(prefs?.getInt('dataKomik[Max]'));
+          //check data komik max
+          if (prefs?.getInt('dataKomik[Max]') != null) {
+            var j = prefs?.getInt('dataKomik[Max]');
+            for (var i = 0; i < j!; i++) {
+              prefs?.remove('dataKomik[$i][title]');
+              prefs?.remove('dataKomik[$i][description]');
+              prefs?.remove('dataKomik[$i][price]');
+              prefs?.remove('dataKomik[$i][genres]');
             }
-            // prefs?.setString('dataKomik', jsonEncode(json['data']));
-            // print(json['data'][0]['genres'][1]);
-            // print(prefs?.getString('dataKomik[0][genres]'));
-          } else {
-            Get.showSnackbar(GetSnackBar(
-              title: json['status'],
-              message: json['message'],
-              icon: Icon(Icons.error, color: Colors.white),
-              duration: const Duration(seconds: 5),
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: lightColorScheme.error,
-            ));
+            prefs?.remove('dataKomik[Max]');
           }
+
+          prefs?.setInt('dataKomik[Max]', json['data'].length);
+          for (var i = 0; i < json['data'].length; i++) {
+            prefs?.setString(
+                'dataKomik[$i][title]', jsonEncode(json['data'][i]['title']));
+            prefs?.setString('dataKomik[$i][description]',
+                jsonEncode(json['data'][i]['description']));
+            prefs?.setString(
+                'dataKomik[$i][price]', jsonEncode(json['data'][i]['price']));
+            String genres = '';
+            for (var j = 0; j < json['data'][i]['genres'].length; j++) {
+              genres += json['data'][i]['genres'][j]['name'].toString() + ', ';
+            }
+            prefs?.setString('dataKomik[$i][genres]', genres);
+          }
+          // prefs?.setString('dataKomik', jsonEncode(json['data']));
+          // print(json['data'][0]['genres'][1]);
+          // print(prefs?.getString('dataKomik[0][genres]'));
         } else {
           Get.showSnackbar(GetSnackBar(
             title: json['status'],

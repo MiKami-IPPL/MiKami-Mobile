@@ -23,15 +23,6 @@ class _SearchScreenState extends State<SearchScreen> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data == false) {
-            //use return login screen and snackbar if user is not logged in use children
-            Get.showSnackbar(GetSnackBar(
-              title: 'Peringatan',
-              message: 'Anda belum login',
-              icon: Icon(Icons.error, color: Colors.white),
-              duration: const Duration(seconds: 3),
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: lightColorScheme.error,
-            ));
             return LoginScreen();
           } else {
             return FutureBuilder(
@@ -229,15 +220,7 @@ class _SearchScreenState extends State<SearchScreen> {
             );
           }
         } else {
-          return GetSnackBar(
-            title: 'Peringatan',
-            message: 'Anda belum login',
-            icon: Icon(Icons.error, color: Colors.white),
-            duration: const Duration(seconds: 3),
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: lightColorScheme.error,
-          );
-          // return CircularProgressIndicator();
+          return CircularProgressIndicator();
         }
       },
     );
