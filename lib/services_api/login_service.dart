@@ -12,18 +12,66 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LoginController extends GetxService {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController emailForgotController = TextEditingController();
 
   ProfileController profilecontroller = Get.put(ProfileController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   Future<bool> isLogin() async {
-    final SharedPreferences? prefs = await _prefs;
-    var token = prefs?.getString('token');
-    if (token == null) {
-      prefs?.clear();
+    try {
+      final SharedPreferences? prefs = await _prefs;
+      var token = prefs?.getString('token');
+      if (token == null) {
+        prefs?.clear();
+        return false;
+      } else {
+        return true;
+      }
+    } catch (e) {
+      print(e.toString());
       return false;
-    } else {
-      return true;
+    }
+  }
+
+  Future<void> forgotPassword() async {
+    try {
+      var headers = {
+        'Content-Type': 'application/json',
+      };
+
+      var url = Uri.parse(
+          "http://10.0.2.2:8000/" + ApiEndPoints.authEndPoints.ForgotPassword);
+
+      Map body = {
+        'email': emailForgotController.text.trim(),
+      };
+
+      http.Response response =
+          await http.post(url, body: jsonEncode(body), headers: headers);
+      final json = jsonDecode(response.body);
+
+      if (json['status'] == 'success') {
+        emailForgotController.clear();
+        Get.showSnackbar(GetSnackBar(
+          title: "Sukses",
+          message: json['message'],
+          icon: Icon(Icons.check_circle, color: Colors.white),
+          duration: const Duration(seconds: 2),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.secondary,
+        ));
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: json['status'],
+          message: json['message'],
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 2),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.error,
+        ));
+      }
+    } catch (e) {
+      print(e.toString());
     }
   }
 

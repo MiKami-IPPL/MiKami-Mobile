@@ -10,4 +10,5 @@ class _AuthEndPoints {
   final String Comics = 'comics';
   final String Coins = 'coins';
   final String Profile = 'profile';
+  final String ForgotPassword = 'forgot-password';
 }

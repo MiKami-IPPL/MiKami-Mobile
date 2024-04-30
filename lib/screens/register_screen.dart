@@ -163,6 +163,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(
                     height: 25,
                   ),
+
                   TextFormField(
                     controller: registerController.password,
                     obscureText: true,

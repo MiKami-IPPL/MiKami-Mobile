@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:mikami_mobile/screens/home_screen.dart';
+import 'package:mikami_mobile/services_api/login_service.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
 
 class ForgotScreen extends StatefulWidget {
@@ -9,10 +12,29 @@ class ForgotScreen extends StatefulWidget {
 }
 
 class _ForgotScreenState extends State<ForgotScreen> {
-  final _formLoginKey = GlobalKey<FormState>();
+  final _formForgotPasswordKey = GlobalKey<FormState>();
+  LoginController loginController = Get.put(LoginController());
   bool rememberMe = false;
+
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: loginController.isLogin(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data == false) {
+            return ForgotWidget();
+          } else {
+            return HomeScreen();
+          }
+        } else {
+          return CircularProgressIndicator();
+        }
+      },
+    );
+  }
+
+  Widget ForgotWidget() {
     return CustomScaffold(
       child: Column(
         children: [
@@ -35,7 +57,7 @@ class _ForgotScreenState extends State<ForgotScreen> {
               ),
               child: SingleChildScrollView(
                 child: Form(
-                  key: _formLoginKey,
+                  key: _formForgotPasswordKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -48,8 +70,13 @@ class _ForgotScreenState extends State<ForgotScreen> {
                         height: 20,
                       ),
                       TextFormField(
-                        validator: (value) =>
-                            value!.isEmpty ? 'Masukkan email' : null,
+                        controller: loginController.emailForgotController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter email';
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration(
                           label: const Text('Email'),
                           hintText: 'Enter Email',
@@ -77,12 +104,10 @@ class _ForgotScreenState extends State<ForgotScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
-                            if (_formLoginKey.currentState!.validate() &&
-                                rememberMe) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('Processing Data')));
+                          onPressed: () async {
+                            if (_formForgotPasswordKey.currentState!
+                                .validate()) {
+                              await loginController.forgotPassword();
                             }
                           },
                           child: const Text('Submit'),

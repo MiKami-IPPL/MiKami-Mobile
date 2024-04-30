@@ -182,26 +182,26 @@ class _AddComicState extends State<AddComic> {
                             ),
                           ),
 
-                          // MultiSelectChipField(
-                          //   items: prefs.getInt('genre[Max]') == null
-                          //       ? _items
-                          //       : _items.sublist(
-                          //           0, prefs.getInt('genre[name]')),
-                          //   initialValue: [_genres[7], _genres[9]],
-                          //   title: Text("Genres"),
-                          //   headerColor: Colors.blue.withOpacity(0.5),
-                          //   decoration: BoxDecoration(
-                          //     border: Border.all(
-                          //         color: lightColorScheme.onBackground,
-                          //         width: 1.8),
-                          //   ),
-                          //   selectedChipColor: Colors.blue.withOpacity(0.5),
-                          //   selectedTextStyle:
-                          //       TextStyle(color: Colors.blue[800]),
-                          //   onTap: (values) {
-                          //     //_selectedAnimals4 = values;
-                          //   },
-                          // ),
+                          MultiSelectChipField(
+                            items: prefs.getInt('genre[Max]') == null
+                                ? _items
+                                : _items.sublist(
+                                    0, prefs.getInt('genre[name]')),
+                            initialValue: [_genres[7], _genres[9]],
+                            title: Text("Genres"),
+                            headerColor: Colors.blue.withOpacity(0.5),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: lightColorScheme.onBackground,
+                                  width: 1.8),
+                            ),
+                            selectedChipColor: Colors.blue.withOpacity(0.5),
+                            selectedTextStyle:
+                                TextStyle(color: Colors.blue[800]),
+                            onTap: (values) {
+                              //_selectedAnimals4 = values;
+                            },
+                          ),
 
                           //add button for submit
                           ElevatedButton(
