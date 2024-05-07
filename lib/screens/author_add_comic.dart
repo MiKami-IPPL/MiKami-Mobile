@@ -9,7 +9,7 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AddComic extends StatefulWidget {
-  const AddComic({super.key});
+  const AddComic({Key? key}) : super(key: key);
 
   @override
   State<AddComic> createState() => _AddComicState();
@@ -29,6 +29,7 @@ class _AddComicState extends State<AddComic> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   LoginController loginController = Get.put(LoginController());
   AuthorController authorController = Get.put(AuthorController());
+
   static List<Genre> _genres = [
     Genre(id: 1, name: 'Action'),
     Genre(id: 2, name: 'Adventure'),
@@ -42,11 +43,13 @@ class _AddComicState extends State<AddComic> {
     Genre(id: 10, name: 'Slice of Life'),
     Genre(id: 11, name: 'Thriller'),
   ];
+
   final _items =
       _genres.map((genre) => MultiSelectItem(genre, genre.name)).toList();
   List<Genre> _selectGenre5 = [];
   final _multiSelectKey = GlobalKey<FormFieldState>();
   final _formAddComic = GlobalKey<FormState>();
+
   @override
   void initState() {
     _selectGenre5 = _genres;
@@ -55,7 +58,7 @@ class _AddComicState extends State<AddComic> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return FutureBuilder<bool>(
       future: loginController.isLogin(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
@@ -65,24 +68,28 @@ class _AddComicState extends State<AddComic> {
             return AddWidget();
           }
         } else {
-          return CircularProgressIndicator();
+          return Center(child: CircularProgressIndicator());
         }
       },
     );
   }
 
   Widget AddWidget() {
-    return FutureBuilder(
-        future: _prefs,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final SharedPreferences prefs = snapshot.data as SharedPreferences;
-            return Scaffold(
-              appBar: AppBar(
-                title: Text('Add Comic'),
-              ),
-              body: SingleChildScrollView(
-                child: Column(
+    return FutureBuilder<SharedPreferences>(
+      future: _prefs,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final SharedPreferences prefs = snapshot.data!;
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Upload Komik'),
+              backgroundColor: Colors.amber[300],
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formAddComic,
+                child: ListView(
                   children: [
                     //make formfield
                     Form(
@@ -218,10 +225,12 @@ class _AddComicState extends State<AddComic> {
                   ],
                 ),
               ),
-            );
-          } else {
-            return CircularProgressIndicator();
-          }
-        });
+            ),
+          );
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
   }
 }

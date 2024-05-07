@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:mikami_mobile/model/list_item_data.dart';
 import 'package:mikami_mobile/model/list_data_provider.dart';
 import 'package:mikami_mobile/screens/author_add_comic.dart';
+import 'package:mikami_mobile/screens/chapter_manage_screen.dart';
 import 'package:mikami_mobile/services_api/author_service.dart';
 
 class AuthorManage extends StatefulWidget {
@@ -112,7 +113,7 @@ class _AuthorManageState extends State<AuthorManage> {
                                     trailing: PopupMenuButton<String>(
                                       onSelected: (String choice) {
                                         if (choice == 'Lihat Daftar Chapter') {
-                                          // Do something
+                                          Get.to(ChapterManageScreen());
                                         } else if (choice == 'Hapus Komik') {
                                           _showConfirmationDialog(
                                               context,
