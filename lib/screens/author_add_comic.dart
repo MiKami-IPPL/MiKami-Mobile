@@ -11,7 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:async';
 
 class AddComic extends StatefulWidget {
-  const AddComic({super.key});
+  const AddComic({Key? key}) : super(key: key);
 
   @override
   State<AddComic> createState() => _AddComicState();
@@ -51,6 +51,7 @@ class _AddComicState extends State<AddComic> {
   List<Genre> _selectedGenre = [];
   final _multiSelectKey = GlobalKey<FormFieldState>();
   final _formAddComic = GlobalKey<FormState>();
+
   @override
   void initState() {
     _selectedGenre = _genres;
@@ -59,7 +60,7 @@ class _AddComicState extends State<AddComic> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return FutureBuilder<bool>(
       future: loginController.isLogin(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
@@ -69,24 +70,28 @@ class _AddComicState extends State<AddComic> {
             return AddWidget();
           }
         } else {
-          return CircularProgressIndicator();
+          return Center(child: CircularProgressIndicator());
         }
       },
     );
   }
 
   Widget AddWidget() {
-    return FutureBuilder(
-        future: _prefs,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final SharedPreferences prefs = snapshot.data as SharedPreferences;
-            return Scaffold(
-              appBar: AppBar(
-                title: Text('Add Comic'),
-              ),
-              body: SingleChildScrollView(
-                child: Column(
+    return FutureBuilder<SharedPreferences>(
+      future: _prefs,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final SharedPreferences prefs = snapshot.data!;
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Upload Komik'),
+              backgroundColor: Colors.amber[300],
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formAddComic,
+                child: ListView(
                   children: [
                     //make formfield
                     Form(
@@ -270,10 +275,12 @@ class _AddComicState extends State<AddComic> {
                   ],
                 ),
               ),
-            );
-          } else {
-            return CircularProgressIndicator();
-          }
-        });
+            ),
+          );
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
   }
 }

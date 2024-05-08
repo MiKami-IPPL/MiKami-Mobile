@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:mikami_mobile/model/list_item_data.dart';
 import 'package:mikami_mobile/model/list_data_provider.dart';
 import 'package:mikami_mobile/screens/author_add_comic.dart';
+import 'package:mikami_mobile/screens/chapter_manage_screen.dart';
 import 'package:mikami_mobile/services_api/author_service.dart';
 
 class AuthorManage extends StatefulWidget {
@@ -82,59 +83,79 @@ class _AuthorManageState extends State<AuthorManage> {
                             itemBuilder: (BuildContext context, int index) {
                               ListItemData itemData =
                                   ListDataProvider.getPublishedList()[index];
-                              return Column(
-                                children: [
-                                  ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 16.0, vertical: 12.0),
-                                    leading: Container(
-                                      width: 70,
-                                      height: 70,
-                                      color: Colors.blue,
-                                      child: Image.asset(
-                                        itemData.imagePath,
-                                        fit: BoxFit.cover,
+                              return GestureDetector(
+                                onTap: () {
+                                  Get.to(ChapterManageScreen());
+                                },
+                                child: Column(
+                                  children: [
+                                    ListTile(
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 16.0, vertical: 12.0),
+                                      leading: Container(
+                                        width: 70,
+                                        height: 70,
+                                        color: Colors.blue,
+                                        child: Image.asset(
+                                          itemData.imagePath,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      title: Text(
+                                        itemData.title,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 18.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      subtitle: ListTileSubtitle(
+                                        line1: itemData.subtitle,
+                                        line2: '',
+                                      ),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                            icon: Icon(Icons.delete),
+                                            onPressed: () {
+                                              _showConfirmationDialog(
+                                                  context, itemData.title);
+                                            },
+                                          ),
+                                          PopupMenuButton<String>(
+                                            onSelected: (String choice) {
+                                              if (choice ==
+                                                  'Lihat Daftar Chapter') {
+                                                Get.to(ChapterManageScreen());
+                                              } else if (choice ==
+                                                  'Hapus Komik') {
+                                                _showConfirmationDialog(
+                                                    context, itemData.title);
+                                              }
+                                            },
+                                            itemBuilder:
+                                                (BuildContext context) =>
+                                                    <PopupMenuEntry<String>>[
+                                              const PopupMenuItem<String>(
+                                                value: 'Lihat Daftar Chapter',
+                                                child: Text(
+                                                    'Lihat Daftar Chapter'),
+                                              ),
+                                              const PopupMenuItem<String>(
+                                                value: 'Hapus Komik',
+                                                child: Text('Hapus Komik'),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    title: Text(
-                                      itemData.title,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 18.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    subtitle: ListTileSubtitle(
-                                      line1: itemData.subtitle,
-                                      line2: '',
-                                    ),
-                                    trailing: PopupMenuButton<String>(
-                                      onSelected: (String choice) {
-                                        if (choice == 'Lihat Daftar Chapter') {
-                                          // Do something
-                                        } else if (choice == 'Hapus Komik') {
-                                          _showConfirmationDialog(
-                                              context,
-                                              itemData
-                                                  .title); // Show confirmation dialog
-                                        }
-                                      },
-                                      itemBuilder: (BuildContext context) =>
-                                          <PopupMenuEntry<String>>[
-                                        const PopupMenuItem<String>(
-                                          value: 'Lihat Daftar Chapter',
-                                          child: Text('Lihat Daftar Chapter'),
-                                        ),
-                                        const PopupMenuItem<String>(
-                                          value: 'Hapus Komik',
-                                          child: Text('Hapus Komik'),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const Divider(), // Add a Divider
-                                ],
+                                    const Divider(),
+                                  ],
+                                ),
                               );
                             },
                           ),
@@ -154,8 +175,7 @@ class _AuthorManageState extends State<AuthorManage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           authorController.getGenre();
-          Get.to(() => AddComic()); // Add onPressed action here
-          // Add onPressed action here
+          Get.to(() => AddComic()); 
         },
         shape: const StadiumBorder(),
         backgroundColor: Colors.amber,
@@ -175,14 +195,13 @@ class _AuthorManageState extends State<AuthorManage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop(); 
               },
               child: const Text("Batal"),
             ),
             TextButton(
               onPressed: () {
-                // Perform delete action here
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop(); 
               },
               child: const Text("Hapus"),
             ),
