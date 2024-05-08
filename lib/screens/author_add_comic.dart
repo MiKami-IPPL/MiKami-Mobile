@@ -7,6 +7,8 @@ import 'package:mikami_mobile/services_api/login_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:async';
 
 class AddComic extends StatefulWidget {
   const AddComic({super.key});
@@ -26,9 +28,10 @@ class Genre {
 }
 
 class _AddComicState extends State<AddComic> {
+  final AuthorController authorController = Get.put(AuthorController());
+  final LoginController loginController = Get.put(LoginController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  LoginController loginController = Get.put(LoginController());
-  AuthorController authorController = Get.put(AuthorController());
+
   static List<Genre> _genres = [
     Genre(id: 1, name: 'Action'),
     Genre(id: 2, name: 'Adventure'),
@@ -42,14 +45,15 @@ class _AddComicState extends State<AddComic> {
     Genre(id: 10, name: 'Slice of Life'),
     Genre(id: 11, name: 'Thriller'),
   ];
-  final _items =
-      _genres.map((genre) => MultiSelectItem(genre, genre.name)).toList();
-  List<Genre> _selectGenre5 = [];
+  final _items = _genres
+      .map((genre) => MultiSelectItem<Genre>(genre, genre.name))
+      .toList();
+  List<Genre> _selectedGenre = [];
   final _multiSelectKey = GlobalKey<FormFieldState>();
   final _formAddComic = GlobalKey<FormState>();
   @override
   void initState() {
-    _selectGenre5 = _genres;
+    _selectedGenre = _genres;
     super.initState();
   }
 
@@ -103,18 +107,17 @@ class _AddComicState extends State<AddComic> {
                               hintText: 'Title',
                             ),
                           ),
-                          TextFormField(
-                            controller: authorController.coverController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter cover of comic';
+                          ElevatedButton(
+                            onPressed: () async {
+                              final ImagePicker picker = ImagePicker();
+                              final XFile? image = await picker.pickImage(
+                                  source: ImageSource.gallery);
+                              if (image != null) {
+                                authorController.coverController.text =
+                                    image.path;
                               }
-                              return null;
                             },
-                            decoration: InputDecoration(
-                              labelText: 'Cover',
-                              hintText: 'Cover',
-                            ),
+                            child: Text('Pick Cover Image'),
                           ),
                           TextFormField(
                             controller: authorController.descriptionController,
@@ -167,39 +170,86 @@ class _AddComicState extends State<AddComic> {
                               hintText: 'Price',
                             ),
                           ),
-                          TextFormField(
-                            keyboardType: TextInputType.number,
-                            controller: authorController.genreIdController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter genre id of comic';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Genre Id',
-                              hintText: 'Genre Id',
-                            ),
+                          // TextFormField(
+                          //   keyboardType: TextInputType.number,
+                          //   controller: authorController.genreIdController,
+                          //   validator: (value) {
+                          //     if (value == null || value.isEmpty) {
+                          //       return 'Please enter genre id of comic';
+                          //     }
+                          //     return null;
+                          //   },
+                          //   decoration: InputDecoration(
+                          //     labelText: 'Genre Id',
+                          //     hintText: 'Genre Id',
+                          //   ),
+                          // ),
+
+                          // MultiSelectChipField(
+                          //   items: _items,
+                          //   initialValue: [_genres[1]],
+                          //   title: Text("Genres"),
+                          //   headerColor: Colors.blue.withOpacity(0.5),
+                          //   decoration: BoxDecoration(
+                          //     border: Border.all(
+                          //         color: lightColorScheme.onBackground,
+                          //         width: 1.8),
+                          //   ),
+                          //   selectedChipColor: Colors.blue.withOpacity(0.5),
+                          //   selectedTextStyle:
+                          //       TextStyle(color: Colors.blue[800]),
+                          //   onTap: (values) {
+                          //     //_selectedAnimals4 = values;
+                          //   },
+                          // ),
+                          SizedBox(
+                            height: 20,
                           ),
 
-                          MultiSelectChipField(
-                            items: prefs.getInt('genre[Max]') == null
-                                ? _items
-                                : _items.sublist(
-                                    0, prefs.getInt('genre[name]')),
-                            initialValue: [_genres[7], _genres[9]],
+                          // MultiSelectDialogField(
+                          //   onConfirm: (val) {
+                          //     _selectedGenre = val;
+                          //   },
+                          //   dialogWidth:
+                          //       MediaQuery.of(context).size.width * 0.7,
+                          //   items: _items,
+                          //   initialValue:
+                          //       _selectedGenre, // setting the value of this in initState() to pre-select values.
+                          // ),
+                          MultiSelectDialogField(
+                            items: _items,
+                            searchable: true,
                             title: Text("Genres"),
-                            headerColor: Colors.blue.withOpacity(0.5),
+                            selectedColor: lightColorScheme.primary,
                             decoration: BoxDecoration(
+                              color: lightColorScheme.primary.withOpacity(0.1),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(40)),
                               border: Border.all(
-                                  color: lightColorScheme.onBackground,
-                                  width: 1.8),
+                                color: lightColorScheme.primary,
+                                width: 2,
+                              ),
                             ),
-                            selectedChipColor: Colors.blue.withOpacity(0.5),
-                            selectedTextStyle:
-                                TextStyle(color: Colors.blue[800]),
-                            onTap: (values) {
-                              //_selectedAnimals4 = values;
+                            buttonIcon: Icon(
+                              Icons.pets,
+                              color: lightColorScheme.primary,
+                            ),
+                            buttonText: Text(
+                              "Choose Genre",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                              ),
+                            ),
+                            onConfirm: (results) {
+                              _selectedGenre = results;
+                              //parse genre id to string
+                              List<String> genreId = [];
+                              for (var i = 0; i < _selectedGenre.length; i++) {
+                                genreId.add(_selectedGenre[i].id.toString());
+                              }
+                              authorController.genreIdController.text =
+                                  genreId.join(',');
                             },
                           ),
 
@@ -208,6 +258,8 @@ class _AddComicState extends State<AddComic> {
                             onPressed: () async {
                               if (_formAddComic.currentState!.validate()) {
                                 await authorController.addComic();
+                              } else {
+                                Get.snackbar('Error', 'Please fill all field');
                               }
                             },
                             child: Text('Submit'),
