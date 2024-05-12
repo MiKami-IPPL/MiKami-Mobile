@@ -91,185 +91,126 @@ class _AddComicState extends State<AddComic> {
                 key: _formAddComic,
                 child: ListView(
                   children: [
-                    //make formfield
-                    Form(
-                      key: _formAddComic,
-                      child: Column(
-                        children: [
-                          //add textfield for title
-                          TextFormField(
-                            controller: authorController.titleController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter title of comic';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Title',
-                              hintText: 'Title',
-                            ),
+                    Column(
+                      children: [
+                        TextFormField(
+                          controller: authorController.titleController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter title of comic';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'Title',
+                            hintText: 'Title',
                           ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              final ImagePicker picker = ImagePicker();
-                              final XFile? image = await picker.pickImage(
-                                  source: ImageSource.gallery);
-                              if (image != null) {
-                                authorController.coverController.text =
-                                    image.path;
-                              }
-                            },
-                            child: Text('Pick Cover Image'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final ImagePicker picker = ImagePicker();
+                            final XFile? image = await picker.pickImage(
+                                source: ImageSource.gallery);
+                            if (image != null) {
+                              authorController.coverController.text =
+                                  image.path;
+                            }
+                          },
+                          child: Text('Pick Cover Image'),
+                        ),
+                        TextFormField(
+                          controller:
+                              authorController.descriptionController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter description of comic';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'Description',
+                            hintText: 'Description',
                           ),
-                          TextFormField(
-                            controller: authorController.descriptionController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter description of comic';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Description',
-                              hintText: 'Description',
-                            ),
+                        ),
+                        TextFormField(
+                          keyboardType: TextInputType.number,
+                          controller: authorController.rateController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter rate of comic';
+                            } else if (double.tryParse(value) == null) {
+                              return 'Rate must be a number';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'Rate',
+                            hintText: 'Rate',
                           ),
-                          //add textfield for genre
-                          TextFormField(
-                            keyboardType: TextInputType.number,
-                            controller: authorController.rateController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter rate of comic';
-                              }
-                              //make else if rate is not number
-                              else if (double.tryParse(value) == null) {
-                                return 'Rate must be a number';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Rate',
-                              hintText: 'Rate',
-                            ),
+                        ),
+                        TextFormField(
+                          keyboardType: TextInputType.number,
+                          controller: authorController.priceController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter price of comic';
+                            } else if (double.tryParse(value) == null) {
+                              return 'Price must be a number';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'Price',
+                            hintText: 'Price',
                           ),
-                          //add textfield for author
-                          TextFormField(
-                            keyboardType: TextInputType.number,
-                            controller: authorController.priceController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter price of comic';
-                              }
-                              //make else if price is not number
-                              else if (double.tryParse(value) == null) {
-                                return 'Price must be a number';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Price',
-                              hintText: 'Price',
-                            ),
-                          ),
-                          // TextFormField(
-                          //   keyboardType: TextInputType.number,
-                          //   controller: authorController.genreIdController,
-                          //   validator: (value) {
-                          //     if (value == null || value.isEmpty) {
-                          //       return 'Please enter genre id of comic';
-                          //     }
-                          //     return null;
-                          //   },
-                          //   decoration: InputDecoration(
-                          //     labelText: 'Genre Id',
-                          //     hintText: 'Genre Id',
-                          //   ),
-                          // ),
-
-                          // MultiSelectChipField(
-                          //   items: _items,
-                          //   initialValue: [_genres[1]],
-                          //   title: Text("Genres"),
-                          //   headerColor: Colors.blue.withOpacity(0.5),
-                          //   decoration: BoxDecoration(
-                          //     border: Border.all(
-                          //         color: lightColorScheme.onBackground,
-                          //         width: 1.8),
-                          //   ),
-                          //   selectedChipColor: Colors.blue.withOpacity(0.5),
-                          //   selectedTextStyle:
-                          //       TextStyle(color: Colors.blue[800]),
-                          //   onTap: (values) {
-                          //     //_selectedAnimals4 = values;
-                          //   },
-                          // ),
-                          SizedBox(
-                            height: 20,
-                          ),
-
-                          // MultiSelectDialogField(
-                          //   onConfirm: (val) {
-                          //     _selectedGenre = val;
-                          //   },
-                          //   dialogWidth:
-                          //       MediaQuery.of(context).size.width * 0.7,
-                          //   items: _items,
-                          //   initialValue:
-                          //       _selectedGenre, // setting the value of this in initState() to pre-select values.
-                          // ),
-                          MultiSelectDialogField(
-                            items: _items,
-                            searchable: true,
-                            title: Text("Genres"),
-                            selectedColor: lightColorScheme.primary,
-                            decoration: BoxDecoration(
-                              color: lightColorScheme.primary.withOpacity(0.1),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(40)),
-                              border: Border.all(
-                                color: lightColorScheme.primary,
-                                width: 2,
-                              ),
-                            ),
-                            buttonIcon: Icon(
-                              Icons.pets,
+                        ),
+                        MultiSelectDialogField(
+                          items: _items,
+                          searchable: true,
+                          title: Text("Genres"),
+                          selectedColor: lightColorScheme.primary,
+                          decoration: BoxDecoration(
+                            color: lightColorScheme.primary.withOpacity(0.1),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(40)),
+                            border: Border.all(
                               color: lightColorScheme.primary,
+                              width: 2,
                             ),
-                            buttonText: Text(
-                              "Choose Genre",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                              ),
+                          ),
+                          buttonIcon: Icon(
+                            Icons.pets,
+                            color: lightColorScheme.primary,
+                          ),
+                          buttonText: Text(
+                            "Choose Genre",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
                             ),
-                            onConfirm: (results) {
-                              _selectedGenre = results;
-                              //parse genre id to string
-                              List<String> genreId = [];
-                              for (var i = 0; i < _selectedGenre.length; i++) {
-                                genreId.add(_selectedGenre[i].id.toString());
-                              }
-                              authorController.genreIdController.text =
-                                  genreId.join(',');
-                            },
                           ),
-
-                          //add button for submit
-                          ElevatedButton(
-                            onPressed: () async {
-                              if (_formAddComic.currentState!.validate()) {
-                                await authorController.addComic();
-                              } else {
-                                Get.snackbar('Error', 'Please fill all field');
-                              }
-                            },
-                            child: Text('Submit'),
-                          ),
-                        ],
-                      ),
-                    )
+                          onConfirm: (results) {
+                            _selectedGenre = results;
+                            List<String> genreId = [];
+                            for (var i = 0; i < _selectedGenre.length; i++) {
+                              genreId.add(_selectedGenre[i].id.toString());
+                            }
+                            authorController.genreIdController.text =
+                                genreId.join(',');
+                          },
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            if (_formAddComic.currentState!.validate()) {
+                              await authorController.addComic();
+                            } else {
+                              Get.snackbar('Error', 'Please fill all field');
+                            }
+                          },
+                          child: Text('Submit'),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
