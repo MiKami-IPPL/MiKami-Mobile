@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:mikami_mobile/screens/login_screen.dart';
+import 'package:mikami_mobile/screens/auth/login_screen.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
@@ -40,7 +40,6 @@ class AuthorController extends GetxService {
         'price': priceController.text,
         'rate': rateController.text,
       };
-      print(jsonEncode(body));
       http.Response response =
           await http.post(url, body: jsonEncode(body), headers: headers);
       final json = jsonDecode(response.body);

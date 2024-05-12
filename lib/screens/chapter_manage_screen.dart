@@ -1,8 +1,5 @@
-
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:mikami_mobile/model/chapter.dart';
 import 'package:mikami_mobile/model/chapter.dart';
 import 'package:mikami_mobile/screens/chapter_upload.dart'; // Import your Chapter model
 
@@ -72,9 +69,12 @@ class _ChapterManageScreenState extends State<ChapterManageScreen> {
   // Function to load mock chapters
   List<Chapter> _loadMockChapters() {
     return [
-      Chapter(id: 1, title: 'Chapter 1', description: 'Description for Chapter 1'),
-      Chapter(id: 2, title: 'Chapter 2', description: 'Description for Chapter 2'),
-      Chapter(id: 3, title: 'Chapter 3', description: 'Description for Chapter 3'),
+      Chapter(
+          id: 1, title: 'Chapter 1', description: 'Description for Chapter 1'),
+      Chapter(
+          id: 2, title: 'Chapter 2', description: 'Description for Chapter 2'),
+      Chapter(
+          id: 3, title: 'Chapter 3', description: 'Description for Chapter 3'),
     ];
   }
 

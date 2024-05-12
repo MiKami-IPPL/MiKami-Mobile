@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/model/list_item_data.dart';
 import 'package:mikami_mobile/model/list_data_provider.dart';
-import 'package:mikami_mobile/screens/author_add_comic.dart';
+import 'package:mikami_mobile/screens/author/add_comic_screen.dart';
 import 'package:mikami_mobile/screens/chapter_manage_screen.dart';
 import 'package:mikami_mobile/services_api/author_service.dart';
 
@@ -174,8 +174,7 @@ class _AuthorManageState extends State<AuthorManage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          authorController.getGenre();
-          Get.to(() => AddComic()); 
+          Get.to(() => AddComic());
         },
         shape: const StadiumBorder(),
         backgroundColor: Colors.amber,
@@ -195,13 +194,13 @@ class _AuthorManageState extends State<AuthorManage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); 
+                Navigator.of(context).pop();
               },
               child: const Text("Batal"),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); 
+                Navigator.of(context).pop();
               },
               child: const Text("Hapus"),
             ),

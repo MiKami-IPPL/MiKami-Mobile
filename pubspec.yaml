@@ -38,7 +38,6 @@ dependencies:
   # provider: ^6.1.2
   http: ^1.2.1
   get: ^4.6.6
-  image_picker: ^0.8.4+4
   shared_preferences: ^2.2.2
   quickalert: ^1.1.0
   carousel_slider: ^4.2.1

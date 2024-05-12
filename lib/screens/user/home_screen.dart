@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
-import 'package:mikami_mobile/screens/profile_screen.dart';
-import 'package:mikami_mobile/screens/search_screen.dart';
-import 'package:mikami_mobile/screens/topup_screen.dart';
-import 'package:mikami_mobile/screens/welcome_screen.dart';
+import 'package:mikami_mobile/screens/user/profile_screen.dart';
+import 'package:mikami_mobile/screens/user/search_screen.dart';
+import 'package:mikami_mobile/screens/user/topup_screen.dart';
+import 'package:mikami_mobile/screens/auth/welcome_screen.dart';
 import 'package:mikami_mobile/services_api/login_service.dart';
 import 'package:mikami_mobile/services_api/profile_service.dart';
 import 'package:mikami_mobile/services_api/user_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'comic_favorite_screen.dart';
-import 'author_screen.dart';
+import '../comic_favorite_screen.dart';
+import '../author/author_menu_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -328,11 +328,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             icon: Icons.auto_stories_sharp,
                             label: 'Menu Author',
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => AuthorScreen()),
-                              );
+                              Get.to(() => AuthorScreen());
                             },
                           ),
                         if (prefs.getString('name') != 'tamu')

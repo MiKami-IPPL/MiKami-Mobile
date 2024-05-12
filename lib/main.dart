@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mikami_mobile/screens/home_screen.dart';
-import 'package:mikami_mobile/screens/welcome_screen.dart';
+import 'package:mikami_mobile/screens/user/home_screen.dart';
+import 'package:mikami_mobile/screens/auth/welcome_screen.dart';
 import 'package:mikami_mobile/services_api/login_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 

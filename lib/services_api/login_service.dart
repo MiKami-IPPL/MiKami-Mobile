@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:mikami_mobile/screens/home_screen.dart';
+import 'package:mikami_mobile/screens/user/home_screen.dart';
 import 'package:mikami_mobile/services_api/profile_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
@@ -40,7 +40,7 @@ class LoginController extends GetxService {
       };
 
       var url = Uri.parse(
-          "http://10.0.2.2:8000/" + ApiEndPoints.authEndPoints.ForgotPassword);
+          ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.ForgotPassword);
 
       Map body = {
         'email': emailForgotController.text.trim(),

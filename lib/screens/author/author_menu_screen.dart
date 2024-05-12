@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mikami_mobile/screens/author_withdrawal_screen.dart';
+import 'package:mikami_mobile/screens/author/withdrawal_screen.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 import 'author_manage_screen.dart';
-import 'author_comic_verify.dart';
-import 'author_history_screen.dart';
+import '../author_comic_verify.dart';
+import '../author_history_screen.dart';
 
 class AuthorScreen extends StatefulWidget {
   const AuthorScreen({super.key});
