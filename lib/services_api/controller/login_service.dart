@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mikami_mobile/screens/user/home_screen.dart';
-import 'package:mikami_mobile/services_api/profile_service.dart';
+import 'package:mikami_mobile/services_api/controller/profile_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
 import 'package:shared_preferences/shared_preferences.dart';

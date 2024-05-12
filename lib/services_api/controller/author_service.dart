@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:mikami_mobile/screens/auth/login_screen.dart';
@@ -12,7 +13,6 @@ class AuthorController extends GetxService {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController genreIdController = TextEditingController();
-  TextEditingController coverController = TextEditingController();
   TextEditingController priceController = TextEditingController();
   TextEditingController rateController = TextEditingController();
 
@@ -30,27 +30,37 @@ class AuthorController extends GetxService {
       var url =
           Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics);
 
-      Map body = {
-        'title': titleController.text,
-        'description': descriptionController.text,
-        'genres_id':
-            genreIdController.text.split(',').map((e) => int.parse(e)).toList(),
-        'cover': coverController.text,
-        'author': prefs?.getString('name'),
-        'price': priceController.text,
-        'rate': rateController.text,
-      };
-      http.Response response =
-          await http.post(url, body: jsonEncode(body), headers: headers);
-      final json = jsonDecode(response.body);
-      print(json);
+      var path_cover = prefs?.getString('cover_image');
+      File cover = File(path_cover!);
+      print(path_cover);
+      var request = http.MultipartRequest('POST', url);
 
-      if (json['status'] == 'success') {
+      //take the file
+      var multipartFile =
+          await http.MultipartFile.fromPath('cover', cover.path);
+
+      request.files.add(multipartFile);
+      //genreList to list<int>
+      var genreList = genreIdController.text.split(',').map(int.parse).toList();
+
+      request.fields['title'] = titleController.text;
+      request.fields['description'] = descriptionController.text;
+      request.fields['genres_id'] = genreList.join(',');
+      request.fields['author'] = prefs!.getString('name')!;
+      request.fields['price'] = priceController.text;
+      request.fields['rate'] = rateController.text;
+
+      request.headers.addAll(headers);
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final json = jsonDecode(respStr);
+
+      if (json == 'success') {
         Get.back();
         titleController.clear();
         descriptionController.clear();
         genreIdController.clear();
-        coverController.clear();
+        prefs?.remove('cover');
         priceController.clear();
         rateController.clear();
         Get.showSnackbar(GetSnackBar(

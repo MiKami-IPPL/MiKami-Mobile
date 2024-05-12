@@ -1,8 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/auth/login_screen.dart';
-import 'package:mikami_mobile/services_api/author_service.dart';
-import 'package:mikami_mobile/services_api/login_service.dart';
+import 'package:mikami_mobile/services_api/controller/author_service.dart';
+import 'package:mikami_mobile/services_api/controller/login_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -75,11 +77,11 @@ class _AddComicState extends State<AddComic> {
   }
 
   Widget AddWidget() {
-    return FutureBuilder<SharedPreferences>(
+    return FutureBuilder(
       future: _prefs,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          final SharedPreferences prefs = snapshot.data!;
+          final SharedPreferences prefs = snapshot.data as SharedPreferences;
           return Scaffold(
             appBar: AppBar(
               title: Text('Upload Komik'),
@@ -106,21 +108,24 @@ class _AddComicState extends State<AddComic> {
                             hintText: 'Title',
                           ),
                         ),
+                        // add preview image when user click on the button
+                        if (prefs.getString('cover_image') != null)
+                          Image.file(File(prefs.getString('cover_image')!)),
                         ElevatedButton(
                           onPressed: () async {
                             final ImagePicker picker = ImagePicker();
                             final XFile? image = await picker.pickImage(
                                 source: ImageSource.gallery);
                             if (image != null) {
-                              authorController.coverController.text =
-                                  image.path;
+                              // Save image to shared preferences
+                              prefs.setString('cover_image', image.path);
                             }
                           },
                           child: Text('Pick Cover Image'),
                         ),
+
                         TextFormField(
-                          controller:
-                              authorController.descriptionController,
+                          controller: authorController.descriptionController,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter description of comic';
@@ -171,8 +176,7 @@ class _AddComicState extends State<AddComic> {
                           selectedColor: lightColorScheme.primary,
                           decoration: BoxDecoration(
                             color: lightColorScheme.primary.withOpacity(0.1),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(40)),
+                            borderRadius: BorderRadius.all(Radius.circular(40)),
                             border: Border.all(
                               color: lightColorScheme.primary,
                               width: 2,
