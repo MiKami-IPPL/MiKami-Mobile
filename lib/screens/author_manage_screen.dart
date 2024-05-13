@@ -1,43 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mikami_mobile/model/list_item_data.dart';
-import 'package:mikami_mobile/model/list_data_provider.dart';
-import 'package:mikami_mobile/screens/author_add_comic.dart';
+import 'package:mikami_mobile/model/comic.dart';
 import 'package:mikami_mobile/screens/chapter_manage_screen.dart';
 import 'package:mikami_mobile/services_api/author_service.dart';
+import 'package:mikami_mobile/screens/author_add_comic.dart';
 
 class AuthorManage extends StatefulWidget {
-  const AuthorManage({super.key});
+  const AuthorManage({Key? key}) : super(key: key);
 
   @override
-  State<AuthorManage> createState() => _AuthorManageState();
+  _AuthorManageState createState() => _AuthorManageState();
 }
 
 class _AuthorManageState extends State<AuthorManage> {
-  AuthorController authorController = Get.put(AuthorController());
+  final AuthorController authorController = AuthorController();
+
+  @override
+  void initState() {
+    super.initState();
+    authorController.getComics().then((_) {
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.amber[300],
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 20,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
+          'Kelola Komik Kamu!',
+          style: TextStyle(color: Colors.white, fontSize: 20),
         ),
         backgroundColor: Colors.amber[300],
       ),
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              color: Colors.amber[300],
               padding: const EdgeInsets.all(16.0),
-              child: const Column(
+              color: Colors.amber[300],
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: const [
                   Text(
                     'Kelola Komik Kamu!',
                     style: TextStyle(
@@ -63,107 +70,25 @@ class _AuthorManageState extends State<AuthorManage> {
                 children: [
                   Container(
                     color: Colors.white,
-                    child: const TabBar(
+                    child: TabBar(
                       indicatorColor: Colors.red,
                       tabs: [
                         Tab(text: 'Published'),
                         Tab(text: 'Pending'),
                       ],
+                      labelColor: Colors.black,
+                      unselectedLabelColor: Colors.grey,
                     ),
                   ),
                   SizedBox(
                     height: MediaQuery.of(context).size.height - 200,
-                    child: Container(
-                      color: Colors.white,
-                      child: TabBarView(
-                        children: [
-                          ListView.builder(
-                            itemCount:
-                                ListDataProvider.getPublishedList().length,
-                            itemBuilder: (BuildContext context, int index) {
-                              ListItemData itemData =
-                                  ListDataProvider.getPublishedList()[index];
-                              return GestureDetector(
-                                onTap: () {
-                                  Get.to(ChapterManageScreen());
-                                },
-                                child: Column(
-                                  children: [
-                                    ListTile(
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 16.0, vertical: 12.0),
-                                      leading: Container(
-                                        width: 70,
-                                        height: 70,
-                                        color: Colors.blue,
-                                        child: Image.asset(
-                                          itemData.imagePath,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      title: Text(
-                                        itemData.title,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      subtitle: ListTileSubtitle(
-                                        line1: itemData.subtitle,
-                                        line2: '',
-                                      ),
-                                      trailing: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          IconButton(
-                                            icon: Icon(Icons.delete),
-                                            onPressed: () {
-                                              _showConfirmationDialog(
-                                                  context, itemData.title);
-                                            },
-                                          ),
-                                          PopupMenuButton<String>(
-                                            onSelected: (String choice) {
-                                              if (choice ==
-                                                  'Lihat Daftar Chapter') {
-                                                Get.to(ChapterManageScreen());
-                                              } else if (choice ==
-                                                  'Hapus Komik') {
-                                                _showConfirmationDialog(
-                                                    context, itemData.title);
-                                              }
-                                            },
-                                            itemBuilder:
-                                                (BuildContext context) =>
-                                                    <PopupMenuEntry<String>>[
-                                              const PopupMenuItem<String>(
-                                                value: 'Lihat Daftar Chapter',
-                                                child: Text(
-                                                    'Lihat Daftar Chapter'),
-                                              ),
-                                              const PopupMenuItem<String>(
-                                                value: 'Hapus Komik',
-                                                child: Text('Hapus Komik'),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const Divider(),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                          const Center(
-                            child: Text('Tidak ada komik yang sedang ditunda'),
-                          ),
-                        ],
-                      ),
+                    child: TabBarView(
+                      children: [
+                        _buildComicList(),
+                        const Center(
+                          child: Text('Tidak ada komik yang sedang ditunda'),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -174,8 +99,7 @@ class _AuthorManageState extends State<AuthorManage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          authorController.getGenre();
-          Get.to(() => AddComic()); 
+          Get.to(() => AddComic());
         },
         shape: const StadiumBorder(),
         backgroundColor: Colors.amber,
@@ -184,24 +108,99 @@ class _AuthorManageState extends State<AuthorManage> {
     );
   }
 
-  void _showConfirmationDialog(BuildContext context, String comicTitle) {
+  Widget _buildComicList() {
+    if (authorController.comics.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    } else {
+      return ListView.builder(
+        itemCount: authorController.comics.length,
+        itemBuilder: (context, index) {
+          Comic comic = authorController.comics[index];
+          return GestureDetector(
+            onTap: () {
+              Get.to(ChapterManageScreen(comic: comic));
+            },
+            child: ListTile(
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              leading: Container(
+                width: 70,
+                height: 70,
+                color: Colors.blue,
+              ),
+              title: Text(
+                comic.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: ListTileSubtitle(
+                line1: comic.description,
+                line2: 'Author: ${comic.author}',
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      _showConfirmationDialog(context, comic); // Fix here
+                    },
+                  ),
+                  PopupMenuButton<String>(
+                    onSelected: (String choice) {
+                      if (choice == 'Lihat Daftar Chapter') {
+                        Get.to(ChapterManageScreen(comic: comic));
+                      } else if (choice == 'Hapus Komik') {
+                        _deleteComic(comic.id.toString()); // Fix here
+                      }
+                    },
+                    itemBuilder: (BuildContext context) =>
+                        <PopupMenuEntry<String>>[
+                      const PopupMenuItem<String>(
+                        value: 'Lihat Daftar Chapter',
+                        child: Text('Lihat Daftar Chapter'),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'Update Informasi Komik',
+                        child: Text('Lihat Daftar Chapter'),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'Hapus Komik',
+                        child: Text('Hapus Komik'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+  }
+
+  void _showConfirmationDialog(BuildContext context, Comic comic) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Konfirmasi Hapus"),
-          content:
-              Text("Apakah Anda yakin ingin menghapus komik '$comicTitle'?"),
+          content: Text("Apakah Anda yakin ingin menghapus komik '${comic.title}'?"),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); 
+                Navigator.of(context).pop();
               },
               child: const Text("Batal"),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); 
+                _deleteComic(comic.id.toString()); 
+                Navigator.of(context).pop();
               },
               child: const Text("Hapus"),
             ),
@@ -210,6 +209,29 @@ class _AuthorManageState extends State<AuthorManage> {
       },
     );
   }
+
+  void _deleteComic(String comicId) async {
+  String response = await authorController.deleteComic(comicId); 
+  if (response == 'success') {
+    // Show success message
+    Get.showSnackbar(GetBar(
+      title: "Success",
+      message: "Comic successfully deleted",
+      duration: const Duration(seconds: 5),
+      backgroundColor: Colors.green,
+    ));
+    
+    await authorController.getComics(); 
+  } else {
+    
+    Get.showSnackbar(GetBar(
+      title: "Error",
+      message: "Failed to delete comic",
+      duration: const Duration(seconds: 5),
+      backgroundColor: Colors.red,
+    ));
+  }
+}
 }
 
 class ListTileSubtitle extends StatelessWidget {

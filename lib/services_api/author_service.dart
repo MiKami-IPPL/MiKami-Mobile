@@ -6,15 +6,62 @@ import 'package:mikami_mobile/utils/api_endpoints.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:mikami_mobile/model/comic.dart';
 
 class AuthorController extends GetxService {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  List<Comic> comics = [];
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController genreIdController = TextEditingController();
   TextEditingController coverController = TextEditingController();
   TextEditingController priceController = TextEditingController();
   TextEditingController rateController = TextEditingController();
+
+  Future<void> getComics() async {
+    try {
+      final SharedPreferences? prefs = await _prefs;
+      var token = prefs?.getString('token');
+
+      var headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+
+      var url = Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics);
+
+      http.Response response = await http.get(url, headers: headers);
+
+      final json = jsonDecode(response.body);
+
+      if (json['status'] == 'success') {
+        comics.clear();
+
+        for (var comicData in json['data']) {
+      comics.add(Comic(
+        id: comicData['id'],
+        title: comicData['title'],
+        description: comicData['description'],
+        coverUrl: comicData['cover'],
+        author: comicData['author'],
+      ));
+    }
+
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: json['status'],
+          message: json['message'],
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        ));
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   Future<void> addComic() async {
     try {
@@ -76,6 +123,82 @@ class AuthorController extends GetxService {
       print(e.toString());
     }
   }
+
+  Future<void> updateComic(String title, String newTitle, String newDescription) async {
+    try {
+      final SharedPreferences? prefs = await _prefs;
+      var token = prefs?.getString('token');
+
+      var headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+
+      var url = Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics + '/$title');
+
+      Map body = {
+        'title': newTitle,
+        'description': newDescription,
+      };
+
+      http.Response response = await http.put(url, body: jsonEncode(body), headers: headers);
+      final json = jsonDecode(response.body);
+      print(json);
+
+      if (json['status'] == 'success') {
+        Get.showSnackbar(GetSnackBar(
+          title: "Sukses",
+          message: 'Komik berhasil diperbarui',
+          icon: Icon(Icons.check_circle, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+        ));
+        await getComics();
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: "Gagal",
+          message: json['message'],
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        ));
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<String> deleteComic(String comicId) async {
+  try {
+    final SharedPreferences? prefs = await _prefs;
+    var token = prefs?.getString('token');
+
+    var headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    var url = Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics + '/$comicId/delete');
+
+    http.Response response = await http.delete(url, headers: headers);
+    final json = jsonDecode(response.body);
+    print(json);
+
+    if (json['status'] == 'success') {
+      return 'success';
+    } else {
+      return 'error';
+    }
+  } catch (e) {
+    print(e.toString());
+    return 'error';
+  }
+}
+
 
   Future<void> getGenre() async {
     try {

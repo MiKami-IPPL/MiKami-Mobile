@@ -4,9 +4,15 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:mikami_mobile/model/chapter.dart';
 import 'package:mikami_mobile/model/chapter.dart';
-import 'package:mikami_mobile/screens/chapter_upload.dart'; // Import your Chapter model
+import 'package:mikami_mobile/screens/chapter_upload.dart';
+import 'package:mikami_mobile/model/comic.dart';
 
 class ChapterManageScreen extends StatefulWidget {
+
+  final Comic? comic;
+
+  const ChapterManageScreen({Key? key, this.comic}) : super(key: key);
+
   @override
   _ChapterManageScreenState createState() => _ChapterManageScreenState();
 }
@@ -14,14 +20,14 @@ class ChapterManageScreen extends StatefulWidget {
 class _ChapterManageScreenState extends State<ChapterManageScreen> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
-  late List<Chapter> mockChapters; // Define mockChapters list
+  late List<Chapter> mockChapters; 
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController();
     _descriptionController = TextEditingController();
-    mockChapters = _loadMockChapters(); // Initialize mockChapters list
+    mockChapters = _loadMockChapters(); 
   }
 
   @override
