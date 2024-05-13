@@ -32,7 +32,7 @@ class AuthorController extends GetxService {
 
       var path_cover = prefs?.getString('cover_image');
       File cover = File(path_cover!);
-      print(path_cover);
+      // print(path_cover);
       var request = http.MultipartRequest('POST', url);
 
       //take the file
@@ -45,15 +45,19 @@ class AuthorController extends GetxService {
 
       request.fields['title'] = titleController.text;
       request.fields['description'] = descriptionController.text;
-      request.fields['genres_id'] = genreList.join(',');
       request.fields['author'] = prefs!.getString('name')!;
       request.fields['price'] = priceController.text;
       request.fields['rate'] = rateController.text;
+      //insert list<int> to request.fields
+      for (var i = 0; i < genreList.length; i++) {
+        request.fields['genres_id[$i]'] = genreList[i].toString();
+      }
 
       request.headers.addAll(headers);
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
       final json = jsonDecode(respStr);
+      print(json);
 
       if (json == 'success') {
         Get.back();
