@@ -1,58 +1,91 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mikami_mobile/services_api/chapter_upload_controller.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mikami_mobile/services_api/chapter_service.dart';
 
-class ChapterUploadScreen extends StatefulWidget {
-  @override
-  _ChapterUploadScreenState createState() => _ChapterUploadScreenState();
-}
+class ChapterAddScreen extends StatelessWidget {
+  final ChapterController _chapterService = Get.find();
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController subtitleController = TextEditingController();
+  final TextEditingController priceController = TextEditingController();
+  final int comicId;
 
-class _ChapterUploadScreenState extends State<ChapterUploadScreen> {
-  final ChapterUploadController chapterUploadController =
-      Get.put(ChapterUploadController());
-  final _formKey = GlobalKey<FormState>();
+  ChapterAddScreen({required this.comicId});
+
+  final List<XFile> selectedImages = [];
+
+  void setSelectedImages(List<XFile> images) {
+    selectedImages.clear();
+    selectedImages.addAll(images);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Upload Chapter'),
-        backgroundColor: Colors.amber[300],
+        title: Text('Add Chapter'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Form fields
               TextFormField(
-                controller: chapterUploadController.title,
-                decoration: InputDecoration(labelText: 'Title'),
-                validator: (value) =>
-                    value!.isEmpty ? 'Please enter a title' : null,
+                controller: titleController,
+                decoration: InputDecoration(
+                  labelText: 'Title',
+                  hintText: 'Enter chapter title',
+                ),
               ),
+              SizedBox(height: 16), // Add space between form fields
               TextFormField(
-                controller: chapterUploadController.subtitle,
-                decoration: InputDecoration(labelText: 'Subtitle'),
-                validator: (value) =>
-                    value!.isEmpty ? 'Please enter a subtitle' : null,
+                controller: subtitleController,
+                decoration: InputDecoration(
+                  labelText: 'Subtitle',
+                  hintText: 'Enter chapter subtitle',
+                ),
               ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _pickImages,
-                child: Text('Select Images'),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: priceController,
+                decoration: InputDecoration(
+                  labelText: 'Price',
+                  hintText: 'Enter chapter price',
+                ),
+                keyboardType: TextInputType.number,
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 16),
+
+              // Image picker
               ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    chapterUploadController.uploadChapter();
+                onPressed: () async {
+                  final ImagePicker picker = ImagePicker();
+                  final List<XFile>? images = await picker.pickMultiImage();
+                  if (images != null) {
+                    setSelectedImages(images);
                   }
                 },
-                child: Text('Upload Chapter'),
+                child: Text('Pick Images'),
+              ),
+              SizedBox(height: 16), // Add space between button and form fields
+
+              // Submit button
+              ElevatedButton(
+                onPressed: () async {
+                  // Convert price to integer
+                  int price = int.tryParse(priceController.text) ?? 0;
+                  List<String> imagePaths = selectedImages.map((image) => image.path).toList();
+                  await _chapterService.addChapter(
+                    comicId: comicId.toString(),
+                    title: titleController.text,
+                    subtitle: subtitleController.text,
+                    imagePaths: imagePaths,
+                    price: price, 
+                  );
+                },
+                child: Text('Submit'),
               ),
             ],
           ),
@@ -60,23 +93,4 @@ class _ChapterUploadScreenState extends State<ChapterUploadScreen> {
       ),
     );
   }
-
-  Future<void> _pickImages() async {
-    try {
-      final List<XFile>? images = await ImagePicker().pickMultiImage(
-        maxWidth: 1920,
-        maxHeight: 1080,
-        imageQuality: 80,
-      );
-
-      if (images != null) {
-        List<File> imageFiles = images.map((image) => File(image.path)).toList();
-        chapterUploadController.setSelectedImages(imageFiles);
-      }
-    } catch (e) {
-      print('Error picking images: $e');
-    }
-  }
-
-
 }

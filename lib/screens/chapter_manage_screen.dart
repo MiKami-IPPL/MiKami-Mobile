@@ -1,14 +1,11 @@
-
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:mikami_mobile/model/chapter.dart';
-import 'package:mikami_mobile/model/chapter.dart';
-import 'package:mikami_mobile/screens/chapter_upload.dart';
 import 'package:mikami_mobile/model/comic.dart';
+import 'package:mikami_mobile/screens/chapter_upload.dart';
+import 'package:mikami_mobile/services_api/chapter_service.dart';
 
 class ChapterManageScreen extends StatefulWidget {
-
   final Comic? comic;
 
   const ChapterManageScreen({Key? key, this.comic}) : super(key: key);
@@ -18,23 +15,13 @@ class ChapterManageScreen extends StatefulWidget {
 }
 
 class _ChapterManageScreenState extends State<ChapterManageScreen> {
-  late TextEditingController _titleController;
-  late TextEditingController _descriptionController;
-  late List<Chapter> mockChapters; 
+  late List<Chapter> mockChapters;
 
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController();
-    _descriptionController = TextEditingController();
-    mockChapters = _loadMockChapters(); 
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
+    mockChapters = _loadMockChapters();
+    Get.put(ChapterController());
   }
 
   @override
@@ -49,6 +36,7 @@ class _ChapterManageScreenState extends State<ChapterManageScreen> {
           fontSize: 20,
         ),
         backgroundColor: Colors.amber[300],
+        title: Text('Chapter Management'),
       ),
       body: ListView.builder(
         itemCount: mockChapters.length,
@@ -67,7 +55,7 @@ class _ChapterManageScreenState extends State<ChapterManageScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.to(ChapterUploadScreen()),
+        onPressed: () => Get.to(ChapterAddScreen(comicId: widget.comic!.id)),
         shape: const StadiumBorder(),
         backgroundColor: Colors.amber,
         child: const Icon(Icons.add),
@@ -78,9 +66,12 @@ class _ChapterManageScreenState extends State<ChapterManageScreen> {
   // Function to load mock chapters
   List<Chapter> _loadMockChapters() {
     return [
-      Chapter(id: 1, title: 'Chapter 1', description: 'Description for Chapter 1'),
-      Chapter(id: 2, title: 'Chapter 2', description: 'Description for Chapter 2'),
-      Chapter(id: 3, title: 'Chapter 3', description: 'Description for Chapter 3'),
+      Chapter(
+          id: 1, title: 'Chapter 1', description: 'Description for Chapter 1', price: 0),
+      Chapter(
+          id: 2, title: 'Chapter 2', description: 'Description for Chapter 2', price: 0),
+      Chapter(
+          id: 3, title: 'Chapter 3', description: 'Description for Chapter 3', price: 0),
     ];
   }
 
@@ -88,53 +79,5 @@ class _ChapterManageScreenState extends State<ChapterManageScreen> {
     setState(() {
       mockChapters.removeWhere((chapter) => chapter.id == chapterId);
     });
-  }
-
-  void _showAddChapterDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Add New Chapter'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _titleController,
-                decoration: InputDecoration(labelText: 'Title'),
-              ),
-              TextField(
-                controller: _descriptionController,
-                decoration: InputDecoration(labelText: 'Description'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                final newChapter = Chapter(
-                  id: mockChapters.length + 1,
-                  title: _titleController.text,
-                  description: _descriptionController.text,
-                );
-                setState(() {
-                  mockChapters.add(newChapter);
-                });
-                _titleController.clear();
-                _descriptionController.clear();
-                Navigator.of(context).pop();
-              },
-              child: Text('Add'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }

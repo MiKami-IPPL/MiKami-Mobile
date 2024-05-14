@@ -77,6 +77,8 @@ class AuthorController extends GetxService {
       var url =
           Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics);
 
+      print(url);    
+
       Map body = {
         'title': titleController.text,
         'description': descriptionController.text,
@@ -124,41 +126,70 @@ class AuthorController extends GetxService {
     }
   }
 
-  Future<void> updateComic(String title, String newTitle, String newDescription) async {
-    try {
-      final SharedPreferences? prefs = await _prefs;
-      var token = prefs?.getString('token');
+  Future<void> updateComic(int comicId, Map<String, dynamic> updatedData) async {
+  try {
+    final SharedPreferences? prefs = await _prefs;
+    var token = prefs?.getString('token');
 
-      var headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      };
+    var headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
 
-      var url = Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics + '/$title');
+    var url = Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics + '/$comicId/update');
 
-      Map body = {
-        'title': newTitle,
-        'description': newDescription,
-      };
+    // Validate rate and price fields
+    double? rate;
+    double? price;
+    if (double.tryParse(rateController.text) != null) {
+      rate = double.parse(rateController.text);
+    }
+    if (double.tryParse(priceController.text) != null) {
+      price = double.parse(priceController.text);
+    }
 
-      http.Response response = await http.put(url, body: jsonEncode(body), headers: headers);
-      final json = jsonDecode(response.body);
-      print(json);
+    if (rate == null || price == null) {
+      // Display error message if rate or price is invalid
+      Get.showSnackbar(GetSnackBar(
+        title: "Error",
+        message: 'Rate and price must be valid numbers',
+        icon: Icon(Icons.error, color: Colors.white),
+        duration: const Duration(seconds: 5),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+
+    // Set rate and price in the updated data
+    updatedData['rate'] = rate;
+    updatedData['price'] = price;
+
+    http.Response response = await http.put(
+      url,
+      body: jsonEncode(updatedData),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      var json = jsonDecode(response.body);
 
       if (json['status'] == 'success') {
         Get.showSnackbar(GetSnackBar(
-          title: "Sukses",
-          message: 'Komik berhasil diperbarui',
+          title: "Success",
+          message: 'Comic successfully updated',
           icon: Icon(Icons.check_circle, color: Colors.white),
           duration: const Duration(seconds: 5),
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green,
         ));
+        // Refresh the list of comics after update
         await getComics();
       } else {
+        // Handle API error response
         Get.showSnackbar(GetSnackBar(
-          title: "Gagal",
+          title: "Error",
           message: json['message'],
           icon: Icon(Icons.error, color: Colors.white),
           duration: const Duration(seconds: 5),
@@ -166,10 +197,29 @@ class AuthorController extends GetxService {
           backgroundColor: Colors.red,
         ));
       }
-    } catch (e) {
-      print(e.toString());
+    } else {
+      // Handle HTTP error response
+      Get.showSnackbar(GetSnackBar(
+        title: "Error",
+        message: 'Failed to update comic: HTTP ${response.statusCode}',
+        icon: Icon(Icons.error, color: Colors.white),
+        duration: const Duration(seconds: 5),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+      ));
     }
+  } catch (e) {
+    print("Error updating comic: $e");
+    Get.showSnackbar(GetSnackBar(
+      title: "Error",
+      message: 'An error occurred while updating the comic',
+      icon: Icon(Icons.error, color: Colors.white),
+      duration: const Duration(seconds: 5),
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red,
+    ));
   }
+}
 
   Future<String> deleteComic(String comicId) async {
   try {

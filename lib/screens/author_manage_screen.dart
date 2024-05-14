@@ -4,6 +4,8 @@ import 'package:mikami_mobile/model/comic.dart';
 import 'package:mikami_mobile/screens/chapter_manage_screen.dart';
 import 'package:mikami_mobile/services_api/author_service.dart';
 import 'package:mikami_mobile/screens/author_add_comic.dart';
+import 'package:mikami_mobile/screens/author_update_comic.dart';
+import 'package:mikami_mobile/screens/chapter_upload.dart';
 
 class AuthorManage extends StatefulWidget {
   const AuthorManage({Key? key}) : super(key: key);
@@ -118,7 +120,7 @@ class _AuthorManageState extends State<AuthorManage> {
           Comic comic = authorController.comics[index];
           return GestureDetector(
             onTap: () {
-              Get.to(ChapterManageScreen(comic: comic));
+              Get.to(() => ChapterManageScreen(comic: comic));
             },
             child: ListTile(
               contentPadding:
@@ -153,9 +155,11 @@ class _AuthorManageState extends State<AuthorManage> {
                   PopupMenuButton<String>(
                     onSelected: (String choice) {
                       if (choice == 'Lihat Daftar Chapter') {
-                        Get.to(ChapterManageScreen(comic: comic));
+                        Get.to(() => ChapterManageScreen(comic: comic));
                       } else if (choice == 'Hapus Komik') {
-                        _deleteComic(comic.id.toString()); // Fix here
+                        _deleteComic(comic.id.toString()); 
+                      } else if (choice == 'Update Informasi Komik') {
+                        Get.to(UpdateComic(comic: comic));
                       }
                     },
                     itemBuilder: (BuildContext context) =>
@@ -166,7 +170,7 @@ class _AuthorManageState extends State<AuthorManage> {
                       ),
                       const PopupMenuItem<String>(
                         value: 'Update Informasi Komik',
-                        child: Text('Lihat Daftar Chapter'),
+                        child: Text('Update Informasi Komik'),
                       ),
                       const PopupMenuItem<String>(
                         value: 'Hapus Komik',
@@ -189,7 +193,8 @@ class _AuthorManageState extends State<AuthorManage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Konfirmasi Hapus"),
-          content: Text("Apakah Anda yakin ingin menghapus komik '${comic.title}'?"),
+          content:
+              Text("Apakah Anda yakin ingin menghapus komik '${comic.title}'?"),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -199,7 +204,7 @@ class _AuthorManageState extends State<AuthorManage> {
             ),
             TextButton(
               onPressed: () {
-                _deleteComic(comic.id.toString()); 
+                _deleteComic(comic.id.toString());
                 Navigator.of(context).pop();
               },
               child: const Text("Hapus"),
@@ -211,27 +216,26 @@ class _AuthorManageState extends State<AuthorManage> {
   }
 
   void _deleteComic(String comicId) async {
-  String response = await authorController.deleteComic(comicId); 
-  if (response == 'success') {
-    // Show success message
-    Get.showSnackbar(GetBar(
-      title: "Success",
-      message: "Comic successfully deleted",
-      duration: const Duration(seconds: 5),
-      backgroundColor: Colors.green,
-    ));
-    
-    await authorController.getComics(); 
-  } else {
-    
-    Get.showSnackbar(GetBar(
-      title: "Error",
-      message: "Failed to delete comic",
-      duration: const Duration(seconds: 5),
-      backgroundColor: Colors.red,
-    ));
+    String response = await authorController.deleteComic(comicId);
+    if (response == 'success') {
+      // Show success message
+      Get.showSnackbar(GetBar(
+        title: "Success",
+        message: "Comic successfully deleted",
+        duration: const Duration(seconds: 5),
+        backgroundColor: Colors.green,
+      ));
+
+      await authorController.getComics();
+    } else {
+      Get.showSnackbar(GetBar(
+        title: "Error",
+        message: "Failed to delete comic",
+        duration: const Duration(seconds: 5),
+        backgroundColor: Colors.red,
+      ));
+    }
   }
-}
 }
 
 class ListTileSubtitle extends StatelessWidget {
