@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
+import 'package:mikami_mobile/screens/user/pengaduan_screen.dart';
 import 'package:mikami_mobile/screens/user/profile_screen.dart';
 import 'package:mikami_mobile/screens/user/search_screen.dart';
 import 'package:mikami_mobile/screens/user/topup_screen.dart';
@@ -28,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    userController.getRecomendedKomik();
     //return route to login screen if user is not logged in
     return FutureBuilder(
       future: authcontroller.isLogin(),
@@ -37,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
             // profileController.logout();
             return WelcomeScreen();
           } else {
-            userController.getRecomendedKomik();
             return HomeWidget();
           }
         } else {
@@ -294,14 +295,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         SizedBox(width: 10), // Add some space at the beginning
                         MenuCard(
-                          icon: Icons.favorite,
-                          label: 'Komik Favorit',
+                          icon: Icons.report,
+                          label: 'Pengaduan',
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ComicFavorite()),
-                            );
+                            Get.to(() => PengaduanScreen());
                           },
                         ),
                         MenuCard(

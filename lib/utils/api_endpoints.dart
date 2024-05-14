@@ -13,4 +13,5 @@ class _AuthEndPoints {
   final String Profile = 'profile';
   final String ForgotPassword = 'forgot-password';
   final String Withdrawal = 'coins/withdrawal';
+  final String Report = 'comics/\$id/report';
 }
