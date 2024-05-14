@@ -42,7 +42,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           color: Colors.white,
                           fontSize: 20,
                         ),
-                        backgroundColor: Colors.amber[300],
+                        backgroundColor: lightColorScheme.primary,
                       ),
                       body:
                           //make scrollable
@@ -84,132 +84,42 @@ class _SearchScreenState extends State<SearchScreen> {
                                       ),
                                       //if press enter on keyboard do search
                                       onSubmitted: (Null) async {
-                                        await userController.searchAllKomik();
+                                        await userController.searchKomik();
+                                        //reset screen
+                                        setState(() {});
                                       },
                                     ),
                                   ),
                                   IconButton(
                                     onPressed: () async {
-                                      await userController.searchAllKomik();
+                                      await userController.searchKomik();
+                                      //reset screen
+                                      setState(() {});
                                     },
                                     icon: const Icon(Icons.search),
                                   ),
                                 ],
                               ),
                             ),
-                            //make list of data
-                            ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: prefs.getInt('dataKomik[Max]') ?? 0,
-                              itemBuilder: (context, index) {
-                                return Container(
-                                  margin: const EdgeInsets.all(5),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10),
+                            //reset list data
+                            if (prefs.getInt('dataKomik[Max]') != 0) listData(),
+                            //if no data or 0
+                            if (prefs.getInt('dataKomik[Max]') == 0)
+                              Container(
+                                margin: const EdgeInsets.all(10),
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Text(
+                                  'Data not found',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 50,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey,
-                                          borderRadius:
-                                              BorderRadius.circular(50),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          //fix text overflow
-                                          Row(
-                                            children: [
-                                              if (prefs
-                                                      .getString(
-                                                          'dataKomik[$index][title]')!
-                                                      .length <=
-                                                  24)
-                                                Text(
-                                                  '${prefs.getString('dataKomik[$index][title]')}',
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              if (prefs
-                                                      .getString(
-                                                          'dataKomik[$index][title]')!
-                                                      .length >
-                                                  25)
-                                                Text(
-                                                  prefs
-                                                          .getString(
-                                                              'dataKomik[$index][title]')!
-                                                          .substring(0, 25) +
-                                                      '...',
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              // Text(
-                                              //   '${prefs.getString('dataKomik[$index][price]')} Koin',
-                                              //   style: const TextStyle(
-                                              //     fontSize: 1,
-                                              //     fontWeight: FontWeight.bold,
-                                              //   ),
-                                              // ),
-                                            ],
-                                          ),
-
-                                          if (prefs
-                                                  .getString(
-                                                      'dataKomik[$index][description]')!
-                                                  .length <=
-                                              29)
-                                            Text(
-                                              'Deskripsi: ${prefs.getString('dataKomik[$index][description]'.tr)}',
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          if (prefs
-                                                  .getString(
-                                                      'dataKomik[$index][description]')!
-                                                  .length >
-                                              30)
-                                            Text(
-                                              'Deskripsi: ${prefs.getString('dataKomik[$index][description]')!.substring(0, 30) + '...'}',
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          Text(
-                                              '${prefs.getString('dataKomik[$index][genres]')}',
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                              )),
-                                        ],
-                                      ),
-                                      const Spacer(),
-                                      //show price
-                                      Text(
-                                        '${prefs.getString('dataKomik[$index][price]')} Koin',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
+                                ),
+                              ),
                           ],
                         ),
                       ));
@@ -224,5 +134,121 @@ class _SearchScreenState extends State<SearchScreen> {
         }
       },
     );
+  }
+
+  //make widget for list of data
+  Widget listData() {
+    return FutureBuilder(
+        future: _prefs,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final SharedPreferences prefs = snapshot.data as SharedPreferences;
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: prefs.getInt('dataKomik[Max]') ?? 0,
+              itemBuilder: (context, index) {
+                return Container(
+                  margin: const EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: Image.network(
+                          prefs.getString('dataKomik[$index][cover]')!,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          //fix text overflow
+                          Row(
+                            children: [
+                              if (prefs
+                                      .getString('dataKomik[$index][title]')!
+                                      .length <=
+                                  24)
+                                Text(
+                                  '${prefs.getString('dataKomik[$index][title]')}',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              if (prefs
+                                      .getString('dataKomik[$index][title]')!
+                                      .length >
+                                  25)
+                                Text(
+                                  prefs
+                                          .getString(
+                                              'dataKomik[$index][title]')!
+                                          .substring(0, 25) +
+                                      '...',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                            ],
+                          ),
+
+                          if (prefs
+                                  .getString('dataKomik[$index][description]')!
+                                  .length <=
+                              29)
+                            Text(
+                              'Deskripsi: ${prefs.getString('dataKomik[$index][description]'.tr)}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                              ),
+                            ),
+                          if (prefs
+                                  .getString('dataKomik[$index][description]')!
+                                  .length >
+                              30)
+                            Text(
+                              'Deskripsi: ${prefs.getString('dataKomik[$index][description]')!.substring(0, 30) + '...'}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                              ),
+                            ),
+                          Text(
+                              '${prefs.getString('dataKomik[$index][genres]')}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                              )),
+                        ],
+                      ),
+                      const Spacer(),
+                      //show price
+                      Text(
+                        '${prefs.getInt('dataKomik[$index][price]')} Koin',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          } else {
+            return const CircularProgressIndicator();
+          }
+        });
   }
 }

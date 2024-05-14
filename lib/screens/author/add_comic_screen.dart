@@ -108,9 +108,7 @@ class _AddComicState extends State<AddComic> {
                             hintText: 'Title',
                           ),
                         ),
-                        // add preview image when user click on the button
-                        if (prefs.getString('cover_image') != null)
-                          Image.file(File(prefs.getString('cover_image')!)),
+
                         ElevatedButton(
                           onPressed: () async {
                             final ImagePicker picker = ImagePicker();
@@ -123,6 +121,13 @@ class _AddComicState extends State<AddComic> {
                           },
                           child: Text('Pick Cover Image'),
                         ),
+                        // add preview image when user click on the button
+                        if (prefs.getString('cover_image') != null)
+                          Image.file(
+                            File(prefs.getString('cover_image')!),
+                            width: 200, // Set the desired width
+                            height: 200, // Set the desired height
+                          ),
 
                         TextFormField(
                           controller: authorController.descriptionController,
@@ -137,22 +142,7 @@ class _AddComicState extends State<AddComic> {
                             hintText: 'Description',
                           ),
                         ),
-                        TextFormField(
-                          keyboardType: TextInputType.number,
-                          controller: authorController.rateController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter rate of comic';
-                            } else if (double.tryParse(value) == null) {
-                              return 'Rate must be a number';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Rate',
-                            hintText: 'Rate',
-                          ),
-                        ),
+
                         TextFormField(
                           keyboardType: TextInputType.number,
                           controller: authorController.priceController,

@@ -31,54 +31,66 @@ class AuthorController extends GetxService {
           Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics);
 
       var path_cover = prefs?.getString('cover_image');
-      File cover = File(path_cover!);
-      // print(path_cover);
-      var request = http.MultipartRequest('POST', url);
+      if (path_cover != null) {
+        File cover = File(path_cover);
+        print(cover.path);
+        var request = http.MultipartRequest('POST', url);
 
-      //take the file
-      var multipartFile =
-          await http.MultipartFile.fromPath('cover', cover.path);
+        //take the file
+        var multipartFile =
+            await http.MultipartFile.fromPath('cover', cover.path);
 
-      request.files.add(multipartFile);
-      //genreList to list<int>
-      var genreList = genreIdController.text.split(',').map(int.parse).toList();
+        request.files.add(multipartFile);
+        //genreList to list<int>
+        var genreList =
+            genreIdController.text.split(',').map(int.parse).toList();
 
-      request.fields['title'] = titleController.text;
-      request.fields['description'] = descriptionController.text;
-      request.fields['author'] = prefs!.getString('name')!;
-      request.fields['price'] = priceController.text;
-      request.fields['rate'] = rateController.text;
-      //insert list<int> to request.fields
-      for (var i = 0; i < genreList.length; i++) {
-        request.fields['genres_id[$i]'] = genreList[i].toString();
-      }
+        request.fields['title'] = titleController.text;
+        request.fields['description'] = descriptionController.text;
+        request.fields['author'] = prefs!.getString('name')!;
+        request.fields['price'] = priceController.text;
+        //insert list<int> to request.fields
+        for (var i = 0; i < genreList.length; i++) {
+          request.fields['genres_id[$i]'] = genreList[i].toString();
+        }
 
-      request.headers.addAll(headers);
-      final response = await request.send();
-      final respStr = await response.stream.bytesToString();
-      final json = jsonDecode(respStr);
-      print(json);
+        request.headers.addAll(headers);
+        final response = await request.send();
+        final respStr = await response.stream.bytesToString();
+        final json = jsonDecode(respStr);
+        print(json);
 
-      if (json == 'success') {
-        Get.back();
-        titleController.clear();
-        descriptionController.clear();
-        genreIdController.clear();
-        prefs?.remove('cover');
-        priceController.clear();
-        rateController.clear();
-        Get.showSnackbar(GetSnackBar(
-          title: "Sukses",
-          message: 'Komik berhasil ditambahkan',
-          icon: Icon(Icons.check_circle, color: Colors.white),
-          duration: const Duration(seconds: 5),
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-        ));
+        if (json == 'success') {
+          //getx back to previous page
+          Get.back();
+          titleController.clear();
+          descriptionController.clear();
+          genreIdController.clear();
+          prefs.remove('cover_image');
+          priceController.clear();
+          rateController.clear();
+          Get.showSnackbar(GetSnackBar(
+            title: "Sukses",
+            message: 'Komik berhasil ditambahkan',
+            icon: Icon(Icons.check_circle, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+          ));
+        } else {
+          Get.showSnackbar(GetSnackBar(
+            title: "Failed",
+            message: json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+          ));
+        }
       } else {
         Get.showSnackbar(GetSnackBar(
-          title: "Gagal",
-          message: json['message'],
+          title: "Failed",
+          message: "Chose cover image first",
           icon: Icon(Icons.error, color: Colors.white),
           duration: const Duration(seconds: 5),
           snackPosition: SnackPosition.BOTTOM,

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mikami_mobile/screens/user/home_screen.dart';
 import 'package:mikami_mobile/services_api/controller/profile_service.dart';
+import 'package:mikami_mobile/services_api/controller/user_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +16,7 @@ class LoginController extends GetxService {
   TextEditingController emailForgotController = TextEditingController();
 
   ProfileController profilecontroller = Get.put(ProfileController());
+  UserController usercontroller = Get.put(UserController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   Future<bool> isLogin() async {
@@ -99,6 +101,7 @@ class LoginController extends GetxService {
         final SharedPreferences? prefs = await _prefs;
         prefs?.clear();
         prefs?.setString('token', json['data']['token']);
+
         Get.offAll(() => HomeScreen());
 
         await profilecontroller.getProfile();
@@ -150,7 +153,6 @@ class LoginController extends GetxService {
         prefs?.clear();
         prefs?.setString('token', json['data']['token']);
         Get.offAll(() => HomeScreen());
-
         await profilecontroller.getProfile();
         Get.showSnackbar(GetSnackBar(
           title: "Sukses",
@@ -185,7 +187,7 @@ class LoginController extends GetxService {
       duration: Duration(seconds: 1),
       backgroundColor: lightColorScheme.secondary,
     ));
-    loginWithEmail();
+    await loginWithEmail();
   }
 
   //make getsnack to show loading when tamu login
@@ -198,6 +200,6 @@ class LoginController extends GetxService {
       duration: Duration(seconds: 1),
       backgroundColor: lightColorScheme.secondary,
     ));
-    loginTamuLoading();
+    await loginTamuLoading();
   }
 }
