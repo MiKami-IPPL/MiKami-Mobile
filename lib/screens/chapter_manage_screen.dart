@@ -1,6 +1,5 @@
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:mikami_mobile/model/chapter.dart';
+import 'package:get/get.dart';
 import 'package:mikami_mobile/model/comic.dart';
 import 'package:mikami_mobile/screens/chapter_upload.dart';
 import 'package:mikami_mobile/services_api/chapter_service.dart';
@@ -15,69 +14,80 @@ class ChapterManageScreen extends StatefulWidget {
 }
 
 class _ChapterManageScreenState extends State<ChapterManageScreen> {
-  late List<Chapter> mockChapters;
+  late ChapterController _chapterController;
 
   @override
   void initState() {
     super.initState();
-    mockChapters = _loadMockChapters();
-    Get.put(ChapterController());
+    _chapterController = Get.put(ChapterController());
+    _loadChapters();
+  }
+
+  void _loadChapters() async {
+    await _chapterController.getChapters(widget.comic!.id.toString());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 20,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
+          'Kelola Chapter',
+          style: TextStyle(color: Colors.white, fontSize: 20),
         ),
         backgroundColor: Colors.amber[300],
-        title: Text('Chapter Management'),
       ),
-      body: ListView.builder(
-        itemCount: mockChapters.length,
-        itemBuilder: (context, index) {
-          final chapter = mockChapters[index];
-          return ListTile(
-            title: Text(chapter.title),
-            subtitle: Text(chapter.description),
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                _deleteChapter(chapter.id);
-              },
-            ),
+      body: Obx(() {
+        if (_chapterController.hasError.value) {
+          return Center(child: Text(_chapterController.errorMessage.value));
+        } else if (_chapterController.chapters.isEmpty) {
+          return Center(child: Text('No chapters available'));
+        } else {
+          return ListView.builder(
+            itemCount: _chapterController.chapters.length,
+            itemBuilder: (context, index) {
+              final chapter = _chapterController.chapters[index];
+              return Column(
+                children: [
+                  ListTile(
+                    title: Text(chapter.title ?? 'No title'),
+                    subtitle: Text(chapter.description ?? 'No description'),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () {
+                            _deleteChapter(chapter.id.toString());
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.more_vert),
+                          onPressed: () {
+                            
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(),
+                ],
+              );
+            },
           );
-        },
-      ),
+        }
+      }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.to(ChapterAddScreen(comicId: widget.comic!.id)),
-        shape: const StadiumBorder(),
-        backgroundColor: Colors.amber,
-        child: const Icon(Icons.add),
+        onPressed: () {
+          Get.to(ChapterAddScreen(comicId: widget.comic!.id!));
+        },
+        child: Icon(Icons.add),
       ),
     );
   }
 
-  // Function to load mock chapters
-  List<Chapter> _loadMockChapters() {
-    return [
-      Chapter(
-          id: 1, title: 'Chapter 1', description: 'Description for Chapter 1', price: 0),
-      Chapter(
-          id: 2, title: 'Chapter 2', description: 'Description for Chapter 2', price: 0),
-      Chapter(
-          id: 3, title: 'Chapter 3', description: 'Description for Chapter 3', price: 0),
-    ];
-  }
-
-  void _deleteChapter(int chapterId) {
-    setState(() {
-      mockChapters.removeWhere((chapter) => chapter.id == chapterId);
-    });
+  void _deleteChapter(String chapterId) async {
+    // Implement delete chapter logic here
   }
 }

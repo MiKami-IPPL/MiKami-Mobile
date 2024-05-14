@@ -6,17 +6,30 @@ import 'package:mikami_mobile/model/chapter.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ChapterController extends GetxService {
+class ChapterController extends GetxController {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController subtitleController = TextEditingController();
   final TextEditingController imageController = TextEditingController();
+  final TextEditingController priceController = TextEditingController();
+  var isLoading = false.obs;
+  var hasError = false.obs;
+  var errorMessage = ''.obs;
+  var chapters = <Chapter>[].obs;
 
   Future<void> getChapters(String comicId) async {
     try {
-      final SharedPreferences? prefs = await _prefs;
-      var token = prefs?.getString('token');
+      isLoading(true);
+      hasError(false);
+      errorMessage('');
+
+      final SharedPreferences prefs = await _prefs;
+      var token = prefs.getString('token') ?? '';
+
+      if (token.isEmpty) {
+        throw Exception('Token is null or empty');
+      }
 
       var headers = {
         'Content-Type': 'application/json',
@@ -24,86 +37,101 @@ class ChapterController extends GetxService {
         'Authorization': 'Bearer $token',
       };
 
-      var url = Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics + '/$comicId/chapters' );
-
+      var url = Uri.parse(ApiEndPoints.baseUrl +
+          ApiEndPoints.authEndPoints.Comics +
+          '/$comicId/chapters');
 
       http.Response response = await http.get(url, headers: headers);
 
       final json = jsonDecode(response.body);
 
       if (json['status'] == 'success') {
-        
+        List<dynamic> chapterList = json['data'] ?? [];
+        chapters.assignAll(chapterList
+            .map((chapterJson) => Chapter.fromJson(chapterJson))
+            .toList());
       } else {
-        // Handle error response
+        throw Exception(json['message'] ?? 'Unknown error');
       }
     } catch (e) {
-      print(e.toString());
-      // Handle error
+      hasError(true);
+      errorMessage(e.toString());
+    } finally {
+      isLoading(false); // Set isLoading to false after API call completes
     }
   }
 
   Future<void> addChapter({
-  required String comicId,
-  required String title,
-  required String subtitle,
-  required List<String> imagePaths,
-  required int price,
-}) async {
-  try {
-    final SharedPreferences? prefs = await _prefs;
-    var token = prefs?.getString('token');
+    required String comicId,
+    required String title,
+    required String subtitle,
+    required List<String> imagePaths,
+    required int price,
+  }) async {
+    try {
+      final SharedPreferences prefs = await _prefs;
+      var token = prefs.getString('token') ?? '';
 
-    var headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
-    };
+      if (token.isEmpty) {
+        throw Exception('Token is null or empty');
+      }
 
-    var url = Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics + '/$comicId/chapters' );
+      var headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
 
-    print(url);
+      var url = Uri.parse(ApiEndPoints.baseUrl +
+          ApiEndPoints.authEndPoints.Comics +
+          '/$comicId/chapters');
 
-    Map<String, dynamic> requestBody = {
-      'title': title,
-      'subtitle': subtitle,
-      'price': price,
-      'images': imagePaths.map((imagePath) => {'image': imagePath}).toList(),
-    };
+      Map<String, dynamic> requestBody = {
+        'title': title,
+        'subtitle': subtitle,
+        'price': price,
+        'images': imagePaths.map((imagePath) => {'image': imagePath}).toList(),
+      };
 
-    http.Response response = await http.post(
-      url,
-      headers: headers,
-      body: jsonEncode(requestBody),
-    );
+      http.Response response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode(requestBody),
+      );
 
-    final json = jsonDecode(response.body);
+      final json = jsonDecode(response.body);
 
-    if (json['status'] == 'success') {
-      // Handle successful response
+      if (json['status'] == 'success') {
+        Get.showSnackbar(GetSnackBar(
+          title: "Sukses",
+          message: 'Chapter berhasil ditambahkan',
+          icon: Icon(Icons.check_circle, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+        ));
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: "Gagal",
+          message: json['message'] ?? 'Unknown error',
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        ));
+      }
+    } catch (e) {
+      print(e.toString());
       Get.showSnackbar(GetSnackBar(
-        title: "Sukses",
-        message: 'Chapter berhasil ditambahkan',
-        icon: Icon(Icons.check_circle, color: Colors.white),
-        duration: const Duration(seconds: 5),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-      ));
-    } else {
-      // Handle error response
-      Get.showSnackbar(GetSnackBar(
-        title: "Gagal",
-        message: json['message'],
+        title: "Error",
+        message: e.toString(),
         icon: Icon(Icons.error, color: Colors.white),
         duration: const Duration(seconds: 5),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
       ));
     }
-  } catch (e) {
-    print(e.toString());
-    // Handle error
   }
-}
 
   Future<void> updateChapter({
     required String comicId,
@@ -111,10 +139,15 @@ class ChapterController extends GetxService {
     required String title,
     required String subtitle,
     required List<String> imagePaths,
+    required int price,
   }) async {
     try {
-      final SharedPreferences? prefs = await _prefs;
-      var token = prefs?.getString('token');
+      final SharedPreferences prefs = await _prefs;
+      var token = prefs.getString('token') ?? '';
+
+      if (token.isEmpty) {
+        throw Exception('Token is null or empty');
+      }
 
       var headers = {
         'Content-Type': 'application/json',
@@ -122,11 +155,14 @@ class ChapterController extends GetxService {
         'Authorization': 'Bearer $token',
       };
 
-      var url = Uri.parse('${ApiEndPoints.baseUrl}/api/comics/$comicId/chapters/$chapterId/update');
+      var url = Uri.parse(ApiEndPoints.baseUrl +
+          ApiEndPoints.authEndPoints.Comics +
+          '/$comicId/chapters/$chapterId');
 
       Map<String, dynamic> requestBody = {
         'title': title,
         'subtitle': subtitle,
+        'price': price,
         'images': imagePaths.map((imagePath) => {'image': imagePath}).toList(),
       };
 
@@ -139,13 +175,34 @@ class ChapterController extends GetxService {
       final json = jsonDecode(response.body);
 
       if (json['status'] == 'success') {
-        // Handle successful response
+        Get.showSnackbar(GetSnackBar(
+          title: "Sukses",
+          message: 'Chapter berhasil diperbarui',
+          icon: Icon(Icons.check_circle, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+        ));
       } else {
-        // Handle error response
+        Get.showSnackbar(GetSnackBar(
+          title: "Gagal",
+          message: json['message'] ?? 'Unknown error',
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        ));
       }
     } catch (e) {
       print(e.toString());
-      // Handle error
+      Get.showSnackbar(GetSnackBar(
+        title: "Error",
+        message: e.toString(),
+        icon: Icon(Icons.error, color: Colors.white),
+        duration: const Duration(seconds: 5),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+      ));
     }
   }
 
@@ -154,8 +211,12 @@ class ChapterController extends GetxService {
     required String chapterId,
   }) async {
     try {
-      final SharedPreferences? prefs = await _prefs;
-      var token = prefs?.getString('token');
+      final SharedPreferences prefs = await _prefs;
+      var token = prefs.getString('token') ?? '';
+
+      if (token.isEmpty) {
+        throw Exception('Token is null or empty');
+      }
 
       var headers = {
         'Content-Type': 'application/json',
@@ -163,7 +224,8 @@ class ChapterController extends GetxService {
         'Authorization': 'Bearer $token',
       };
 
-      var url = Uri.parse('${ApiEndPoints.baseUrl}/api/comics/$comicId/chapters/$chapterId/delete');
+      var url = Uri.parse(
+          '${ApiEndPoints.baseUrl}/api/comics/$comicId/chapters/$chapterId/delete');
 
       http.Response response = await http.delete(
         url,
@@ -173,15 +235,34 @@ class ChapterController extends GetxService {
       final json = jsonDecode(response.body);
 
       if (json['status'] == 'success') {
-        // Handle successful response
+        Get.showSnackbar(GetSnackBar(
+          title: "Sukses",
+          message: 'Chapter berhasil dihapus',
+          icon: Icon(Icons.check_circle, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+        ));
       } else {
-        // Handle error response
+        Get.showSnackbar(GetSnackBar(
+          title: "Gagal",
+          message: json['message'] ?? 'Unknown error',
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        ));
       }
     } catch (e) {
       print(e.toString());
-      // Handle error
+      Get.showSnackbar(GetSnackBar(
+        title: "Error",
+        message: e.toString(),
+        icon: Icon(Icons.error, color: Colors.white),
+        duration: const Duration(seconds: 5),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+      ));
     }
   }
-
-  // Add other methods as needed
 }
