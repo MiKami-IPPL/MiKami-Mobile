@@ -12,4 +12,5 @@ class _AuthEndPoints {
   final String Coins = 'coins';
   final String Profile = 'profile';
   final String ForgotPassword = 'forgot-password';
+  final String Withdrawal = 'coins/withdrawal';
 }

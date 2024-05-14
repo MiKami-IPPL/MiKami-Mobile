@@ -5,13 +5,13 @@ import 'package:mikami_mobile/screens/user/profile_screen.dart';
 import 'package:mikami_mobile/screens/user/search_screen.dart';
 import 'package:mikami_mobile/screens/user/topup_screen.dart';
 import 'package:mikami_mobile/screens/auth/welcome_screen.dart';
-import 'package:mikami_mobile/services_api/controller/login_service.dart';
+import 'package:mikami_mobile/services_api/controller/auth_service.dart';
 import 'package:mikami_mobile/services_api/controller/profile_service.dart';
 import 'package:mikami_mobile/services_api/controller/user_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../comic_favorite_screen.dart';
-import '../author/author_menu_screen.dart';
+import '../author/menu_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,7 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentSlide = 0;
   ProfileController profileController = Get.put(ProfileController());
-  LoginController loginController = Get.put(LoginController());
+  AuthController authcontroller = Get.put(AuthController());
   UserController userController = Get.put(UserController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     //return route to login screen if user is not logged in
     return FutureBuilder(
-      future: loginController.isLogin(),
+      future: authcontroller.isLogin(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data == false) {

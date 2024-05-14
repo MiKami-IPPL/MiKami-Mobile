@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/auth/login_screen.dart';
-import 'package:mikami_mobile/services_api/controller/login_service.dart';
+import 'package:mikami_mobile/services_api/controller/auth_service.dart';
 import 'package:mikami_mobile/services_api/controller/user_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,13 +13,13 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  LoginController loginController = Get.put(LoginController());
+  AuthController authcontroller = Get.put(AuthController());
   UserController userController = Get.put(UserController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: loginController.isLogin(),
+      future: authcontroller.isLogin(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data == false) {

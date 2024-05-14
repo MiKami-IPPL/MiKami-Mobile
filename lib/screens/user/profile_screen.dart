@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/auth/login_screen.dart';
-import 'package:mikami_mobile/services_api/controller/login_service.dart';
+import 'package:mikami_mobile/services_api/controller/auth_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,13 +14,13 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  LoginController loginController = Get.put(LoginController());
+  AuthController authcontroller = Get.put(AuthController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: loginController.isLogin(),
+      future: authcontroller.isLogin(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data == false) {
@@ -72,7 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Colors.white,
                   fontSize: 20,
                 ),
-                backgroundColor: Colors.amber[300],
+                backgroundColor: lightColorScheme.primary,
               ),
               body: SingleChildScrollView(
                   child: Padding(

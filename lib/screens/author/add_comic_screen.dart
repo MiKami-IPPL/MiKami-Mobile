@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/auth/login_screen.dart';
 import 'package:mikami_mobile/services_api/controller/author_service.dart';
-import 'package:mikami_mobile/services_api/controller/login_service.dart';
+import 'package:mikami_mobile/services_api/controller/auth_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,7 +30,7 @@ class Genre {
 
 class _AddComicState extends State<AddComic> {
   final AuthorController authorController = Get.put(AuthorController());
-  final LoginController loginController = Get.put(LoginController());
+  final AuthController authcontroller = Get.put(AuthController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   static List<Genre> _genres = [
@@ -61,7 +61,7 @@ class _AddComicState extends State<AddComic> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
-      future: loginController.isLogin(),
+      future: authcontroller.isLogin(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data == false) {

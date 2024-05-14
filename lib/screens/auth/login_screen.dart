@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/auth/forgot_password_screen.dart';
 import 'package:mikami_mobile/screens/user/home_screen.dart';
 import 'package:mikami_mobile/screens/auth/register_screen.dart';
-import 'package:mikami_mobile/services_api/controller/login_service.dart';
+import 'package:mikami_mobile/services_api/controller/auth_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
@@ -16,7 +16,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  LoginController loginController = Get.put(LoginController());
+  AuthController authcontroller = Get.put(AuthController());
   final _formLoginKey = GlobalKey<FormState>();
   bool rememberMe = false;
 
@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     //return route to home screen if user already login
     return FutureBuilder(
-      future: loginController.isLogin(),
+      future: authcontroller.isLogin(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data == false) {
@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 20,
                       ),
                       TextFormField(
-                        controller: loginController.emailController,
+                        controller: authcontroller.emailController,
                         validator: (value) =>
                             value!.isEmpty ? 'Masukkan email' : null,
                         decoration: InputDecoration(
@@ -103,9 +103,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 25,
                       ),
                       TextFormField(
-                        controller: loginController.passwordController,
+                        controller: authcontroller.passwordController,
                         onFieldSubmitted: (Null) async {
-                          await loginController.login();
+                          await authcontroller.login();
                         },
                         obscureText: true,
                         obscuringCharacter: "*",
@@ -178,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: ElevatedButton(
                           onPressed: () async {
                             if (_formLoginKey.currentState!.validate()) {
-                              loginController.login();
+                              authcontroller.login();
                             }
                           },
                           child: const Text('Masuk'),
@@ -189,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          await loginController.loginTamu();
+                          await authcontroller.loginTamu();
                         },
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
