@@ -5,7 +5,6 @@ import 'package:mikami_mobile/screens/chapter_manage_screen.dart';
 import 'package:mikami_mobile/services_api/author_service.dart';
 import 'package:mikami_mobile/screens/author_add_comic.dart';
 import 'package:mikami_mobile/screens/author_update_comic.dart';
-import 'package:mikami_mobile/screens/chapter_upload.dart';
 
 class AuthorManage extends StatefulWidget {
   const AuthorManage({Key? key}) : super(key: key);

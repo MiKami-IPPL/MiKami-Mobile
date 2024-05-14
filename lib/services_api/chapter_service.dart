@@ -155,9 +155,7 @@ class ChapterController extends GetxController {
         'Authorization': 'Bearer $token',
       };
 
-      var url = Uri.parse(ApiEndPoints.baseUrl +
-          ApiEndPoints.authEndPoints.Comics +
-          '/$comicId/chapters/$chapterId');
+      var url = Uri.parse(ApiEndPoints.baseUrl + 'chapters/$chapterId/update');
 
       Map<String, dynamic> requestBody = {
         'title': title,
@@ -207,62 +205,53 @@ class ChapterController extends GetxController {
   }
 
   Future<void> deleteChapter({
-    required String comicId,
-    required String chapterId,
-  }) async {
-    try {
-      final SharedPreferences prefs = await _prefs;
-      var token = prefs.getString('token') ?? '';
+  required String chapterId,
+}) async {
+  try {
+    final SharedPreferences prefs = await _prefs;
+    var token = prefs.getString('token') ?? '';
 
-      if (token.isEmpty) {
-        throw Exception('Token is null or empty');
-      }
-
-      var headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      };
-
-      var url = Uri.parse(
-          '${ApiEndPoints.baseUrl}/api/comics/$comicId/chapters/$chapterId/delete');
-
-      http.Response response = await http.delete(
-        url,
-        headers: headers,
-      );
-
-      final json = jsonDecode(response.body);
-
-      if (json['status'] == 'success') {
-        Get.showSnackbar(GetSnackBar(
-          title: "Sukses",
-          message: 'Chapter berhasil dihapus',
-          icon: Icon(Icons.check_circle, color: Colors.white),
-          duration: const Duration(seconds: 5),
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-        ));
-      } else {
-        Get.showSnackbar(GetSnackBar(
-          title: "Gagal",
-          message: json['message'] ?? 'Unknown error',
-          icon: Icon(Icons.error, color: Colors.white),
-          duration: const Duration(seconds: 5),
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-        ));
-      }
-    } catch (e) {
-      print(e.toString());
-      Get.showSnackbar(GetSnackBar(
-        title: "Error",
-        message: e.toString(),
-        icon: Icon(Icons.error, color: Colors.white),
-        duration: const Duration(seconds: 5),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-      ));
+    if (token.isEmpty) {
+      throw Exception('Token is null or empty');
     }
+
+    var headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    var url = Uri.parse(ApiEndPoints.baseUrl + 'chapters/$chapterId/delete');
+
+
+    http.Response response = await http.delete(
+      url,
+      headers: headers,
+    );
+
+    final json = jsonDecode(response.body);
+
+    if (json['status'] == 'success') {
+      chapters.removeWhere((chapter) => chapter.id.toString() == chapterId);
+      Get.snackbar(
+        "Success",
+        'Chapter successfully deleted',
+        backgroundColor: Colors.green,
+      );
+    } else {
+      Get.snackbar(
+        "Error",
+        json['message'] ?? 'Unknown error',
+        backgroundColor: Colors.red,
+      );
+    }
+  } catch (e) {
+    print(e.toString());
+    Get.snackbar(
+      "Error",
+      e.toString(),
+      backgroundColor: Colors.red,
+    );
   }
+}
 }

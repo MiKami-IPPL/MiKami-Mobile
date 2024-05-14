@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/model/comic.dart';
+import 'package:mikami_mobile/model/chapter.dart';
 import 'package:mikami_mobile/screens/chapter_upload.dart';
 import 'package:mikami_mobile/services_api/chapter_service.dart';
+import 'package:mikami_mobile/screens/chapter_update_screen.dart';
 
 class ChapterManageScreen extends StatefulWidget {
   final Comic? comic;
@@ -20,74 +22,109 @@ class _ChapterManageScreenState extends State<ChapterManageScreen> {
   void initState() {
     super.initState();
     _chapterController = Get.put(ChapterController());
-    _loadChapters();
+    if (widget.comic != null) {
+      _chapterController.getChapters(widget.comic!.id.toString());
+    }
   }
 
-  void _loadChapters() async {
-    await _chapterController.getChapters(widget.comic!.id.toString());
+  void _navigateToChapterUpload() {
+    Get.to(() => ChapterAddScreen(
+          comicId: widget.comic!.id,
+        ));
+  }
+
+  void _navigateToChapterUpdate(String chapterId) {
+    Get.to(() => ChapterUpdateScreen(
+          comicId: widget.comic!.id,
+          chapterId: chapterId,
+        ));
+  }
+
+  void _showDeleteConfirmationDialog(String chapterId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content: const Text('Are you sure you want to delete this chapter?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog before deletion
+                _chapterController.deleteChapter(
+                  chapterId: chapterId,
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text(
-          'Kelola Chapter',
-          style: TextStyle(color: Colors.white, fontSize: 20),
-        ),
-        backgroundColor: Colors.amber[300],
+        title: const Text('Chapter Management'),
       ),
       body: Obx(() {
-        if (_chapterController.hasError.value) {
-          return Center(child: Text(_chapterController.errorMessage.value));
+        if (_chapterController.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (_chapterController.hasError.value) {
+          return Center(
+            child: Text(
+              _chapterController.errorMessage.value,
+              style: const TextStyle(color: Colors.red),
+            ),
+          );
         } else if (_chapterController.chapters.isEmpty) {
-          return Center(child: Text('No chapters available'));
+          return const Center(child: Text('No chapters available'));
         } else {
           return ListView.builder(
             itemCount: _chapterController.chapters.length,
             itemBuilder: (context, index) {
-              final chapter = _chapterController.chapters[index];
-              return Column(
-                children: [
-                  ListTile(
-                    title: Text(chapter.title ?? 'No title'),
-                    subtitle: Text(chapter.description ?? 'No description'),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () {
-                            _deleteChapter(chapter.id.toString());
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.more_vert),
-                          onPressed: () {
-                            
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Divider(),
-                ],
+              var chapter = _chapterController.chapters[index];
+              return ListTile(
+                title: Text(chapter.title),
+                subtitle: Text(chapter.description),
+                trailing: PopupMenuButton(
+                  onSelected: (value) {
+                    if (value == 'edit') {
+                      _navigateToChapterUpdate(chapter.id.toString());
+                    } else if (value == 'delete') {
+                      _showDeleteConfirmationDialog(chapter.id.toString());
+                    }
+                  },
+                  itemBuilder: (BuildContext context) {
+                    return [
+                      const PopupMenuItem(
+                        value: 'edit',
+                        child: Text('Edit'),
+                      ),
+                      const PopupMenuItem(
+                        value: 'delete',
+                        child: Text('Delete'),
+                      ),
+                    ];
+                  },
+                ),
               );
             },
           );
         }
       }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Get.to(ChapterAddScreen(comicId: widget.comic!.id!));
-        },
-        child: Icon(Icons.add),
+        onPressed: _navigateToChapterUpload,
+        child: const Icon(Icons.add),
       ),
     );
-  }
-
-  void _deleteChapter(String chapterId) async {
-    // Implement delete chapter logic here
   }
 }
