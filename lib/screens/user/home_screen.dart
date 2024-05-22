@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
-import 'package:mikami_mobile/screens/profile_screen.dart';
-import 'package:mikami_mobile/screens/search_screen.dart';
-import 'package:mikami_mobile/screens/topup_screen.dart';
-import 'package:mikami_mobile/screens/welcome_screen.dart';
-import 'package:mikami_mobile/services_api/login_service.dart';
-import 'package:mikami_mobile/services_api/profile_service.dart';
-import 'package:mikami_mobile/services_api/user_service.dart';
+import 'package:mikami_mobile/screens/user/pengaduan_screen.dart';
+import 'package:mikami_mobile/screens/user/profile_screen.dart';
+import 'package:mikami_mobile/screens/user/search_screen.dart';
+import 'package:mikami_mobile/screens/user/topup_screen.dart';
+import 'package:mikami_mobile/screens/auth/welcome_screen.dart';
+import 'package:mikami_mobile/services_api/controller/auth_service.dart';
+import 'package:mikami_mobile/services_api/controller/profile_service.dart';
+import 'package:mikami_mobile/services_api/controller/user_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'comic_favorite_screen.dart';
-import 'author_screen.dart';
+import '../comic_favorite_screen.dart';
+import '../author/menu_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,15 +23,16 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentSlide = 0;
   ProfileController profileController = Get.put(ProfileController());
-  LoginController loginController = Get.put(LoginController());
+  AuthController authcontroller = Get.put(AuthController());
   UserController userController = Get.put(UserController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   @override
   Widget build(BuildContext context) {
+    userController.getRecomendedKomik();
     //return route to login screen if user is not logged in
     return FutureBuilder(
-      future: loginController.isLogin(),
+      future: authcontroller.isLogin(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data == false) {
@@ -48,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget HomeWidget() {
     return Scaffold(
-      backgroundColor: Colors.amber[300],
+      backgroundColor: lightColorScheme.primary,
       body: SingleChildScrollView(
         child: FutureBuilder(
           future: _prefs,
@@ -115,22 +117,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                // Row(
-                                //   children: [
-                                //     Icon(
-                                //       Icons.monetization_on,
-                                //       color: lightColorScheme.primary,
-                                //     ),
-                                //     SizedBox(width: 4),
-                                //     Text(
-                                //       'Koin anda:',
-                                //       style: TextStyle(
-                                //         fontSize: 20,
-                                //         color: Colors.black,
-                                //       ),
-                                //     ),
-                                //   ],
-                                // ),
                                 if (prefs.getString('name') != 'tamu')
                                   GestureDetector(
                                     onTap: () {
@@ -218,6 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             //when user tap on search bar, navigate to search screen
                             onTap: () async {
                               await userController.searchAllKomik();
+                              userController.searchController.clear();
                               Get.to(() => SearchScreen());
                             },
                             readOnly: true,
@@ -302,20 +289,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(height: 20),
                   Container(
                     height: 100, // Adjust the height of the menu row
-                    color: Colors.amber[600], // Set the background color
+                    color: lightColorScheme.primary, // Set the background color
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children: [
                         SizedBox(width: 10), // Add some space at the beginning
                         MenuCard(
-                          icon: Icons.favorite,
-                          label: 'Komik Favorit',
+                          icon: Icons.report,
+                          label: 'Pengaduan',
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ComicFavorite()),
-                            );
+                            Get.to(() => PengaduanScreen());
                           },
                         ),
                         MenuCard(
@@ -328,11 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             icon: Icons.auto_stories_sharp,
                             label: 'Menu Author',
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => AuthorScreen()),
-                              );
+                              Get.to(() => AuthorScreen());
                             },
                           ),
                         if (prefs.getString('name') != 'tamu')
@@ -364,23 +343,21 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               SizedBox(
                                   width: 10), // Add some space at the beginning
-                              RoundedImageWithText(
-                                imagePath: 'assets/images/solev_poster.png',
-                                text: 'Solo Leveling',
-                              ),
-                              RoundedImageWithText(
-                                imagePath: 'assets/images/maxlevel_poster.jpg',
-                                text: 'Max Level Hero',
-                              ),
-                              RoundedImageWithText(
-                                imagePath:
-                                    'assets/images/secondlife_poster.jpg',
-                                text: 'Second Life Ranker',
-                              ),
-                              RoundedImageWithText(
-                                imagePath: 'assets/images/beginning_poster.jpg',
-                                text: 'The Beginning After The End',
-                              ),
+
+                              // Add the recommended comics here if prefs.getInt('dataKomik[Max]') > 0
+                              // Use prefs.getString('dataKomik[$i][cover]') to get the cover image
+                              // Use prefs.getString('dataKomik[$i][title]') to get the title
+                              //use image from api
+                              if (prefs.getInt('dataKomik[Max]') != null)
+                                for (int i = 0;
+                                    i < prefs.getInt('dataKomik[Max]')!;
+                                    i++)
+                                  RoundedImageWithText(
+                                    imagePath: prefs
+                                        .getString('dataKomik[$i][cover]')!,
+                                    text: prefs
+                                        .getString('dataKomik[$i][title]')!,
+                                  )
                             ],
                           ),
                         ),
@@ -398,23 +375,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             scrollDirection: Axis.horizontal,
                             children: [
                               SizedBox(width: 10),
-                              RoundedImageWithText(
-                                imagePath: 'assets/images/solev_poster.png',
-                                text: 'Solo Leveling',
-                              ),
-                              RoundedImageWithText(
-                                imagePath: 'assets/images/maxlevel_poster.jpg',
-                                text: 'Max Level Hero',
-                              ),
-                              RoundedImageWithText(
-                                imagePath:
-                                    'assets/images/secondlife_poster.jpg',
-                                text: 'Second Life Ranker',
-                              ),
-                              RoundedImageWithText(
-                                imagePath: 'assets/images/beginning_poster.jpg',
-                                text: 'The Beginning After the End',
-                              ),
+                              if (prefs.getInt('dataKomik[Max]') != null)
+                                for (int i = 0;
+                                    i < prefs.getInt('dataKomik[Max]')!;
+                                    i++)
+                                  RoundedImageWithText(
+                                    imagePath: prefs
+                                        .getString('dataKomik[$i][cover]')!,
+                                    text: prefs
+                                        .getString('dataKomik[$i][title]')!,
+                                  )
                             ],
                           ),
                         ),
@@ -476,7 +446,7 @@ class MenuCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 30, color: Colors.amber),
+              Icon(icon, size: 30, color: lightColorScheme.primary),
               SizedBox(height: 8),
               Text(
                 label,
@@ -505,7 +475,7 @@ class RoundedImageWithText extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 5.0),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10.0),
-            child: Image.asset(
+            child: Image.network(
               imagePath,
               height: 150,
               width: 100,

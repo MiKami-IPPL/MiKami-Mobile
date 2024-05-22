@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mikami_mobile/screens/home_screen.dart';
-import 'package:mikami_mobile/services_api/login_service.dart';
+import 'package:mikami_mobile/screens/user/home_screen.dart';
+import 'package:mikami_mobile/services_api/controller/auth_service.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
 
 class ForgotScreen extends StatefulWidget {
@@ -13,13 +13,13 @@ class ForgotScreen extends StatefulWidget {
 
 class _ForgotScreenState extends State<ForgotScreen> {
   final _formForgotPasswordKey = GlobalKey<FormState>();
-  LoginController loginController = Get.put(LoginController());
+  AuthController authcontroller = Get.put(AuthController());
   bool rememberMe = false;
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: loginController.isLogin(),
+      future: authcontroller.isLogin(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data == false) {
@@ -70,7 +70,7 @@ class _ForgotScreenState extends State<ForgotScreen> {
                         height: 20,
                       ),
                       TextFormField(
-                        controller: loginController.emailForgotController,
+                        controller: authcontroller.emailForgotController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter email';
@@ -107,7 +107,7 @@ class _ForgotScreenState extends State<ForgotScreen> {
                           onPressed: () async {
                             if (_formForgotPasswordKey.currentState!
                                 .validate()) {
-                              await loginController.forgotPassword();
+                              await authcontroller.forgotPassword();
                             }
                           },
                           child: const Text('Submit'),

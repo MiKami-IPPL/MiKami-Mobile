@@ -61,7 +61,7 @@ class _PaymentScreen extends State<PaymentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Flutter Simple Example')),
+      appBar: AppBar(title: const Text('Top Up Coin')),
       body: WebViewWidget(controller: _controller),
     );
   }

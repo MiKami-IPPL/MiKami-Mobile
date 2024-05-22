@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:mikami_mobile/screens/welcome_screen.dart';
+import 'package:mikami_mobile/screens/auth/welcome_screen.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,6 +35,27 @@ class ProfileController extends GetxController {
 
   Future<void> changePassword() async {
     Get.toNamed('/change-password');
+  }
+
+  //Make topup coin
+  Future<void> topupCoin() async {
+    try {
+      var Url = Uri.parse(
+          ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.TopUpCoins);
+      final SharedPreferences? prefs = await _prefs;
+      var token = prefs?.getString('token');
+
+      var header = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+      var body = jsonEncode({'amount': 1000});
+
+      http.Response response = await http.post(Url, headers: header);
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   Future<void> getCoin() async {

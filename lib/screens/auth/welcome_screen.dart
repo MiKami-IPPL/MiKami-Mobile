@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:mikami_mobile/screens/login_screen.dart';
-import 'package:mikami_mobile/screens/register_screen.dart';
-import 'package:mikami_mobile/services_api/login_service.dart';
+import 'package:mikami_mobile/screens/auth/login_screen.dart';
+import 'package:mikami_mobile/screens/auth/register_screen.dart';
+import 'package:mikami_mobile/services_api/controller/auth_service.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
 import 'package:mikami_mobile/widgets/welcome_button.dart';
 
@@ -15,11 +14,11 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  LoginController loginController = Get.put(LoginController());
+  AuthController authcontroller = Get.put(AuthController());
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: loginController.isLogin(),
+      future: authcontroller.isLogin(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data == false) {

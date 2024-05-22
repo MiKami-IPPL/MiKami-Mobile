@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mikami_mobile/screens/author_withdrawal_screen.dart';
+import 'package:mikami_mobile/screens/author/withdrawal_screen.dart';
+import 'package:mikami_mobile/services_api/controller/auth_service.dart';
+import 'package:mikami_mobile/services_api/controller/author_service.dart';
+import 'package:mikami_mobile/theme/theme.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
-import 'author_manage_screen.dart';
-import 'author_comic_verify.dart';
-import 'author_history_screen.dart';
+import 'manage_screen.dart';
+import '../author_comic_verify.dart';
+import '../author_history_screen.dart';
 
 class AuthorScreen extends StatefulWidget {
   const AuthorScreen({super.key});
@@ -14,17 +17,17 @@ class AuthorScreen extends StatefulWidget {
 }
 
 class _AuthorScreenState extends State<AuthorScreen> {
-  // final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  AuthorController authorcontroller = Get.put(AuthorController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.amber[300],
+        backgroundColor: lightColorScheme.primary,
         iconTheme: const IconThemeData(
           color: Colors.white,
         ),
       ),
-      backgroundColor: Colors.amber[300],
+      backgroundColor: lightColorScheme.primary,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -62,12 +65,7 @@ class _AuthorScreenState extends State<AuthorScreen> {
                         'assets/images/list.png',
                         "Daftar Komik",
                         () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AuthorManage(),
-                            ),
-                          );
+                          Get.to(() => const AuthorManage());
                         },
                       ),
                       _buildMenuButton(
@@ -93,13 +91,9 @@ class _AuthorScreenState extends State<AuthorScreen> {
                       _buildMenuButton(
                         'assets/images/withdrawal.png',
                         "Withdrawal",
-                        () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AuthorWithdrawal(),
-                            ),
-                          );
+                        () async {
+                          await authorcontroller.getHistoryWithdrawal();
+                          Get.to(() => const WithdrawalScreen());
                         },
                       ),
                     ],

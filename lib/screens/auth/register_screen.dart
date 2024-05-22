@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:mikami_mobile/screens/login_screen.dart';
-import 'package:mikami_mobile/services_api/login_service.dart';
-import 'package:mikami_mobile/services_api/register_service.dart';
+import 'package:mikami_mobile/screens/auth/login_screen.dart';
+import 'package:mikami_mobile/services_api/controller/auth_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/widgets/custom_scaffold.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -16,8 +13,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  RegisterController registerController = Get.put(RegisterController());
-  LoginController loginController = Get.put(LoginController());
+  AuthController authcontroller = Get.put(AuthController());
   final _formRegisterKey = GlobalKey<FormState>();
   // final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
@@ -25,7 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: loginController.isLogin(),
+      future: authcontroller.isLogin(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data == false) {
@@ -75,7 +71,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     height: 40,
                   ),
                   TextFormField(
-                    controller: registerController.name,
+                    controller: authcontroller.name,
                     validator: (value) =>
                         value!.isEmpty ? 'Masukkan nama' : null,
                     decoration: InputDecoration(
@@ -103,7 +99,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     height: 25,
                   ),
                   TextFormField(
-                    controller: registerController.email,
+                    controller: authcontroller.email,
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) =>
                         value!.isEmpty ? 'Masukkan email' : null,
@@ -132,7 +128,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     height: 25,
                   ),
                   TextFormField(
-                    controller: registerController.age,
+                    controller: authcontroller.age,
                     keyboardType: TextInputType.number,
 
                     // obscureText: true,
@@ -165,7 +161,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
 
                   TextFormField(
-                    controller: registerController.password,
+                    controller: authcontroller.password,
                     obscureText: true,
                     obscuringCharacter: "*",
                     validator: (value) =>
@@ -221,9 +217,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       onPressed: () {
                         if (_formRegisterKey.currentState!.validate() &&
                             agree == true) {
-                          registerController.registerWithEmail();
+                          authcontroller.registerWithEmail();
                         } else {
-                          registerController.password.clear();
+                          authcontroller.password.clear();
                           Get.snackbar(
                             'Error', 'Isi semua form dan setujui EULA',
                             snackPosition: SnackPosition.BOTTOM,
@@ -243,7 +239,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   GestureDetector(
                     //navigasi ke tamu screen
                     onTap: () async {
-                      await loginController.loginTamu();
+                      await authcontroller.loginTamu();
                     },
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
