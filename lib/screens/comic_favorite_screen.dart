@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mikami_mobile/model/list_item_data.dart';
 import 'package:mikami_mobile/model/list_data_provider.dart';
-import 'chapter_list.dart';
+import 'chapter_read.dart';
 
 class ComicFavorite extends StatelessWidget {
   const ComicFavorite({Key? key});
