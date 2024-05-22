@@ -13,6 +13,7 @@ class AuthorController extends GetxService {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController genreIdController = TextEditingController();
   TextEditingController priceController = TextEditingController();
+  TextEditingController coverController = TextEditingController();
   TextEditingController rateController = TextEditingController();
 
   TextEditingController passWithdrawalController = TextEditingController();
@@ -28,8 +29,7 @@ class AuthorController extends GetxService {
         'Authorization': 'Bearer $token',
       };
 
-      var url =
-          Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics);
+      var url = Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics);
 
       var path_cover = prefs?.getString('cover_image');
       if (path_cover != null) {
@@ -37,20 +37,19 @@ class AuthorController extends GetxService {
         print(cover.path);
         var request = http.MultipartRequest('POST', url);
 
-        //take the file
-        var multipartFile =
-            await http.MultipartFile.fromPath('cover', cover.path);
+        // Take the file
+        var multipartFile = await http.MultipartFile.fromPath('cover', cover.path);
 
         request.files.add(multipartFile);
-        //genreList to list<int>
-        var genreList =
-            genreIdController.text.split(',').map(int.parse).toList();
+        // GenreList to list<int>
+        var genreList = genreIdController.text.split(',').map(int.parse).toList();
 
         request.fields['title'] = titleController.text;
         request.fields['description'] = descriptionController.text;
         request.fields['author'] = prefs!.getString('name')!;
         request.fields['price'] = priceController.text;
-        //insert list<int> to request.fields
+        request.fields['rate'] = rateController.text;
+        // Insert list<int> to request.fields
         for (var i = 0; i < genreList.length; i++) {
           request.fields['genres_id[$i]'] = genreList[i].toString();
         }
@@ -62,7 +61,7 @@ class AuthorController extends GetxService {
         print(json);
 
         if (json == 'success') {
-          //getx back to previous page
+          // Getx back to previous page
           Get.back();
           titleController.clear();
           descriptionController.clear();
@@ -71,8 +70,8 @@ class AuthorController extends GetxService {
           priceController.clear();
           rateController.clear();
           Get.showSnackbar(GetSnackBar(
-            title: "Sukses",
-            message: 'Komik berhasil ditambahkan',
+            title: "Success",
+            message: 'Comic successfully added',
             icon: Icon(Icons.check_circle, color: Colors.white),
             duration: const Duration(seconds: 5),
             snackPosition: SnackPosition.BOTTOM,
@@ -91,7 +90,7 @@ class AuthorController extends GetxService {
       } else {
         Get.showSnackbar(GetSnackBar(
           title: "Failed",
-          message: "Chose cover image first",
+          message: "Choose cover image first",
           icon: Icon(Icons.error, color: Colors.white),
           duration: const Duration(seconds: 5),
           snackPosition: SnackPosition.BOTTOM,

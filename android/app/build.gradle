@@ -51,7 +51,7 @@ android {
         versionName flutterVersionName
     }
     defaultConfig {
-        minSdkVersion 20
+        minSdkVersion flutter.minSdkVersion
     }
 
     buildTypes {
