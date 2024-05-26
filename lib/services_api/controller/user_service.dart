@@ -240,6 +240,9 @@ class UserController extends GetxController {
             backgroundColor: lightColorScheme.secondary,
           ));
         } else {
+          reasonController.clear();
+          prefs?.remove('selectedID');
+          prefs?.remove('selectedTitle');
           Get.showSnackbar(GetSnackBar(
             title: json['status'],
             message: json['message'],

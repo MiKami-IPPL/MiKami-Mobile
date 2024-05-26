@@ -11,7 +11,6 @@ import 'package:mikami_mobile/services_api/controller/profile_service.dart';
 import 'package:mikami_mobile/services_api/controller/user_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../comic_favorite_screen.dart';
 import '../author/menu_screen.dart';
 
 class HomeScreen extends StatefulWidget {

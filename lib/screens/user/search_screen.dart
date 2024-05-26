@@ -16,384 +16,218 @@ class _SearchScreenState extends State<SearchScreen> {
   AuthController authcontroller = Get.put(AuthController());
   UserController usercontroller = Get.put(UserController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: authcontroller.isLogin(),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          if (snapshot.data == false) {
-            return LoginScreen();
-          } else {
-            return FutureBuilder(
-              future: _prefs,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final SharedPreferences prefs =
-                      snapshot.data as SharedPreferences;
-                  return Scaffold(
-                      backgroundColor: lightColorScheme.primary,
-                      appBar: AppBar(
-                        title: const Text('Search Komik'),
-                        iconTheme: const IconThemeData(
-                          color: Colors.white,
-                        ),
-                        titleTextStyle: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                        ),
-                        backgroundColor: lightColorScheme.primary,
-                      ),
-                      body:
-                          //make scrollable
-                          SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            //make search bar
-                            Container(
-                              padding:
-                                  const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: TextField(
-                                      controller:
-                                          usercontroller.searchController,
-                                      decoration: InputDecoration(
-                                        hintText: 'Search',
-                                        hintStyle:
-                                            const TextStyle(color: Colors.grey),
-                                        filled: true,
-                                        fillColor: Colors.white,
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          borderSide: const BorderSide(
-                                              color: Colors.white),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          borderSide: const BorderSide(
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                      //if press enter on keyboard do search
-                                      onSubmitted: (Null) async {
-                                        await usercontroller.searchKomik();
-                                        //reset screen
-                                        setState(() {});
-                                      },
-                                    ),
-                                  ),
-                                  IconButton(
-                                    onPressed: () async {
-                                      await usercontroller.searchKomik();
-                                      //reset screen
-                                      setState(() {});
-                                    },
-                                    icon: const Icon(Icons.search),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            //reset list data
-                            if (prefs.getInt('dataKomik[Max]') != 0) listData(),
-                            //if no data or 0
-                            if (prefs.getInt('dataKomik[Max]') == null)
-                              Container(
-                                margin: const EdgeInsets.all(10),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Text(
-                                  'Data not found',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ));
-                } else {
-                  return const CircularProgressIndicator();
-                }
-              },
-            );
-          }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        } else if (snapshot.hasData && snapshot.data == true) {
+          return searchScreenContent();
         } else {
-          return CircularProgressIndicator();
+          return LoginScreen();
         }
       },
     );
   }
 
-  //make widget for list of data
-  Widget listData() {
+  Widget searchScreenContent() {
     return FutureBuilder(
-        future: _prefs,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final SharedPreferences prefs = snapshot.data as SharedPreferences;
-            return ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: prefs.getInt('dataKomik[Max]') ?? 0,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    prefs.remove('selectedID');
-                    prefs.remove('selectedTitle');
-                    // Save prefs when clicked
-                    prefs.setInt(
-                        'selectedID', prefs.getInt('dataKomik[$index][id]')!);
-                    prefs.setString('selectedTitle',
-                        prefs.getString('dataKomik[$index][title]')!);
-                    //get back
-                    Get.back();
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.all(5),
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Image.network(
-                            prefs.getString('dataKomik[$index][cover]')!,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            //fix text overflow
-                            Row(
-                              children: [
-                                if (prefs
-                                        .getString('dataKomik[$index][title]')!
-                                        .length <=
-                                    24)
-                                  Text(
-                                    '${prefs.getString('dataKomik[$index][title]')}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                if (prefs
-                                        .getString('dataKomik[$index][title]')!
-                                        .length >
-                                    25)
-                                  Text(
-                                    prefs
-                                            .getString(
-                                                'dataKomik[$index][title]')!
-                                            .substring(0, 25) +
-                                        '...',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                              ],
-                            ),
-
-                            if (prefs
-                                    .getString(
-                                        'dataKomik[$index][description]')!
-                                    .length <=
-                                29)
-                              Text(
-                                'Deskripsi: ${prefs.getString('dataKomik[$index][description]'.tr)}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                ),
-                              ),
-                            if (prefs
-                                    .getString(
-                                        'dataKomik[$index][description]')!
-                                    .length >
-                                30)
-                              Text(
-                                'Deskripsi: ${prefs.getString('dataKomik[$index][description]')!.substring(0, 30) + '...'}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                ),
-                              ),
-                            Text(
-                                '${prefs.getString('dataKomik[$index][genres]')}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                )),
-                          ],
-                        ),
-                        const Spacer(),
-                        //show price
-                        Text(
-                          '${prefs.getInt('dataKomik[$index][price]')} Koin',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
+      future: _prefs,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        } else if (snapshot.hasData) {
+          final SharedPreferences prefs = snapshot.data as SharedPreferences;
+          return Scaffold(
+            backgroundColor: lightColorScheme.primary,
+            appBar: AppBar(
+              title: const Text('Search Komik'),
+              iconTheme: const IconThemeData(color: Colors.white),
+              titleTextStyle: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+              ),
+              backgroundColor: lightColorScheme.primary,
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  buildSearchBar(),
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: prefs.getInt('dataKomik[Max]') != null
+                        ? listData(prefs)
+                        : buildNoDataFound(),
                   ),
-                );
-              },
-            );
-          } else {
-            return const CircularProgressIndicator();
-          }
-        });
+                ],
+              ),
+            ),
+          );
+        } else {
+          return Scaffold(
+            body: Center(
+              child: const Text('Error loading preferences'),
+            ),
+          );
+        }
+      },
+    );
   }
 
-  Widget listViewWidget() {
-    return FutureBuilder(
-        future: _prefs,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final SharedPreferences prefs = snapshot.data as SharedPreferences;
-            return ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: prefs.getInt('dataKomik[Max]') ?? 0,
-              itemBuilder: (context, index) {
-                return Container(
-                  margin: const EdgeInsets.all(5),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      prefs.remove('selectedID');
-                      prefs.remove('selectedTitle');
-                      // Save prefs when clicked
-                      prefs.setInt(
-                          'selectedID', prefs.getInt('dataKomik[$index][id]')!);
-                      prefs.setString('selectedTitle',
-                          prefs.getString('dataKomik[$index][title]')!);
-                      //get back
-                      Get.back();
-                    },
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Image.network(
-                            prefs.getString('dataKomik[$index][cover]')!,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            //fix text overflow
-                            Row(
-                              children: [
-                                if (prefs
-                                        .getString('dataKomik[$index][title]')!
-                                        .length <=
-                                    24)
-                                  Text(
-                                    '${prefs.getString('dataKomik[$index][title]')}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                if (prefs
-                                        .getString('dataKomik[$index][title]')!
-                                        .length >
-                                    25)
-                                  Text(
-                                    prefs
-                                            .getString(
-                                                'dataKomik[$index][title]')!
-                                            .substring(0, 25) +
-                                        '...',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                              ],
-                            ),
+  Widget buildSearchBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: usercontroller.searchController,
+              decoration: InputDecoration(
+                hintText: 'Search',
+                hintStyle: const TextStyle(color: Colors.grey),
+                filled: true,
+                fillColor: Colors.white,
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
+              ),
+              onSubmitted: (value) async {
+                await usercontroller.searchKomik();
+                setState(() {});
+              },
+            ),
+          ),
+          IconButton(
+            onPressed: () async {
+              await usercontroller.searchKomik();
+              setState(() {});
+            },
+            icon: const Icon(Icons.search),
+          ),
+        ],
+      ),
+    );
+  }
 
-                            if (prefs
-                                    .getString(
-                                        'dataKomik[$index][description]')!
-                                    .length <=
-                                29)
-                              Text(
-                                'Deskripsi: ${prefs.getString('dataKomik[$index][description]'.tr)}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                ),
-                              ),
-                            if (prefs
-                                    .getString(
-                                        'dataKomik[$index][description]')!
-                                    .length >
-                                30)
-                              Text(
-                                'Deskripsi: ${prefs.getString('dataKomik[$index][description]')!.substring(0, 30) + '...'}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                ),
-                              ),
-                            Text(
-                                '${prefs.getString('dataKomik[$index][genres]')}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                )),
-                          ],
-                        ),
-                        const Spacer(),
-                        //show price
-                        Text(
-                          '${prefs.getInt('dataKomik[$index][price]')} Koin',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+  Widget buildNoDataFound() {
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Text(
+          'Data not found',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget listData(SharedPreferences prefs) {
+    return ListView.builder(
+      itemCount: prefs.getInt('dataKomik[Max]') ?? 0,
+      itemBuilder: (context, index) {
+        return GestureDetector(
+          onTap: () {
+            prefs.remove('selectedID');
+            prefs.remove('selectedTitle');
+            prefs.setInt('selectedID', prefs.getInt('dataKomik[$index][id]')!);
+            prefs.setString(
+                'selectedTitle', prefs.getString('dataKomik[$index][title]')!);
+            Get.back();
+          },
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 5.0),
+            padding: const EdgeInsets.all(10.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: Image.network(
+                      prefs.getString('dataKomik[$index][cover]')!,
+                      fit: BoxFit.cover,
                     ),
                   ),
-                );
-              },
-            );
-          } else {
-            return const CircularProgressIndicator();
-          }
-        });
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        prefs.getString('dataKomik[$index][title]') ?? '',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        'Deskripsi: ${prefs.getString('dataKomik[$index][description]') ?? ''}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        prefs.getString('dataKomik[$index][genres]') ?? '',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  '${prefs.getInt('dataKomik[$index][price]') ?? 0} Koin',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

@@ -246,16 +246,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: ElevatedButton(
                               onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
-                                  final String imageUrl =
-                                      prefs.getString('image') ?? '';
-                                  final imageBytes = await NetworkAssetBundle(
-                                          Uri.parse(imageUrl))
-                                      .load('');
-                                  final Uint8List imageUint8List =
-                                      Uint8List.view(imageBytes.buffer);
-                                  final image = Image.memory(imageUint8List);
-
                                   await profileController.changePassword();
+
                                   // Get.back();
                                 }
                               },
@@ -307,6 +299,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             backgroundImage:
                                 NetworkImage(prefs.getString('image')!),
                           ),
+                        //reset state
+
                         if (prefs.getString('image') == null)
                           CircleAvatar(
                             radius: 70,
@@ -330,6 +324,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                     const SizedBox(height: 20),
+
+                    if (prefs.getString('name') != 'tamu' &&
+                        prefs.getString('role') != 'author')
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.all(15),
+                            ),
+                            child: const Text('Upgrade to Author')),
+                      ),
+                    const SizedBox(height: 20),
                     itemProfile('Name', '${prefs.getString('name')}',
                         CupertinoIcons.person),
                     const SizedBox(height: 10),
@@ -345,6 +352,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(
                       height: 20,
                     ),
+                    //add button upgrade to author
+
                     if (prefs.getString('name') != 'tamu')
                       SizedBox(
                         width: double.infinity,
@@ -355,7 +364,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.all(15),
                             ),
-                            child: const Text('Ubah Password')),
+                            child: const Text('Change Password')),
                       )
                   ],
                 ),
