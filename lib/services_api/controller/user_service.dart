@@ -173,22 +173,20 @@ class UserController extends GetxController {
 
         if (json['status'] == 'success') {
           //check data komik max
-          if (prefs?.getInt('dataKomik[Max]') != null) {
-            var j = prefs?.getInt('dataKomik[Max]');
+          if (prefs?.getInt('rekKomik[Max]') != null) {
+            var j = prefs?.getInt('rekKomik[Max]');
             for (var i = 0; i < j!; i++) {
-              prefs?.remove('dataKomik[$i][title]');
-              prefs?.remove('dataKomik[$i][cover]');
+              prefs?.remove('rekKomik[$i][title]');
+              prefs?.remove('rekKomik[$i][cover]');
             }
-            prefs?.remove('dataKomik[Max]');
+            prefs?.remove('rekKomik[Max]');
           }
 
-          prefs?.setInt('dataKomik[Max]', json['data'].length);
+          prefs?.setInt('rekKomik[Max]', json['data'].length);
           for (var i = 0; i < json['data'].length; i++) {
             //set cover
-            prefs?.setString(
-                'dataKomik[$i][cover]', (json['data'][i]['cover']));
-            prefs?.setString(
-                'dataKomik[$i][title]', (json['data'][i]['title']));
+            prefs?.setString('rekKomik[$i][cover]', (json['data'][i]['cover']));
+            prefs?.setString('rekKomik[$i][title]', (json['data'][i]['title']));
           }
         } else {
           Get.showSnackbar(GetSnackBar(

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mikami_mobile/screens/auth/login_screen.dart';
@@ -15,6 +16,7 @@ class AuthController extends GetxService {
   //for login
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
   //for forgot password
   TextEditingController emailForgotController = TextEditingController();
   //for registration

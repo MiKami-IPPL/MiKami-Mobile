@@ -34,7 +34,6 @@ class AuthorController extends GetxService {
       var path_cover = prefs?.getString('cover_image');
       if (path_cover != null) {
         File cover = File(path_cover);
-        print(cover.path);
         var request = http.MultipartRequest('POST', url);
 
         //take the file
@@ -61,15 +60,15 @@ class AuthorController extends GetxService {
         final json = jsonDecode(respStr);
         print(json);
 
-        if (json == 'success') {
+        if (json['status'] == 'success') {
           //getx back to previous page
-          Get.back();
           titleController.clear();
           descriptionController.clear();
           genreIdController.clear();
           prefs.remove('cover_image');
           priceController.clear();
           rateController.clear();
+          Get.back();
           Get.showSnackbar(GetSnackBar(
             title: "Sukses",
             message: 'Komik berhasil ditambahkan',

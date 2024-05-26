@@ -102,16 +102,28 @@ class _HomeScreenState extends State<HomeScreen> {
                                           )),
                                   ],
                                 ),
-                                GestureDetector(
-                                  onTap: () {
-                                    Get.to(() => ProfileScreen());
-                                  },
-                                  child: CircleAvatar(
-                                    radius: 35,
-                                    backgroundImage:
-                                        AssetImage('assets/images/seulgi.jpg'),
+                                if (prefs.getString('image') != null)
+                                  GestureDetector(
+                                    onTap: () {
+                                      Get.to(() => ProfileScreen());
+                                    },
+                                    child: CircleAvatar(
+                                      radius: 35,
+                                      backgroundImage: NetworkImage(
+                                          prefs.getString('image')!),
+                                    ),
                                   ),
-                                ),
+                                if (prefs.getString('image') == null)
+                                  GestureDetector(
+                                    onTap: () {
+                                      Get.to(() => ProfileScreen());
+                                    },
+                                    child: CircleAvatar(
+                                      radius: 35,
+                                      backgroundImage: AssetImage(
+                                          'assets/images/solev_banner.jpg'),
+                                    ),
+                                  ),
                               ],
                             ),
                             Row(
@@ -203,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: TextFormField(
                             //when user tap on search bar, navigate to search screen
                             onTap: () async {
-                              await userController.searchAllKomik();
+                              await userController.searchKomik();
                               userController.searchController.clear();
                               Get.to(() => SearchScreen());
                             },
@@ -216,11 +228,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               prefixIcon: Icon(Icons.search),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30.0),
+                                borderSide: BorderSide(
+                                  color: Colors
+                                      .white, // Set the outline color to white
+                                ),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Theme.of(context).primaryColor,
-                                    width: 2.0),
+                                borderSide:
+                                    BorderSide(color: Colors.black, width: 2.0),
                                 borderRadius: BorderRadius.circular(30.0),
                               ),
                             ),
@@ -304,7 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         MenuCard(
                           icon: Icons.account_circle,
                           label: 'Profil',
-                          onTap: () => Get.to(ProfileScreen()),
+                          onTap: () => Get.to(() => ProfileScreen()),
                         ),
                         if (prefs.getString('role') == 'author')
                           MenuCard(
@@ -318,7 +333,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           MenuCard(
                             icon: Icons.monetization_on,
                             label: 'Top Up',
-                            onTap: () => Get.to(TopupScreen()),
+                            onTap: () => Get.to(() => TopupScreen()),
                           ),
                       ],
                     ),
@@ -344,47 +359,29 @@ class _HomeScreenState extends State<HomeScreen> {
                               SizedBox(
                                   width: 10), // Add some space at the beginning
 
-                              // Add the recommended comics here if prefs.getInt('dataKomik[Max]') > 0
-                              // Use prefs.getString('dataKomik[$i][cover]') to get the cover image
-                              // Use prefs.getString('dataKomik[$i][title]') to get the title
-                              //use image from api
-                              if (prefs.getInt('dataKomik[Max]') != null)
-                                for (int i = 0;
-                                    i < prefs.getInt('dataKomik[Max]')!;
-                                    i++)
-                                  RoundedImageWithText(
-                                    imagePath: prefs
-                                        .getString('dataKomik[$i][cover]')!,
-                                    text: prefs
-                                        .getString('dataKomik[$i][title]')!,
-                                  )
-                            ],
-                          ),
-                        ),
-                        Text(
-                          'Penuh Aksi',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Container(
-                          height: 200,
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            children: [
-                              SizedBox(width: 10),
-                              if (prefs.getInt('dataKomik[Max]') != null)
-                                for (int i = 0;
-                                    i < prefs.getInt('dataKomik[Max]')!;
-                                    i++)
-                                  RoundedImageWithText(
-                                    imagePath: prefs
-                                        .getString('dataKomik[$i][cover]')!,
-                                    text: prefs
-                                        .getString('dataKomik[$i][title]')!,
-                                  )
+                              if (prefs.getInt('rekKomik[Max]') == null)
+                                FutureBuilder<void>(
+                                  future: userController.getRecomendedKomik(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return CircularProgressIndicator();
+                                    } else if (snapshot.hasError) {
+                                      return Text('Error: ${snapshot.error}');
+                                    } else {
+                                      return SizedBox.shrink();
+                                    }
+                                  },
+                                ),
+                              if (prefs.getInt('rekKomik[Max]') != null)
+                                if (prefs.getInt('rekKomik[Max]')! > 4)
+                                  for (int i = 0; i < 5; i++)
+                                    RoundedImageWithText(
+                                      imagePath: prefs
+                                          .getString('rekKomik[$i][cover]')!,
+                                      text: prefs
+                                          .getString('rekKomik[$i][title]')!,
+                                    )
                             ],
                           ),
                         ),

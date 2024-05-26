@@ -18,7 +18,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   AuthController authcontroller = Get.put(AuthController());
   final _formLoginKey = GlobalKey<FormState>();
-  bool rememberMe = false;
+  bool rememberMe = true;
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: ElevatedButton(
                           onPressed: () async {
                             if (_formLoginKey.currentState!.validate()) {
-                              authcontroller.login();
+                              await authcontroller.login();
                             }
                           },
                           child: const Text('Masuk'),
