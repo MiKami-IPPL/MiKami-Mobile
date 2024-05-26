@@ -14,6 +14,236 @@ class ProfileController extends GetxController {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController newPasswordController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController ageController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+
+  Future<void> changeEmail() async {
+    try {
+      //cek email valid
+      if (emailController.text.isEmail) {
+        var Url = Uri.parse(
+            ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.EditProfile);
+        final SharedPreferences? prefs = await _prefs;
+        var token = prefs?.getString('token');
+
+        var header = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        };
+
+        File image = File(prefs!.getString('image')!);
+
+        // Get the image from network and cache it
+        http.Response getFile =
+            await http.get(Uri.parse(prefs.getString('image')!));
+        Uint8List bytes = getFile.bodyBytes;
+        await image.writeAsBytes(bytes);
+        print(image.path);
+        var request = http.MultipartRequest('POST', Url);
+
+        //take the file
+        var multipartFile =
+            await http.MultipartFile.fromPath('picture', image.path);
+
+        request.files.add(multipartFile);
+        //genreList to list<int>
+        request.fields['name'] = prefs.getString('name')!;
+        request.fields['email'] = emailController.text;
+        request.fields['age'] = prefs.getInt('age').toString();
+        request.fields['password'] = prefs.getString('password')!;
+        request.headers.addAll(header);
+        final response = await request.send();
+        final respStr = await response.stream.bytesToString();
+        final json = jsonDecode(respStr);
+
+        if (json['status'] == 'success') {
+          await getProfile();
+          emailController.clear();
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.check, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.primary,
+          ));
+        } else {
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.error,
+          ));
+        }
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: 'Error',
+          message: 'Email is not valid',
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.error,
+        ));
+        return;
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> changeAge() async {
+    try {
+      if (!ageController.text.isEmpty) {
+        var Url = Uri.parse(
+            ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.EditProfile);
+        final SharedPreferences? prefs = await _prefs;
+        var token = prefs?.getString('token');
+
+        var header = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        };
+
+        File image = File(prefs!.getString('image')!);
+
+        // Get the image from network and cache it
+        http.Response getFile =
+            await http.get(Uri.parse(prefs.getString('image')!));
+        Uint8List bytes = getFile.bodyBytes;
+        await image.writeAsBytes(bytes);
+        print(image.path);
+        var request = http.MultipartRequest('POST', Url);
+
+        //take the file
+        var multipartFile =
+            await http.MultipartFile.fromPath('picture', image.path);
+
+        request.files.add(multipartFile);
+        //genreList to list<int>
+        request.fields['name'] = prefs.getString('name')!;
+        request.fields['email'] = prefs.getString('email')!;
+        request.fields['age'] = ageController.text;
+        request.fields['password'] = prefs.getString('password')!;
+        request.headers.addAll(header);
+        final response = await request.send();
+        final respStr = await response.stream.bytesToString();
+        final json = jsonDecode(respStr);
+
+        if (json['status'] == 'success') {
+          await getProfile();
+          ageController.clear();
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.check, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.primary,
+          ));
+        } else {
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.error,
+          ));
+        }
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: 'Error',
+          message: 'Age cannot be empty',
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.error,
+        ));
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> changeUsername() async {
+    try {
+      if (!usernameController.text.isEmpty) {
+        var Url = Uri.parse(
+            ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.EditProfile);
+        final SharedPreferences? prefs = await _prefs;
+        var token = prefs?.getString('token');
+
+        var header = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        };
+
+        File image = File(prefs!.getString('image')!);
+
+        // Get the image from network and cache it
+        http.Response getFile =
+            await http.get(Uri.parse(prefs.getString('image')!));
+        Uint8List bytes = getFile.bodyBytes;
+        await image.writeAsBytes(bytes);
+        print(image.path);
+        var request = http.MultipartRequest('POST', Url);
+
+        //take the file
+        var multipartFile =
+            await http.MultipartFile.fromPath('picture', image.path);
+
+        request.files.add(multipartFile);
+        //genreList to list<int>
+        request.fields['name'] = usernameController.text;
+        request.fields['email'] = prefs.getString('email')!;
+        request.fields['age'] = prefs.getInt('age').toString();
+        request.fields['password'] = prefs.getString('password')!;
+        request.headers.addAll(header);
+        final response = await request.send();
+        final respStr = await response.stream.bytesToString();
+        final json = jsonDecode(respStr);
+
+        if (json['status'] == 'success') {
+          await getProfile();
+          usernameController.clear();
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.check, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.primary,
+          ));
+        } else {
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.error,
+          ));
+        }
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: 'Error',
+          message: 'Username cannot be empty',
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.error,
+        ));
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   Future<void> changeImage(String imagePath) async {
     try {
@@ -255,7 +485,16 @@ class ProfileController extends GetxController {
         prefs?.setString('role', json['data']['role']);
         prefs?.setInt('age', json['data']['age']);
         prefs?.setInt('remainingAds', json['data']['remainingAds']);
-        prefs?.setString('image', json['data']['picture']);
+        var image = json['data']['picture'];
+        var lastTwoDirectories =
+            image.split('/').sublist(image.split('/').length - 1).join('/');
+        if (lastTwoDirectories == 'picture') {
+          prefs?.setString('image', '');
+        } else {
+          prefs?.setString('image', json['data']['picture']);
+        }
+        print(prefs?.getString('image'));
+
         await getCoin();
       } else {
         Get.showSnackbar(GetSnackBar(

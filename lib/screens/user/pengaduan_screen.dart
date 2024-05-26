@@ -100,7 +100,6 @@ class _PengaduanScreenState extends State<PengaduanScreen> {
                           usercontroller.searchController.clear();
                           prefs.remove('selectedID');
                           prefs.remove('selectedTitle');
-                          usercontroller.searchController.clear();
                           usercontroller.reasonController.clear();
                           setState(() {});
                         },

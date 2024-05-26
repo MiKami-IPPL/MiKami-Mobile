@@ -40,24 +40,323 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  itemProfile(String title, String subtitle, IconData iconData) {
-    return Container(
-      decoration: BoxDecoration(
+  itemProfile(Widget widget, String title, String subtitle, IconData iconData) {
+    return GestureDetector(
+      onTap: () async {
+        await Get.to(() => widget);
+        setState(() {});
+      },
+      child: Container(
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                  offset: Offset(0, 5),
+                  color: Colors.deepOrange.withOpacity(.2),
+                  spreadRadius: 2,
+                  blurRadius: 10)
+            ]),
+        child: ListTile(
+          title: Text(title),
+          subtitle: Text(subtitle),
+          leading: Icon(iconData),
+          trailing: Icon(Icons.arrow_forward, color: Colors.grey.shade400),
+          tileColor: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  Widget EmailWidget(SharedPreferences prefs) {
+    return Form(
+      key: _formKey,
+      child: Scaffold(
+        appBar: AppBar(
+          iconTheme: const IconThemeData(
+            color: Colors.white,
+          ),
+          titleTextStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+          backgroundColor: lightColorScheme.primary,
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                TextFormField(
+                  controller: profileController.emailController = prefs
+                              .getString('email') ==
+                          null
+                      ? TextEditingController()
+                      : TextEditingController(text: prefs.getString('email')),
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    prefixIcon: Icon(CupertinoIcons.mail),
+                    labelStyle: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    prefixIconConstraints: BoxConstraints(
+                      minWidth: 40,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.blue,
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.red,
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.red,
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        await profileController.changeEmail();
+                        Get.back();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(15),
+                    ),
+                    child: const Text('Save Email'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget AgeWidget(SharedPreferences prefs) {
+    return Form(
+      key: _formKey,
+      child: Scaffold(
+        appBar: AppBar(
+          iconTheme: const IconThemeData(
+            color: Colors.white,
+          ),
+          titleTextStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+          backgroundColor: lightColorScheme.primary,
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                TextFormField(
+                  controller: profileController.ageController =
+                      prefs.getInt('age') != null
+                          ? TextEditingController(
+                              text: prefs.getInt('age').toString())
+                          : TextEditingController(),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                  decoration: InputDecoration(
+                    labelText: 'Age',
+                    prefixIcon: Icon(CupertinoIcons.calendar),
+                    labelStyle: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    prefixIconConstraints: BoxConstraints(
+                      minWidth: 40,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.blue,
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.red,
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.red,
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter your age';
+                    }
+                    if (value.length > 2) {
+                      return 'Age must be 2 digits or less';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          await profileController.changeAge();
+                          Get.back();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(15),
+                      ),
+                      child: const Text('Save Age')),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget UsernameWidget(SharedPreferences prefs) {
+    return Scaffold(
+      appBar: AppBar(
+        iconTheme: const IconThemeData(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-                offset: Offset(0, 5),
-                color: Colors.deepOrange.withOpacity(.2),
-                spreadRadius: 2,
-                blurRadius: 10)
-          ]),
-      child: ListTile(
-        title: Text(title),
-        subtitle: Text(subtitle),
-        leading: Icon(iconData),
-        trailing: Icon(Icons.arrow_forward, color: Colors.grey.shade400),
-        tileColor: Colors.white,
+        ),
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+        ),
+        backgroundColor: lightColorScheme.primary,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              const SizedBox(height: 40),
+              TextFormField(
+                controller: profileController.usernameController =
+                    prefs.getString('name') == null
+                        ? TextEditingController()
+                        : TextEditingController(text: prefs.getString('name')),
+                decoration: InputDecoration(
+                  labelText: 'Username',
+                  prefixIcon: Icon(CupertinoIcons.person),
+                  labelStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  prefixIconConstraints: BoxConstraints(
+                    minWidth: 40,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 2.0,
+                    ),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.grey,
+                      width: 1.0,
+                    ),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.red,
+                      width: 1.0,
+                    ),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.red,
+                      width: 2.0,
+                    ),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter your username';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        await profileController.changeUsername();
+                        Get.back();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(15),
+                    ),
+                    child: const Text('Save Username')),
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -288,12 +587,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 20),
                     Stack(
                       alignment: Alignment.bottomRight,
                       children: [
                         //if is not null
-                        if (prefs.getString('image') != null)
+                        if (prefs.getString('image') != '' &&
+                            prefs.getString('image') != null)
                           CircleAvatar(
                             radius: 70,
                             backgroundImage:
@@ -301,26 +601,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         //reset state
 
-                        if (prefs.getString('image') == null)
+                        if (prefs.getString('image') == '')
                           CircleAvatar(
                             radius: 70,
                             backgroundImage: const AssetImage(
                                 'assets/images/solev_banner.jpg'),
                           ),
-                        IconButton(
-                          icon: Icon(Icons.edit, color: Colors.white),
-                          onPressed: () async {
-                            final ImagePicker picker = ImagePicker();
-                            final XFile? image = await picker.pickImage(
-                                source: ImageSource.gallery);
-                            if (image != null) {
-                              prefs.remove('image');
-                              await profileController.changeImage(image.path);
-                              //reset state
-                              setState(() {});
-                            }
-                          },
-                        ),
+                        if (prefs.getString('name') != 'tamu')
+                          IconButton(
+                            icon: Icon(Icons.edit, color: Colors.white),
+                            onPressed: () async {
+                              final ImagePicker picker = ImagePicker();
+                              final XFile? image = await picker.pickImage(
+                                  source: ImageSource.gallery);
+                              if (image != null) {
+                                prefs.remove('image');
+                                await profileController.changeImage(image.path);
+                                //reset state
+                                setState(() {});
+                              }
+                            },
+                          ),
                       ],
                     ),
                     const SizedBox(height: 20),
@@ -337,18 +638,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: const Text('Upgrade to Author')),
                       ),
                     const SizedBox(height: 20),
-                    itemProfile('Name', '${prefs.getString('name')}',
-                        CupertinoIcons.person),
-                    const SizedBox(height: 10),
-                    itemProfile('Age', '${prefs.getInt('age')}',
-                        CupertinoIcons.calendar),
-                    const SizedBox(height: 10),
-                    itemProfile('Role', '${prefs.getString('role')}',
-                        CupertinoIcons.lock_shield_fill),
+                    ListTile(
+                      leading: Icon(CupertinoIcons.lock_shield_fill),
+                      title: Text('Role'),
+                      subtitle: Text(prefs.getString('role') ?? ''),
+                    ),
                     const SizedBox(height: 10),
                     if (prefs.getString('name') != 'tamu')
-                      itemProfile('Email', '${prefs.getString('email')}',
-                          CupertinoIcons.mail),
+                      itemProfile(UsernameWidget(prefs), 'Username',
+                          '${prefs.getString('name')}', CupertinoIcons.person),
+                    if (prefs.getString('name') == 'tamu')
+                      ListTile(
+                        leading: Icon(CupertinoIcons.person),
+                        title: Text('Username'),
+                        subtitle: Text(prefs.getString('name') ?? ''),
+                      ),
+                    const SizedBox(height: 10),
+                    if (prefs.getString('name') != 'tamu')
+                      itemProfile(AgeWidget(prefs), 'Age',
+                          '${prefs.getInt('age')}', CupertinoIcons.calendar),
+                    if (prefs.getString('name') == 'tamu')
+                      ListTile(
+                        leading: Icon(CupertinoIcons.calendar),
+                        title: Text('Age'),
+                        subtitle: Text(prefs.getInt('age').toString() ?? ''),
+                      ),
+                    const SizedBox(height: 10),
+
+                    if (prefs.getString('name') != 'tamu')
+                      itemProfile(EmailWidget(prefs), 'Email',
+                          '${prefs.getString('email')}', CupertinoIcons.mail),
                     const SizedBox(
                       height: 20,
                     ),

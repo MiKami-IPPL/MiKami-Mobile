@@ -59,6 +59,11 @@ class _SearchScreenState extends State<SearchScreen> {
                 fontSize: 20,
               ),
               backgroundColor: lightColorScheme.primary,
+              elevation: 0,
+              flexibleSpace: AnimatedContainer(
+                duration: const Duration(milliseconds: 500),
+                color: lightColorScheme.primary,
+              ),
             ),
             body: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -67,7 +72,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   buildSearchBar(),
                   const SizedBox(height: 20),
                   Expanded(
-                    child: prefs.getInt('dataKomik[Max]') != null
+                    child: prefs.getInt('dataKomik[Max]') != 0
                         ? listData(prefs)
                         : buildNoDataFound(),
                   ),
@@ -87,40 +92,33 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget buildSearchBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
+    return Row(
+      children: [
+        Expanded(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 500),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: SearchBar(
               controller: usercontroller.searchController,
-              decoration: InputDecoration(
-                hintText: 'Search',
-                hintStyle: const TextStyle(color: Colors.grey),
-                filled: true,
-                fillColor: Colors.white,
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
-              ),
+              hintText: 'Search',
               onSubmitted: (value) async {
                 await usercontroller.searchKomik();
                 setState(() {});
               },
             ),
           ),
-          IconButton(
-            onPressed: () async {
-              await usercontroller.searchKomik();
-              setState(() {});
-            },
-            icon: const Icon(Icons.search),
-          ),
-        ],
-      ),
+        ),
+        IconButton(
+          onPressed: () async {
+            await usercontroller.searchKomik();
+            setState(() {});
+          },
+          icon: const Icon(Icons.search),
+        ),
+      ],
     );
   }
 

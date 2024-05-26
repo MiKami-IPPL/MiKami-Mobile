@@ -15,4 +15,5 @@ class _AuthEndPoints {
   final String Withdrawal = 'coins/withdrawal';
   final String Report = 'comics/\$id/report';
   final String EditProfile = 'edit-profile';
+  final String Upgrade = 'register-author';
 }

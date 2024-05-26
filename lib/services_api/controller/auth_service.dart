@@ -233,6 +233,7 @@ class AuthController extends GetxService {
       final json = jsonDecode(response.body);
 
       if (json['status'] == 'success') {
+        emailController.text = email.text;
         name.clear();
         email.clear();
         password.clear();

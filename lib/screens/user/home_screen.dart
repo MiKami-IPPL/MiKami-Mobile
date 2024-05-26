@@ -1,16 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mikami_mobile/screens/auth/welcome_screen.dart';
 import 'package:mikami_mobile/screens/user/pengaduan_screen.dart';
 import 'package:mikami_mobile/screens/user/profile_screen.dart';
 import 'package:mikami_mobile/screens/user/search_screen.dart';
 import 'package:mikami_mobile/screens/user/topup_screen.dart';
-import 'package:mikami_mobile/screens/auth/welcome_screen.dart';
 import 'package:mikami_mobile/services_api/controller/auth_service.dart';
 import 'package:mikami_mobile/services_api/controller/profile_service.dart';
 import 'package:mikami_mobile/services_api/controller/user_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../author/menu_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -23,12 +24,12 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentSlide = 0;
   ProfileController profileController = Get.put(ProfileController());
   AuthController authcontroller = Get.put(AuthController());
-  UserController userController = Get.put(UserController());
+  UserController usercontroller = Get.put(UserController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   @override
   Widget build(BuildContext context) {
-    userController.getRecomendedKomik();
+    usercontroller.getRecomendedKomik();
     //return route to login screen if user is not logged in
     return FutureBuilder(
       future: authcontroller.isLogin(),
@@ -38,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // profileController.logout();
             return WelcomeScreen();
           } else {
-            return HomeWidget();
+            return homeWidget();
           }
         } else {
           return CircularProgressIndicator();
@@ -47,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget HomeWidget() {
+  Widget homeWidget() {
     return Scaffold(
       backgroundColor: lightColorScheme.primary,
       body: SingleChildScrollView(
@@ -88,20 +89,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     if (prefs.getString('name') != 'tamu')
                                       Text(
-                                          '${prefs.getInt('remainingAds')} iklan tersisa',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.grey,
-                                          )),
+                                        '${prefs.getInt('remainingAds')} iklan tersisa',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
                                     if (prefs.getString('name') == 'tamu')
-                                      Text('Silahkan Login',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.grey,
-                                          )),
+                                      Text(
+                                        'Silahkan Login',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
                                   ],
                                 ),
-                                if (prefs.getString('image') != null)
+                                if (prefs.getString('image') != '' &&
+                                    prefs.getString('image') != null)
                                   GestureDetector(
                                     onTap: () {
                                       Get.to(() => ProfileScreen());
@@ -109,10 +114,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: CircleAvatar(
                                       radius: 35,
                                       backgroundImage: NetworkImage(
-                                          prefs.getString('image')!),
+                                        prefs.getString('image')!,
+                                      ),
                                     ),
                                   ),
-                                if (prefs.getString('image') == null)
+                                if (prefs.getString('image') == '')
                                   GestureDetector(
                                     onTap: () {
                                       Get.to(() => ProfileScreen());
@@ -120,7 +126,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: CircleAvatar(
                                       radius: 35,
                                       backgroundImage: AssetImage(
-                                          'assets/images/solev_banner.jpg'),
+                                        'assets/images/solev_banner.jpg',
+                                      ),
                                     ),
                                   ),
                               ],
@@ -140,7 +147,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(
-                                            horizontal: 12, vertical: 6),
+                                          horizontal: 12,
+                                          vertical: 6,
+                                        ),
                                         child: Row(
                                           children: [
                                             Image.asset(
@@ -163,38 +172,41 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ),
                                 Row(
-                                  // mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     if (prefs.getString('name') != 'tamu')
                                       GestureDetector(
-                                          onTap: () =>
-                                              profileController.logout(),
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 12, vertical: 6),
-                                            child: Text(
-                                              'Logout',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: lightColorScheme.error,
-                                              ),
+                                        onTap: () => profileController.logout(),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          child: Text(
+                                            'Logout',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: lightColorScheme.error,
                                             ),
-                                          )),
+                                          ),
+                                        ),
+                                      ),
                                     if (prefs.getString('name') == 'tamu')
                                       GestureDetector(
-                                          onTap: () =>
-                                              profileController.logout(),
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 12, vertical: 6),
-                                            child: Text(
-                                              'Login',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: lightColorScheme.primary,
-                                              ),
+                                        onTap: () => profileController.logout(),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          child: Text(
+                                            'Login',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: lightColorScheme.primary,
                                             ),
-                                          )),
+                                          ),
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ],
@@ -212,29 +224,31 @@ class _HomeScreenState extends State<HomeScreen> {
                         SizedBox(
                           height: 40,
                           child: TextFormField(
-                            //when user tap on search bar, navigate to search screen
                             onTap: () async {
-                              await userController.searchKomik();
-                              userController.searchController.clear();
+                              usercontroller.searchController.clear();
+                              await usercontroller.searchKomik();
                               Get.to(() => SearchScreen());
                             },
                             readOnly: true,
                             style: TextStyle(fontSize: 14),
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 8.0),
+                                horizontal: 16.0,
+                                vertical: 8.0,
+                              ),
                               hintText: 'Isi Judul Komik yang ingin dibaca',
                               prefixIcon: Icon(Icons.search),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30.0),
                                 borderSide: BorderSide(
-                                  color: Colors
-                                      .white, // Set the outline color to white
+                                  color: Colors.white,
                                 ),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.black, width: 2.0),
+                                borderSide: BorderSide(
+                                  color: Colors.black,
+                                  width: 2.0,
+                                ),
                                 borderRadius: BorderRadius.circular(30.0),
                               ),
                             ),
@@ -302,16 +316,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   SizedBox(height: 20),
                   Container(
-                    height: 100, // Adjust the height of the menu row
-                    color: lightColorScheme.primary, // Set the background color
+                    height: 100,
+                    color: lightColorScheme.primary,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children: [
-                        SizedBox(width: 10), // Add some space at the beginning
+                        SizedBox(width: 10),
                         MenuCard(
                           icon: Icons.report,
                           label: 'Pengaduan',
                           onTap: () {
+                            usercontroller.searchController.clear();
+                            prefs.remove('selectedID');
+                            prefs.remove('selectedTitle');
+                            usercontroller.reasonController.clear();
                             Get.to(() => PengaduanScreen());
                           },
                         ),
@@ -351,16 +369,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         Container(
-                          height: 200, // Adjust the height of the row
+                          height: 200,
                           child: ListView(
                             scrollDirection: Axis.horizontal,
                             children: [
-                              SizedBox(
-                                  width: 10), // Add some space at the beginning
-
+                              SizedBox(width: 10),
                               if (prefs.getInt('rekKomik[Max]') == null)
                                 FutureBuilder<void>(
-                                  future: userController.getRecomendedKomik(),
+                                  future: usercontroller.getRecomendedKomik(),
                                   builder: (context, snapshot) {
                                     if (snapshot.connectionState ==
                                         ConnectionState.waiting) {
@@ -380,7 +396,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           .getString('rekKomik[$i][cover]')!,
                                       text: prefs
                                           .getString('rekKomik[$i][title]')!,
-                                    )
+                                    ),
                             ],
                           ),
                         ),
