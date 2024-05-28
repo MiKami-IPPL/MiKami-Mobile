@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mikami_mobile/model/comic.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ComicController extends GetxController {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
@@ -27,7 +27,8 @@ class ComicController extends GetxController {
         'Authorization': 'Bearer $token',
       };
 
-      var url = Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics);
+      var url =
+          Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics);
       http.Response response = await http.get(url, headers: headers);
 
       if (response.statusCode == 200) {

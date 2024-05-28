@@ -1,16 +1,16 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mikami_mobile/screens/auth/login_screen.dart';
-import 'package:mikami_mobile/services_api/controller/author_service.dart';
 import 'package:mikami_mobile/services_api/controller/auth_service.dart';
+import 'package:mikami_mobile/services_api/controller/author_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:async';
 
 class AddComic extends StatefulWidget {
   const AddComic({Key? key}) : super(key: key);

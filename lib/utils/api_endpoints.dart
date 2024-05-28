@@ -20,4 +20,6 @@ class _AuthEndPoints {
   final String EditPicture = 'edit-profile-picture';
   final String Upgrade = 'register-author';
   final String Price = 'coins/price';
+  final String ComicsByAuthor = 'comics/author';
+  final String DeleteComic = 'comics/\$id/delete';
 }
