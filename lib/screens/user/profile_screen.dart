@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,11 +8,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mikami_mobile/screens/auth/login_screen.dart';
 import 'package:mikami_mobile/services_api/controller/auth_service.dart';
 import 'package:mikami_mobile/services_api/controller/profile_service.dart';
+import 'package:mikami_mobile/services_api/controller/user_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({Key? key}) : super(key: key);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -20,6 +23,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   AuthController authcontroller = Get.put(AuthController());
   ProfileController profileController = Get.put(ProfileController());
+  UserController userController = Get.put(UserController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   @override
@@ -65,6 +69,220 @@ class _ProfileScreenState extends State<ProfileScreen> {
           tileColor: Colors.white,
         ),
       ),
+    );
+  }
+
+  Widget upgradeWidget(SharedPreferences prefs) {
+    //TODO: Implementasi Upgrade to Author form
+    return Form(
+      key: _formKey,
+      child: Scaffold(
+        appBar: AppBar(
+          iconTheme: const IconThemeData(
+            color: Colors.white,
+          ),
+          titleTextStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+          backgroundColor: Theme.of(context).primaryColor,
+        ),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 40),
+                    _buildImageRow(
+                      prefs,
+                      'Identity Card',
+                      'identity',
+                      'Upload Your Identity Card',
+                      'Identity',
+                    ),
+                    const SizedBox(height: 20),
+                    _buildImageRow(
+                      prefs,
+                      'Certificate Card',
+                      'certificate',
+                      'Upload Your Certificate Card',
+                      'Certificate',
+                    ),
+                    const SizedBox(height: 20),
+                    _buildImageRow(
+                      prefs,
+                      'Your Selfie',
+                      'selfie',
+                      'Upload Your Selfie',
+                      'Selfie',
+                    ),
+                    const SizedBox(height: 20),
+                    _buildTextField(
+                      controller: profileController.bankNameController,
+                      labelText: 'Bank Name',
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter your bank';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    _buildTextField(
+                      controller: profileController.accountNumberController,
+                      labelText: 'Bank Account Number',
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter your bank number';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          prefs.remove('identity');
+                          prefs.remove('certificate');
+                          prefs.remove('selfie');
+                          profileController.bankNameController.clear();
+                          profileController.accountNumberController.clear();
+                          setState(() {});
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(15),
+                        ),
+                        child: const Text('Reset'),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (prefs.getString('currentLocation') == '' ||
+                              prefs.getString('currentLocation') == null) {
+                            await userController.handleLocationPermission();
+                          }
+                          await profileController.upgradeAuthor();
+                          Get.to(() => ProfileScreen());
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(15),
+                        ),
+                        child: const Text('Save'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    required String? Function(String?) validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        prefixIcon: Icon(Icons.account_balance),
+        labelStyle: TextStyle(
+          color: Colors.black,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+        prefixIconConstraints: BoxConstraints(
+          minWidth: 40,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.blue,
+            width: 2.0,
+          ),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.grey,
+            width: 1.0,
+          ),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.red,
+            width: 1.0,
+          ),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.red,
+            width: 2.0,
+          ),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+      ),
+      validator: validator,
+    );
+  }
+
+  Widget _buildImageRow(SharedPreferences prefs, String title, String prefsKey,
+      String placeholder, String buttonText) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        prefs.getString(prefsKey) != null
+            ? Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              )
+            : Container(),
+        Row(
+          children: [
+            prefs.getString(prefsKey) != null
+                ? Image.file(
+                    File(prefs.getString(prefsKey)!),
+                    height: 100,
+                  )
+                : Text(
+                    placeholder,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+            const SizedBox(width: 20),
+            if (prefs.getString(prefsKey) == null)
+              ElevatedButton(
+                onPressed: () async {
+                  final ImagePicker picker = ImagePicker();
+                  final XFile? image =
+                      await picker.pickImage(source: ImageSource.camera);
+                  if (image != null) {
+                    await prefs.setString(prefsKey, image.path);
+                    // //reset state
+                    // setState(() {});
+                  }
+                },
+                child: Text(buttonText),
+              ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -270,91 +488,95 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget UsernameWidget(SharedPreferences prefs) {
-    return Scaffold(
-      appBar: AppBar(
-        iconTheme: const IconThemeData(
-          color: Colors.white,
+    return Form(
+      key: _formKey,
+      child: Scaffold(
+        appBar: AppBar(
+          iconTheme: const IconThemeData(
+            color: Colors.white,
+          ),
+          titleTextStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+          backgroundColor: lightColorScheme.primary,
         ),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-        ),
-        backgroundColor: lightColorScheme.primary,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              const SizedBox(height: 40),
-              TextFormField(
-                controller: profileController.usernameController =
-                    prefs.getString('name') == null
-                        ? TextEditingController()
-                        : TextEditingController(text: prefs.getString('name')),
-                decoration: InputDecoration(
-                  labelText: 'Username',
-                  prefixIcon: Icon(CupertinoIcons.person),
-                  labelStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  prefixIconConstraints: BoxConstraints(
-                    minWidth: 40,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.blue,
-                      width: 2.0,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                TextFormField(
+                  controller: profileController.usernameController = prefs
+                              .getString('name') ==
+                          null
+                      ? TextEditingController()
+                      : TextEditingController(text: prefs.getString('name')),
+                  decoration: InputDecoration(
+                    labelText: 'Username',
+                    prefixIcon: Icon(CupertinoIcons.person),
+                    labelStyle: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.grey,
-                      width: 1.0,
+                    prefixIconConstraints: BoxConstraints(
+                      minWidth: 40,
                     ),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.red,
-                      width: 1.0,
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.blue,
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.red,
-                      width: 2.0,
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
-                    borderRadius: BorderRadius.circular(10.0),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.red,
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.red,
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
                   ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter your username';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter your username';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        await profileController.changeUsername();
-                        Get.back();
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(15),
-                    ),
-                    child: const Text('Save Username')),
-              )
-            ],
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          await profileController.changeUsername();
+                          Get.back();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(15),
+                      ),
+                      child: const Text('Save Username')),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -631,7 +853,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Get.to(() => upgradeWidget(prefs));
+                            },
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.all(15),
                             ),

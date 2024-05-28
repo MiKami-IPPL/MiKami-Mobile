@@ -388,15 +388,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                     }
                                   },
                                 ),
-                              if (prefs.getInt('rekKomik[Max]') != null)
-                                if (prefs.getInt('rekKomik[Max]')! > 4)
-                                  for (int i = 0; i < 5; i++)
-                                    RoundedImageWithText(
-                                      imagePath: prefs
-                                          .getString('rekKomik[$i][cover]')!,
-                                      text: prefs
-                                          .getString('rekKomik[$i][title]')!,
-                                    ),
+                              if (prefs.getInt('rekKomik[Max]') != null &&
+                                  prefs.getInt('rekKomik[Max]')! > 4)
+                                for (int i = 0; i < 5; i++)
+                                  RoundedImageWithText(
+                                    imagePath:
+                                        prefs.getString('rekKomik[$i][cover]')!,
+                                    text:
+                                        prefs.getString('rekKomik[$i][title]')!,
+                                  ),
                             ],
                           ),
                         ),

@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mikami_mobile/screens/auth/welcome_screen.dart';
+import 'package:mikami_mobile/screens/user/profile_screen.dart';
+import 'package:mikami_mobile/services_api/controller/user_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,11 +20,115 @@ class ProfileController extends GetxController {
   TextEditingController usernameController = TextEditingController();
   TextEditingController ageController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+  TextEditingController bankNameController = TextEditingController();
+  TextEditingController accountNumberController = TextEditingController();
+  UserController usercontroller = Get.put(UserController());
+
+  Future<void> upgradeAuthor() async {
+    try {
+      final SharedPreferences? prefs = await _prefs;
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      prefs?.remove('currentAddress');
+      prefs?.setString('currentAddress', '');
+      await placemarkFromCoordinates(position.latitude, position.longitude)
+          .then((List<Placemark> placemarks) {
+        Placemark place = placemarks[0];
+        prefs?.setString('currentAddress',
+            '${place.street}, ${place.subLocality},${place.subAdministrativeArea}, ${place.postalCode}, ${place.country}');
+      });
+      if (prefs!.getString('identity') == null ||
+          prefs.getString('certificate') == null ||
+          prefs.getString('selfie') == null) {
+        Get.showSnackbar(GetSnackBar(
+          title: 'Error',
+          message: 'Please upload all the required documents',
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.error,
+        ));
+        return;
+      } else {
+        print('Bisa upgrade');
+        var Url = Uri.parse(
+            ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Upgrade);
+        var token = prefs.getString('token');
+
+        var header = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        };
+        var request = http.MultipartRequest('POST', Url);
+        File identity = File(prefs.getString('identity')!);
+        File certificate = File(prefs.getString('certificate')!);
+        File selfie = File(prefs.getString('selfie')!);
+
+        var identityMultipartFile =
+            await http.MultipartFile.fromPath('identity', identity.path);
+        var certificateMultipartFile =
+            await http.MultipartFile.fromPath('certificate', certificate.path);
+        var selfieMultipartFile =
+            await http.MultipartFile.fromPath('selfie', selfie.path);
+
+        request.files.add(identityMultipartFile);
+        request.files.add(certificateMultipartFile);
+        request.files.add(selfieMultipartFile);
+
+        request.fields['bank'] = bankNameController.text;
+        request.fields['bankNumber'] = accountNumberController.text;
+        request.fields['location'] = prefs.getString('currentAddress')!;
+
+        request.headers.addAll(header);
+        final response = await request.send();
+        final respStr = await response.stream.bytesToString();
+        final json = jsonDecode(respStr);
+
+        if (json['status'] == 'success') {
+          print('disini');
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: "Upgrade success, please wait for admin approval",
+            icon: Icon(Icons.check, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.primary,
+          ));
+          bankNameController.clear();
+          accountNumberController.clear();
+          prefs.remove('identity');
+          prefs.remove('certificate');
+          prefs.remove('selfie');
+
+          Get.to(() => ProfileScreen());
+        } else {
+          print('error');
+
+          bankNameController.clear();
+          accountNumberController.clear();
+          prefs.remove('identity');
+          prefs.remove('certificate');
+          prefs.remove('selfie');
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.error,
+          ));
+        }
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   Future<void> changeEmail() async {
     try {
       //cek email valid
-      if (emailController.text.isEmail) {
+      if (!emailController.text.isEmpty) {
         var Url = Uri.parse(
             ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.EditProfile);
         final SharedPreferences? prefs = await _prefs;
@@ -33,34 +140,19 @@ class ProfileController extends GetxController {
           'Authorization': 'Bearer $token',
         };
 
-        File image = File(prefs!.getString('image')!);
+        Map body = {
+          'name': prefs!.getString('name'),
+          'email': emailController.text,
+          'age': prefs.getInt('age').toString(),
+          'password': prefs.getString('password'),
+        };
 
-        // Get the image from network and cache it
-        http.Response getFile =
-            await http.get(Uri.parse(prefs.getString('image')!));
-        Uint8List bytes = getFile.bodyBytes;
-        await image.writeAsBytes(bytes);
-        print(image.path);
-        var request = http.MultipartRequest('POST', Url);
-
-        //take the file
-        var multipartFile =
-            await http.MultipartFile.fromPath('picture', image.path);
-
-        request.files.add(multipartFile);
-        //genreList to list<int>
-        request.fields['name'] = prefs.getString('name')!;
-        request.fields['email'] = emailController.text;
-        request.fields['age'] = prefs.getInt('age').toString();
-        request.fields['password'] = prefs.getString('password')!;
-        request.headers.addAll(header);
-        final response = await request.send();
-        final respStr = await response.stream.bytesToString();
-        final json = jsonDecode(respStr);
-
+        http.Response response =
+            await http.post(Url, body: jsonEncode(body), headers: header);
+        final json = jsonDecode(response.body);
+        print(json);
         if (json['status'] == 'success') {
-          await getProfile();
-          emailController.clear();
+          getProfile();
           Get.showSnackbar(GetSnackBar(
             title: json['status'],
             message: json['message'],
@@ -109,30 +201,16 @@ class ProfileController extends GetxController {
           'Authorization': 'Bearer $token',
         };
 
-        File image = File(prefs!.getString('image')!);
+        Map body = {
+          'name': prefs!.getString('name'),
+          'email': prefs.getString('email'),
+          'age': ageController.text,
+          'password': prefs.getString('password'),
+        };
 
-        // Get the image from network and cache it
-        http.Response getFile =
-            await http.get(Uri.parse(prefs.getString('image')!));
-        Uint8List bytes = getFile.bodyBytes;
-        await image.writeAsBytes(bytes);
-        print(image.path);
-        var request = http.MultipartRequest('POST', Url);
-
-        //take the file
-        var multipartFile =
-            await http.MultipartFile.fromPath('picture', image.path);
-
-        request.files.add(multipartFile);
-        //genreList to list<int>
-        request.fields['name'] = prefs.getString('name')!;
-        request.fields['email'] = prefs.getString('email')!;
-        request.fields['age'] = ageController.text;
-        request.fields['password'] = prefs.getString('password')!;
-        request.headers.addAll(header);
-        final response = await request.send();
-        final respStr = await response.stream.bytesToString();
-        final json = jsonDecode(respStr);
+        http.Response response =
+            await http.post(Url, body: jsonEncode(body), headers: header);
+        final json = jsonDecode(response.body);
 
         if (json['status'] == 'success') {
           await getProfile();
@@ -184,30 +262,16 @@ class ProfileController extends GetxController {
           'Authorization': 'Bearer $token',
         };
 
-        File image = File(prefs!.getString('image')!);
+        Map body = {
+          'name': usernameController.text,
+          'email': prefs?.getString('email'),
+          'age': prefs?.getInt('age').toString(),
+          'password': prefs?.getString('password'),
+        };
 
-        // Get the image from network and cache it
-        http.Response getFile =
-            await http.get(Uri.parse(prefs.getString('image')!));
-        Uint8List bytes = getFile.bodyBytes;
-        await image.writeAsBytes(bytes);
-        print(image.path);
-        var request = http.MultipartRequest('POST', Url);
-
-        //take the file
-        var multipartFile =
-            await http.MultipartFile.fromPath('picture', image.path);
-
-        request.files.add(multipartFile);
-        //genreList to list<int>
-        request.fields['name'] = usernameController.text;
-        request.fields['email'] = prefs.getString('email')!;
-        request.fields['age'] = prefs.getInt('age').toString();
-        request.fields['password'] = prefs.getString('password')!;
-        request.headers.addAll(header);
-        final response = await request.send();
-        final respStr = await response.stream.bytesToString();
-        final json = jsonDecode(respStr);
+        http.Response response =
+            await http.post(Url, body: jsonEncode(body), headers: header);
+        final json = jsonDecode(response.body);
 
         if (json['status'] == 'success') {
           await getProfile();
@@ -249,7 +313,7 @@ class ProfileController extends GetxController {
     try {
       if (!imagePath.isEmpty) {
         var Url = Uri.parse(
-            ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.EditProfile);
+            ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.EditPicture);
         final SharedPreferences? prefs = await _prefs;
         var token = prefs?.getString('token');
 
@@ -268,11 +332,7 @@ class ProfileController extends GetxController {
             await http.MultipartFile.fromPath('picture', image.path);
 
         request.files.add(multipartFile);
-        //genreList to list<int>
-        request.fields['name'] = prefs!.getString('name')!;
-        request.fields['email'] = prefs.getString('email')!;
-        request.fields['age'] = prefs.getInt('age').toString();
-        request.fields['password'] = prefs.getString('password')!;
+
         request.headers.addAll(header);
         final response = await request.send();
         final respStr = await response.stream.bytesToString();
@@ -329,31 +389,16 @@ class ProfileController extends GetxController {
           'Authorization': 'Bearer $token',
         };
 
-        File image = File(prefs!.getString('image')!);
+        Map body = {
+          'name': prefs!.getString('name'),
+          'email': prefs.getString('email'),
+          'age': prefs.getInt('age').toString(),
+          'password': newPasswordController.text,
+        };
 
-        // Get the image from network and cache it
-        http.Response getFile =
-            await http.get(Uri.parse(prefs.getString('image')!));
-        Uint8List bytes = getFile.bodyBytes;
-        await image.writeAsBytes(bytes);
-        print(image.path);
-        var request = http.MultipartRequest('POST', Url);
-
-        //take the file
-        var multipartFile =
-            await http.MultipartFile.fromPath('picture', image.path);
-
-        request.files.add(multipartFile);
-        //genreList to list<int>
-        request.fields['name'] = prefs.getString('name')!;
-        request.fields['email'] = prefs.getString('email')!;
-        request.fields['age'] = prefs.getInt('age').toString();
-        request.fields['password'] = newPasswordController.text;
-        request.headers.addAll(header);
-        final response = await request.send();
-        final respStr = await response.stream.bytesToString();
-        final json = jsonDecode(respStr);
-        print(json);
+        http.Response response =
+            await http.post(Url, body: jsonEncode(body), headers: header);
+        final json = jsonDecode(response.body);
 
         if (json['status'] == 'success') {
           await getProfile();
@@ -488,7 +533,9 @@ class ProfileController extends GetxController {
         var image = json['data']['picture'];
         var lastTwoDirectories =
             image.split('/').sublist(image.split('/').length - 1).join('/');
+        print(lastTwoDirectories);
         if (lastTwoDirectories == 'picture') {
+          print('masauk');
           prefs?.setString('image', '');
         } else {
           prefs?.setString('image', json['data']['picture']);

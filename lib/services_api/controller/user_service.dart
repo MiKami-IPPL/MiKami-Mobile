@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mikami_mobile/screens/auth/login_screen.dart';
@@ -11,6 +13,52 @@ class UserController extends GetxController {
   TextEditingController searchController = TextEditingController();
   TextEditingController reasonController = TextEditingController();
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+  Future<bool> handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      Get.showSnackbar(GetSnackBar(
+        title: 'Location Services Disabled',
+        message: 'Location services are disabled. Please enable the services',
+        icon: Icon(Icons.error, color: Colors.white),
+        duration: const Duration(seconds: 2),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: lightColorScheme.error,
+      ));
+      return false;
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        Get.showSnackbar(GetSnackBar(
+          title: 'Location Permissions Denied',
+          message: 'Location permissions are denied',
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 2),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.error,
+        ));
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      Get.showSnackbar(GetSnackBar(
+        title: 'Location Permissions Denied',
+        message:
+            'Location permissions are permanently denied, we cannot request permissions.',
+        icon: Icon(Icons.error, color: Colors.white),
+        duration: const Duration(seconds: 2),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: lightColorScheme.error,
+      ));
+      return false;
+    }
+    return true;
+  }
 
   //search komik by title
   Future<void> searchKomik() async {
@@ -120,8 +168,13 @@ class UserController extends GetxController {
           prefs?.setInt('rekKomik[Max]', json['data'].length);
           for (var i = 0; i < json['data'].length; i++) {
             //set cover
-            prefs?.setString('rekKomik[$i][cover]', (json['data'][i]['cover']));
-            prefs?.setString('rekKomik[$i][title]', (json['data'][i]['title']));
+            if (json['data'][i]['cover'] != null) {
+              prefs?.setString('rekKomik[$i][cover]', json['data'][i]['cover']);
+              prefs?.setString('rekKomik[$i][title]', json['data'][i]['title']);
+            } else {
+              prefs?.setString('rekKomik[$i][cover]', '');
+              prefs?.setString('rekKomik[$i][title]', json['data'][i]['title']);
+            }
           }
         } else {
           Get.showSnackbar(GetSnackBar(
