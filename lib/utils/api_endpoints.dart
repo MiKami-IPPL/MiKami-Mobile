@@ -22,4 +22,5 @@ class _AuthEndPoints {
   final String Price = 'coins/price';
   final String ComicsByAuthor = 'comics/author';
   final String DeleteComic = 'comics/\$id/delete';
+  final String TopupHistory = 'coins/order';
 }

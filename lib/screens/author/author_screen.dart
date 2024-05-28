@@ -71,20 +71,14 @@ class _AuthorScreenState extends State<AuthorScreen> {
                         'assets/images/verified.png',
                         "Pengajuan Verifikasi",
                         () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ComicVerify(),
-                            ),
-                          );
+                          Get.to(() => ComicVerify());
                         },
                       ),
                       _buildMenuButton(
                         'assets/images/history.png',
                         "Riwayat",
-                        () {
-                          //use getx to navigate to history screen
-                          Get.to(() => const AuthorHistory());
+                        () async {
+                          Get.to(() => AuthorHistory());
                         },
                       ),
                       _buildMenuButton(
@@ -92,7 +86,7 @@ class _AuthorScreenState extends State<AuthorScreen> {
                         "Withdrawal",
                         () async {
                           await authorcontroller.getHistoryWithdrawal();
-                          Get.to(() => const WithdrawalScreen());
+                          Get.to(() => WithdrawalScreen());
                         },
                       ),
                     ],

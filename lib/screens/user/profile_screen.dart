@@ -73,18 +73,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget upgradeWidget(SharedPreferences prefs) {
-    //TODO: Implementasi Upgrade to Author form
     return Form(
       key: _formKey,
       child: Scaffold(
         appBar: AppBar(
-          iconTheme: const IconThemeData(
-            color: Colors.white,
-          ),
-          titleTextStyle: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-          ),
+          iconTheme: const IconThemeData(color: Colors.white),
+          titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20),
           backgroundColor: Theme.of(context).primaryColor,
         ),
         body: LayoutBuilder(
@@ -141,40 +135,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                     ),
                     const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          prefs.remove('identity');
-                          prefs.remove('certificate');
-                          prefs.remove('selfie');
-                          profileController.bankNameController.clear();
-                          profileController.accountNumberController.clear();
-                          setState(() {});
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(15),
-                        ),
-                        child: const Text('Reset'),
-                      ),
+                    _buildButton(
+                      text: 'Reset',
+                      onPressed: () {
+                        _handleReset(prefs);
+                      },
                     ),
                     const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          if (prefs.getString('currentLocation') == '' ||
-                              prefs.getString('currentLocation') == null) {
-                            await userController.handleLocationPermission();
-                          }
-                          await profileController.upgradeAuthor();
-                          Get.to(() => ProfileScreen());
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(15),
-                        ),
-                        child: const Text('Save'),
-                      ),
+                    _buildButton(
+                      text: 'Save',
+                      onPressed: () async {
+                        await _handleSave(prefs);
+                      },
                     ),
                   ],
                 ),
@@ -184,6 +156,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildButton({required String text, required VoidCallback onPressed}) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(15)),
+        child: Text(text),
+      ),
+    );
+  }
+
+  void _handleReset(SharedPreferences prefs) {
+    prefs.remove('identity');
+    prefs.remove('certificate');
+    prefs.remove('selfie');
+    profileController.bankNameController.clear();
+    profileController.accountNumberController.clear();
+    // Call setState if needed
+  }
+
+  Future<void> _handleSave(SharedPreferences prefs) async {
+    if (prefs.getString('currentLocation') == '' ||
+        prefs.getString('currentLocation') == null) {
+      await userController.handleLocationPermission();
+    }
+    await profileController.upgradeAuthor();
+    Get.to(() => ProfileScreen());
   }
 
   Widget _buildTextField({

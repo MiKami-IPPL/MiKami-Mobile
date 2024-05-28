@@ -18,6 +18,7 @@ class AuthorController extends GetxService {
   TextEditingController rateController = TextEditingController();
   TextEditingController passWithdrawalController = TextEditingController();
   ProfileController profileController = Get.put(ProfileController());
+  TextEditingController amountController = TextEditingController();
 
   Future<void> getAuthorComics() async {
     try {
@@ -428,6 +429,26 @@ class AuthorController extends GetxService {
           backgroundColor: Colors.red,
         ));
         return;
+      } else if (amountController.text.isEmpty) {
+        Get.showSnackbar(GetSnackBar(
+          title: "Failed",
+          message: "Amount is empty",
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        ));
+        return;
+      } else if (int.parse(amountController.text) < 100) {
+        Get.showSnackbar(GetSnackBar(
+          title: "Failed",
+          message: "Minimum withdrawal is 100",
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        ));
+        return;
       } else {
         //check if password is correct with login password
         final SharedPreferences? prefs = await _prefs;
@@ -456,7 +477,7 @@ class AuthorController extends GetxService {
               ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Withdrawal);
 
           Map body = {
-            'amount': prefs?.getInt('coin'),
+            'amount': amountController.text,
           };
 
           http.Response response =

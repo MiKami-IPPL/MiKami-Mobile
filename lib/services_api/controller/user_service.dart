@@ -15,6 +15,66 @@ class UserController extends GetxController {
   TextEditingController reasonController = TextEditingController();
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
+  Future<void> getTopupHistory() async {
+    try {
+      var Url = Uri.parse(
+          ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.TopupHistory);
+      final SharedPreferences? prefs = await _prefs;
+      var token = prefs?.getString('token');
+      if (token == null) {
+        Get.offAll(() => LoginScreen());
+      } else {
+        var header = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        };
+
+        http.Response response = await http.get(Url, headers: header);
+        final json = jsonDecode(response.body);
+        print(json);
+
+        if (json['status'] == 'success') {
+          if (prefs?.getInt('topupHistory[Max]') != null) {
+            var j = prefs?.getInt('topupHistory[Max]');
+            for (var i = 0; i < j!; i++) {
+              prefs?.remove('topupHistory[$i][order_id]');
+              prefs?.remove('topupHistory[$i][price]');
+              prefs?.remove('topupHistory[$i][status]');
+              prefs?.remove('topupHistory[$i][created_at]');
+              prefs?.remove('topupHistory[$i][updated_at]');
+            }
+            prefs?.remove('topupHistory[Max]');
+          }
+
+          prefs?.setInt('topupHistory[Max]', json['data'].length);
+          for (var i = 0; i < json['data'].length; i++) {
+            prefs?.setString(
+                'topupHistory[$i][id]', json['data'][i]['order_id']);
+            prefs?.setInt('topupHistory[$i][price]', json['data'][i]['price']);
+            prefs?.setString(
+                'topupHistory[$i][status]', json['data'][i]['status']);
+            prefs?.setString(
+                'topupHistory[$i][created_at]', json['data'][i]['created_at']);
+            prefs?.setString(
+                'topupHistory[$i][updated_at]', json['data'][i]['updated_at']);
+          }
+        } else {
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.error,
+          ));
+        }
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   Future<void> topupCoin(int amount, int perkoin) async {
     try {
       var Url = Uri.parse(
@@ -35,7 +95,9 @@ class UserController extends GetxController {
       print(json);
 
       if (json['message'] == 'success') {
-        Get.to(() => PaymentScreen(linkPayment: json['data']['redirect_url']));
+        await Get.to(
+            () => PaymentScreen(linkPayment: json['data']['redirect_url']));
+        // await profilecontroller.getCoin();
       } else {
         Get.showSnackbar(GetSnackBar(
           title: 'Error',

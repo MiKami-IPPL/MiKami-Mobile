@@ -109,6 +109,10 @@ class _AuthorManageState extends State<AuthorManage> {
             ),
             floatingActionButton: FloatingActionButton(
               onPressed: () {
+                authorcontroller.titleController.clear();
+                authorcontroller.descriptionController.clear();
+                authorcontroller.priceController.clear();
+                prefs.remove('cover_image');
                 Get.to(() => AddComic());
               },
               shape: const StadiumBorder(),
