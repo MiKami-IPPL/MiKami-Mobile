@@ -1,4 +1,3 @@
-//buat statefull widget pengaduanScreen
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/auth/welcome_screen.dart';
@@ -17,108 +16,115 @@ class _PengaduanScreenState extends State<PengaduanScreen> {
   UserController usercontroller = Get.put(UserController());
   AuthController authcontroller = Get.put(AuthController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: authcontroller.isLogin(),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          if (snapshot.data == false) {
-            // profileController.logout();
-            return WelcomeScreen();
-          } else {
-            return pengaduanWidget();
-          }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        } else if (snapshot.hasData && snapshot.data == true) {
+          return pengaduanWidget();
         } else {
-          return CircularProgressIndicator();
+          return WelcomeScreen();
         }
       },
     );
   }
 
-  //buat statefull widget pengaduanScreen
   Widget pengaduanWidget() {
     return FutureBuilder(
-        future: _prefs,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final SharedPreferences prefs = snapshot.data as SharedPreferences;
-            return Scaffold(
+      future: _prefs,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        } else if (snapshot.hasData) {
+          final SharedPreferences prefs = snapshot.data as SharedPreferences;
+          return Scaffold(
+            backgroundColor: lightColorScheme.background,
+            appBar: AppBar(
+              title: Text('Pengaduan'),
               backgroundColor: lightColorScheme.primary,
-              appBar: AppBar(
-                title: Text('Pengaduan'),
-              ),
-              body: Container(
-                padding: EdgeInsets.all(16),
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // add search bar with animation
-                    SearchBar(
-                      controller: usercontroller.searchController,
-                      hintText: 'Search Comic',
-                      onSubmitted: (Null) async {
-                        await usercontroller.searchKomik();
-                        Get.to(() => SearchScreen());
-                        //reset state
-                      },
-                    ),
-
-                    // Add SizedBox widget to give space between the search bar and the list
-                    SizedBox(height: 20),
-                    // add text widget
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Report Comic :',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                    if (prefs.getInt('selectedID') == null)
+                      AnimatedContainer(
+                        duration: Duration(milliseconds: 500),
+                        child: SearchBar(
+                          controller: usercontroller.searchController,
+                          hintText: 'Search Comic',
+                          onSubmitted: (value) async {
+                            await usercontroller.searchKomik();
+                            await Get.to(() => SearchScreen());
+                            setState(() {});
+                          },
                         ),
-                        SizedBox(width: 10),
-                        if (prefs.getInt('selectedID') != null)
-                          Text(
-                            prefs.getString('selectedTitle') ?? 'not selected',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                      ],
+                      ),
+                    SizedBox(height: 20),
+                    Text(
+                      'Report Comic:',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-
+                    SizedBox(height: 10),
+                    if (prefs.getInt('selectedID') != null)
+                      Text(
+                        prefs.getString('selectedTitle') ?? 'Not selected',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     SizedBox(height: 20),
                     if (prefs.getInt('selectedID') != null)
-                      ElevatedButton(
+                      ElevatedButton.icon(
+                        icon: Icon(Icons.cancel),
+                        label: Text('Cancel Choose'),
                         onPressed: () {
                           usercontroller.searchController.clear();
                           prefs.remove('selectedID');
                           prefs.remove('selectedTitle');
-                          //reset state
+                          usercontroller.reasonController.clear();
                           setState(() {});
                         },
-                        child: Text('Cancel Choose'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          shadowColor: Colors.white,
+                        ),
                       ),
-                    SizedBox(height: 20),
                     if (prefs.getInt('selectedID') == null)
-                      //make refresh screen button
-                      ElevatedButton(
+                      ElevatedButton.icon(
+                        icon: Icon(Icons.refresh),
+                        label: Text('Refresh Screen'),
                         onPressed: () {
                           setState(() {});
                         },
-                        child: Text('Refresh Screen'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: lightColorScheme.primary,
+                          shadowColor: Colors.white,
+                        ),
                       ),
-                    SizedBox(height: 20),
-                    if (prefs.getInt('selectedID') != null)
-                      //make textfield for reason with animation
+                    if (prefs.getInt('selectedID') != null) ...[
+                      SizedBox(height: 20),
                       TextFormField(
-                        onFieldSubmitted: (Null) async {
-                          await usercontroller.postReportKomik();
-                          //reset state
-                          setState(() {});
-                        },
                         controller: usercontroller.reasonController,
+                        maxLines: 5,
                         decoration: InputDecoration(
                           labelText: 'Reason',
                           labelStyle: TextStyle(
@@ -133,29 +139,40 @@ class _PengaduanScreenState extends State<PengaduanScreen> {
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Colors.blue),
                           ),
-                          errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.red),
-                          ),
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.red),
-                          ),
                         ),
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
+                      SizedBox(height: 20),
+                      Center(
+                        child: ElevatedButton.icon(
+                          icon: Icon(Icons.send),
+                          label: Text('Submit Report'),
+                          onPressed: () async {
+                            await usercontroller.postReportKomik();
+                            setState(() {});
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            shadowColor: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
-            );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        });
+            ),
+          );
+        } else {
+          return Scaffold(
+            body: Center(
+              child: Text('Error loading preferences'),
+            ),
+          );
+        }
+      },
+    );
   }
 }
