@@ -885,7 +885,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ListTile(
                         leading: Icon(CupertinoIcons.calendar),
                         title: Text('Age'),
-                        subtitle: Text(prefs.getInt('age').toString() ?? ''),
+                        subtitle: Text(prefs.getInt('age').toString()),
                       ),
                     const SizedBox(height: 10),
 
