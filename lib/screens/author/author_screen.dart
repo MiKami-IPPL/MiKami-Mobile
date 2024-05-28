@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mikami_mobile/screens/author/author_manage_screen.dart';
 import 'package:mikami_mobile/screens/author/withdrawal_screen.dart';
 import 'package:mikami_mobile/services_api/controller/author_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 
 import '../author_comic_verify.dart';
 import '../author_history_screen.dart';
-import 'manage_screen.dart';
 
 class AuthorScreen extends StatefulWidget {
   const AuthorScreen({super.key});
@@ -64,7 +64,7 @@ class _AuthorScreenState extends State<AuthorScreen> {
                         'assets/images/list.png',
                         "Daftar Komik",
                         () {
-                          Get.to(() => const AuthorManage());
+                          Get.to(() => AuthorManage());
                         },
                       ),
                       _buildMenuButton(

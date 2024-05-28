@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/auth/welcome_screen.dart';
+import 'package:mikami_mobile/screens/author/author_screen.dart';
 import 'package:mikami_mobile/screens/user/pengaduan_screen.dart';
 import 'package:mikami_mobile/screens/user/profile_screen.dart';
 import 'package:mikami_mobile/screens/user/search_screen.dart';
@@ -11,8 +12,6 @@ import 'package:mikami_mobile/services_api/controller/profile_service.dart';
 import 'package:mikami_mobile/services_api/controller/user_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../author/menu_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

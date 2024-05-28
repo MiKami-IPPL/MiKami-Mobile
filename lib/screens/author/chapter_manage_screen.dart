@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/model/comic.dart';
-import 'package:mikami_mobile/model/chapter.dart';
+import 'package:mikami_mobile/screens/author/chapter_update_screen.dart';
 import 'package:mikami_mobile/screens/author/chapter_upload.dart';
 import 'package:mikami_mobile/services_api/controller/chapter_service.dart';
-import 'package:mikami_mobile/screens/author/chapter_update_screen.dart';
 
 class ChapterManageScreen extends StatefulWidget {
   final Comic? comic;
