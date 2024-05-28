@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:mikami_mobile/services_api/controller/profile_service.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
-// Import for iOS features.
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 class PaymentScreen extends StatefulWidget {
-  const PaymentScreen({super.key});
+  final String linkPayment;
+  const PaymentScreen({super.key, required this.linkPayment});
+
   @override
-  State<PaymentScreen> createState() => _PaymentScreen();
+  State<PaymentScreen> createState() => _PaymentScreenState();
 }
 
-class _PaymentScreen extends State<PaymentScreen> {
+class _PaymentScreenState extends State<PaymentScreen> {
+  ProfileController profilecontroller = Get.put(ProfileController());
   late final WebViewController _controller;
+
   @override
   void initState() {
     super.initState();
@@ -29,14 +34,14 @@ class _PaymentScreen extends State<PaymentScreen> {
 
     final WebViewController controller =
         WebViewController.fromPlatformCreationParams(params);
-// ···
+    // ···
     if (controller.platform is AndroidWebViewController) {
       AndroidWebViewController.enableDebugging(true);
       (controller.platform as AndroidWebViewController)
           .setMediaPlaybackRequiresUserGesture(false);
     }
     // #enddocregion platform_features
-    _controller = WebViewController()
+    _controller = controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
@@ -45,17 +50,24 @@ class _PaymentScreen extends State<PaymentScreen> {
             // Update loading bar.
           },
           onPageStarted: (String url) {},
-          onPageFinished: (String url) {},
+          onPageFinished: (String url) {
+            // Navigate back once the page finishes loading
+            // Get.back();
+          },
           onWebResourceError: (WebResourceError error) {},
-          onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith('https://www.youtube.com/')) {
-              return NavigationDecision.prevent;
+          onNavigationRequest: (NavigationRequest request) async {
+            // Only allow navigation to the provided linkPayment URL
+            if (request.url == widget.linkPayment) {
+              return NavigationDecision.navigate;
+            } else {
+              await profilecontroller.getProfile();
+              Get.back();
             }
-            return NavigationDecision.navigate;
+            return NavigationDecision.prevent;
           },
         ),
       )
-      ..loadRequest(Uri.parse('https://flutter.dev'));
+      ..loadRequest(Uri.parse(widget.linkPayment));
   }
 
   @override

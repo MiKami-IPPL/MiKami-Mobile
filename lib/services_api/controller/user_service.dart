@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:mikami_mobile/screens/auth/login_screen.dart';
+import 'package:mikami_mobile/screens/user/payment_screen.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,25 +27,18 @@ class UserController extends GetxController {
         'Accept': 'application/json',
         'Authorization': 'Bearer $token',
       };
-      Map body = {'amount': amount, 'price': perkoin};
+      Map body = {'coin_amount': amount, 'price': perkoin};
 
       http.Response response =
           await http.post(Url, body: jsonEncode(body), headers: header);
       final json = jsonDecode(response.body);
+      print(json);
 
-      if (json['status'] == 'success') {
-        print(json['data'][0]['redirect_url']);
-        Get.showSnackbar(GetSnackBar(
-          title: "Sukses",
-          message: json['message'],
-          icon: Icon(Icons.check_circle, color: Colors.white),
-          duration: const Duration(seconds: 2),
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: lightColorScheme.secondary,
-        ));
+      if (json['message'] == 'success') {
+        Get.to(() => PaymentScreen(linkPayment: json['data']['redirect_url']));
       } else {
         Get.showSnackbar(GetSnackBar(
-          title: json['status'],
+          title: 'Error',
           message: json['message'],
           icon: Icon(Icons.error, color: Colors.white),
           duration: const Duration(seconds: 2),
@@ -289,6 +283,4 @@ class UserController extends GetxController {
       print(e.toString());
     }
   }
-
-  void getRecommendedComics() {}
 }

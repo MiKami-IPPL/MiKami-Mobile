@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mikami_mobile/services_api/controller/profile_service.dart';
 import 'package:mikami_mobile/services_api/controller/user_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,6 +13,7 @@ class TopupScreen extends StatefulWidget {
 class _TopupScreenState extends State<TopupScreen> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   UserController usercontroller = Get.put(UserController());
+  ProfileController profilecontroller = Get.put(ProfileController());
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _prefs,
@@ -128,6 +130,7 @@ class _TopupScreenState extends State<TopupScreen> {
                               'assets/images/koin_mikami.png',
                               "10 Koin",
                               () async {
+                                await profilecontroller.getPrice();
                                 await usercontroller.topupCoin(
                                     10, prefs.getInt('price')!);
                               },
@@ -135,22 +138,28 @@ class _TopupScreenState extends State<TopupScreen> {
                             _buildMenuButton(
                               'assets/images/koin_mikami.png',
                               "100 Koin",
-                              () {
-                                Get.to(() => TopupScreen());
+                              () async {
+                                await profilecontroller.getPrice();
+                                await usercontroller.topupCoin(
+                                    100, prefs.getInt('price')!);
                               },
                             ),
                             _buildMenuButton(
                               'assets/images/koin_mikami.png',
                               "500 Koin",
-                              () {
-                                Get.to(() => TopupScreen());
+                              () async {
+                                await profilecontroller.getPrice();
+                                await usercontroller.topupCoin(
+                                    500, prefs.getInt('price')!);
                               },
                             ),
                             _buildMenuButton(
                               'assets/images/koin_mikami.png',
                               "1000 Koin",
-                              () {
-                                Get.to(() => TopupScreen());
+                              () async {
+                                await profilecontroller.getPrice();
+                                await usercontroller.topupCoin(
+                                    1000, prefs.getInt('price')!);
                               },
                             ),
                           ],
