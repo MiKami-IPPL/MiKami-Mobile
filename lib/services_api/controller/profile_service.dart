@@ -450,27 +450,6 @@ class ProfileController extends GetxController {
     }
   }
 
-  //Make topup coin
-  Future<void> topupCoin() async {
-    try {
-      var Url = Uri.parse(
-          ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.TopUpCoins);
-      final SharedPreferences? prefs = await _prefs;
-      var token = prefs?.getString('token');
-
-      var header = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      };
-      var body = jsonEncode({'amount': 1000});
-
-      http.Response response = await http.post(Url, headers: header);
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
   Future<void> getCoin() async {
     try {
       var Url =
@@ -493,6 +472,38 @@ class ProfileController extends GetxController {
         } else {
           prefs?.setInt('coin', json['data'][0]['amount']);
         }
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: json['status'],
+          message: json['message'],
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.error,
+        ));
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> getPrice() async {
+    try {
+      var Url =
+          Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Price);
+      final SharedPreferences? prefs = await _prefs;
+      var token = prefs?.getString('token');
+
+      var header = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+      http.Response response = await http.get(Url, headers: header);
+      final json = jsonDecode(response.body);
+
+      if (json['status'] == 'success') {
+        prefs?.setInt('price', json['data'][0]['price']);
       } else {
         Get.showSnackbar(GetSnackBar(
           title: json['status'],
@@ -541,7 +552,7 @@ class ProfileController extends GetxController {
           prefs?.setString('image', json['data']['picture']);
         }
         print(prefs?.getString('image'));
-
+        await getPrice();
         await getCoin();
       } else {
         Get.showSnackbar(GetSnackBar(

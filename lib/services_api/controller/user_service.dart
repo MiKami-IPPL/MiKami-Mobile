@@ -14,6 +14,49 @@ class UserController extends GetxController {
   TextEditingController reasonController = TextEditingController();
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
+  Future<void> topupCoin(int amount, int perkoin) async {
+    try {
+      var Url = Uri.parse(
+          ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.TopUpCoins);
+      final SharedPreferences? prefs = await _prefs;
+      var token = prefs?.getString('token');
+
+      var header = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+      Map body = {'amount': amount, 'price': perkoin};
+
+      http.Response response =
+          await http.post(Url, body: jsonEncode(body), headers: header);
+      final json = jsonDecode(response.body);
+
+      if (json['status'] == 'success') {
+        print(json['data'][0]['redirect_url']);
+        Get.showSnackbar(GetSnackBar(
+          title: "Sukses",
+          message: json['message'],
+          icon: Icon(Icons.check_circle, color: Colors.white),
+          duration: const Duration(seconds: 2),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.secondary,
+        ));
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: json['status'],
+          message: json['message'],
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 2),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: lightColorScheme.error,
+        ));
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   Future<bool> handleLocationPermission() async {
     bool serviceEnabled;
     LocationPermission permission;

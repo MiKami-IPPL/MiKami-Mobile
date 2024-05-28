@@ -19,4 +19,5 @@ class _AuthEndPoints {
   final String EditProfile = 'edit-profile';
   final String EditPicture = 'edit-profile-picture';
   final String Upgrade = 'register-author';
+  final String Price = 'coins/price';
 }
