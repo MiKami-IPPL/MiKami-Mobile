@@ -465,6 +465,7 @@ class ProfileController extends GetxController {
       http.Response response = await http.get(Url, headers: header);
 
       final json = jsonDecode(response.body);
+      // print(json['data'][0]['amount']);
 
       if (json['status'] == 'success') {
         if (json['data'][0]['amount'] == null) {
@@ -506,7 +507,7 @@ class ProfileController extends GetxController {
         prefs?.remove('price');
       }
       if (json['status'] == 'success') {
-        print(json['data']['price']);
+        // print(json['data']['price']);
         prefs?.setInt('price', price);
       } else {
         Get.showSnackbar(GetSnackBar(

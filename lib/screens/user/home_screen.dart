@@ -28,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    profileController.getCoin();
     usercontroller.getRecomendedKomik();
     //return route to login screen if user is not logged in
     return FutureBuilder(

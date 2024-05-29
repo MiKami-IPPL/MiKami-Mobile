@@ -1,42 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mikami_mobile/model/comic.dart';
-import 'package:mikami_mobile/screens/author/chapter_update_screen.dart';
-import 'package:mikami_mobile/screens/author/chapter_upload.dart';
-import 'package:mikami_mobile/services_api/controller/chapter_service.dart';
+import 'package:mikami_mobile/screens/author/chapter_upload_screen.dart';
+import 'package:mikami_mobile/services_api/controller/author_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChapterManageScreen extends StatefulWidget {
-  final Comic? comic;
-
-  const ChapterManageScreen({Key? key, this.comic}) : super(key: key);
+  const ChapterManageScreen({Key? key}) : super(key: key);
 
   @override
   _ChapterManageScreenState createState() => _ChapterManageScreenState();
 }
 
 class _ChapterManageScreenState extends State<ChapterManageScreen> {
-  late ChapterController _chapterController;
+  final AuthorController authorController = Get.put(AuthorController());
+  final RxBool isLoading = true.obs;
+  final RxString errorMessage = ''.obs;
+  final RxList<Map<String, String>> chapters = <Map<String, String>>[].obs;
 
   @override
   void initState() {
     super.initState();
-    _chapterController = Get.put(ChapterController());
-    if (widget.comic != null) {
-      _chapterController.getChapters(widget.comic!.id.toString());
+    _loadChaptersFromPrefs();
+  }
+
+  Future<void> _loadChaptersFromPrefs() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final List<String>? savedChapters = prefs.getStringList('chapters');
+      if (savedChapters != null) {
+        chapters.assignAll(savedChapters.map((chapter) {
+          final parts = chapter.split('|');
+          return {'id': parts[0], 'title': parts[1], 'description': parts[2]};
+        }).toList());
+      } else {
+        chapters.clear();
+      }
+      isLoading.value = false;
+    } catch (e) {
+      errorMessage.value = 'Failed to load chapters';
+      isLoading.value = false;
     }
   }
 
   void _navigateToChapterUpload() {
-    Get.to(() => ChapterAddScreen(
-          comicId: widget.comic!.id,
-        ));
+    Get.to(() => ChapterAddScreen());
   }
 
   void _navigateToChapterUpdate(String chapterId) {
-    Get.to(() => ChapterUpdateScreen(
-          comicId: widget.comic!.id,
-          chapterId: chapterId,
-        ));
+    // Navigate to chapter update screen
   }
 
   void _showDeleteConfirmationDialog(String chapterId) {
@@ -56,10 +67,9 @@ class _ChapterManageScreenState extends State<ChapterManageScreen> {
             TextButton(
               child: const Text('Delete'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog before deletion
-                _chapterController.deleteChapter(
-                  chapterId: chapterId,
-                );
+                // Handle delete action
+                authorController.deleteChapter(chapterId);
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -75,31 +85,31 @@ class _ChapterManageScreenState extends State<ChapterManageScreen> {
         title: const Text('Chapter Management'),
       ),
       body: Obx(() {
-        if (_chapterController.isLoading.value) {
+        if (isLoading.value) {
           return const Center(child: CircularProgressIndicator());
-        } else if (_chapterController.hasError.value) {
+        } else if (errorMessage.isNotEmpty) {
           return Center(
             child: Text(
-              _chapterController.errorMessage.value,
+              errorMessage.value,
               style: const TextStyle(color: Colors.red),
             ),
           );
-        } else if (_chapterController.chapters.isEmpty) {
+        } else if (chapters.isEmpty) {
           return const Center(child: Text('No chapters available'));
         } else {
           return ListView.builder(
-            itemCount: _chapterController.chapters.length,
+            itemCount: chapters.length,
             itemBuilder: (context, index) {
-              var chapter = _chapterController.chapters[index];
+              var chapter = chapters[index];
               return ListTile(
-                title: Text(chapter.title),
-                subtitle: Text(chapter.description),
+                title: Text(chapter['title']!),
+                subtitle: Text(chapter['description']!),
                 trailing: PopupMenuButton(
                   onSelected: (value) {
                     if (value == 'edit') {
-                      _navigateToChapterUpdate(chapter.id.toString());
+                      _navigateToChapterUpdate(chapter['id']!);
                     } else if (value == 'delete') {
-                      _showDeleteConfirmationDialog(chapter.id.toString());
+                      _showDeleteConfirmationDialog(chapter['id']!);
                     }
                   },
                   itemBuilder: (BuildContext context) {

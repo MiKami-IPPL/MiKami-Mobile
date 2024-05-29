@@ -153,6 +153,9 @@ class _SearchScreenState extends State<SearchScreen> {
             prefs.setInt('selectedID', prefs.getInt('dataKomik[$index][id]')!);
             prefs.setString(
                 'selectedTitle', prefs.getString('dataKomik[$index][title]')!);
+
+            prefs.setString(
+                'selectedCover', prefs.getString('dataKomik[$index][cover]')!);
             Get.back();
           },
           child: Container(

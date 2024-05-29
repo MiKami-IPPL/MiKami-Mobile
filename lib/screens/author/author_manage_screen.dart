@@ -134,7 +134,7 @@ class _AuthorManageState extends State<AuthorManage> {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              // Get.to(() => ChapterManageScreen(comic: comic));
+              // Get.to(() => ChapterManageScreen(prefs.getInt('authKomik[$index][id]'));
             },
             child: ListTile(
               contentPadding:
@@ -180,7 +180,8 @@ class _AuthorManageState extends State<AuthorManage> {
                   PopupMenuButton<String>(
                     onSelected: (String choice) async {
                       if (choice == 'Lihat Daftar Chapter') {
-                        // Get.to(() => ChapterManageScreen(comic: comic));
+                        await authorcontroller.getChapters(
+                            prefs.getInt('authKomik[$index][id]')!);
                       } else if (choice == 'Hapus Komik') {
                         await authorcontroller.deleteComic(
                             prefs.getInt('authKomik[$index][id]')!,

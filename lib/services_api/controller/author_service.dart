@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:mikami_mobile/screens/author/chapter_manage_screen.dart';
 import 'package:mikami_mobile/services_api/controller/profile_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:mikami_mobile/utils/api_endpoints.dart';
@@ -19,6 +20,185 @@ class AuthorController extends GetxService {
   TextEditingController passWithdrawalController = TextEditingController();
   ProfileController profileController = Get.put(ProfileController());
   TextEditingController amountController = TextEditingController();
+  TextEditingController subtitleController = TextEditingController();
+
+  Future<void> uploadChapter() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString('token');
+      var comicId = prefs.getInt('comicId');
+      var headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+      var url = Uri.parse(ApiEndPoints.baseUrl +
+          ApiEndPoints.authEndPoints.Comics +
+          '/$comicId/chapters');
+
+      var image = prefs.getStringList('images');
+      if (image != null) {
+        var request = http.MultipartRequest('POST', url);
+        List<File> imageList = [];
+        for (var path in image) {
+          File chapter = File(path);
+          imageList.add(chapter);
+        }
+
+        //take the files
+        for (var chapter in imageList) {
+          var multipartFile =
+              await http.MultipartFile.fromPath('images', chapter.path);
+          request.files.add(multipartFile);
+        }
+
+        request.fields['title'] = titleController.text;
+        request.fields['subtitle'] = subtitleController.text;
+        request.fields['price'] = priceController.text;
+
+        request.headers.addAll(headers);
+        final response = await request.send();
+        final respStr = await response.stream.bytesToString();
+        final json = jsonDecode(respStr);
+        print(json);
+
+        if (json['status'] == 'success') {
+          //getx back to previous page
+          titleController.clear();
+          priceController.clear();
+          subtitleController.clear();
+          prefs.remove('images');
+          Get.showSnackbar(GetSnackBar(
+            title: "Sukses",
+            message: 'Komik berhasil ditambahkan',
+            icon: Icon(Icons.check_circle, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+          ));
+
+          Get.back();
+        } else {
+          Get.showSnackbar(GetSnackBar(
+            title: "Failed",
+            message: json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+          ));
+        }
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: "Failed",
+          message: "Chose cover image first",
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        ));
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> deleteChapter(String id) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString('token');
+      var comicId = prefs.getInt('comicId');
+
+      var headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+
+      var url =
+          Uri.parse(ApiEndPoints.baseUrl + 'chapters' + '/$id' + '/delete');
+      print(url);
+
+      http.Response response = await http.delete(url, headers: headers);
+
+      final json = jsonDecode(response.body);
+
+      if (json['status'] == 'success') {
+        Get.showSnackbar(GetSnackBar(
+          title: 'Deleted Chapter',
+          message: 'Chapter successfully deleted',
+          icon: Icon(Icons.check_circle, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+        ));
+        await getChapters(comicId!);
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: "Error",
+          message: json['message'],
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        ));
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> getChapters(int id) async {
+    try {
+      var url = Uri.parse(ApiEndPoints.baseUrl +
+          ApiEndPoints.authEndPoints.Comics +
+          '/$id' +
+          '/chapters');
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setInt('comicId', id);
+      var token = prefs.getString('token');
+      if (token == null) {
+        Get.offAll(() => profileController.logout());
+      } else {
+        var headers = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        };
+        http.Response response = await http.get(url, headers: headers);
+
+        final json = jsonDecode(response.body);
+        print(json);
+
+        if (json['status'] == 'success') {
+          // Clear previous chapter data
+          prefs.remove('chapters');
+
+          // Save new chapter data
+          List<String> chapterList = [];
+          for (var chapter in json['data']) {
+            String chapterData =
+                '${chapter['id']}|${chapter['title']}|${chapter['subtitle']}';
+            chapterList.add(chapterData);
+          }
+          prefs.setStringList('chapters', chapterList);
+
+          Get.to(() => ChapterManageScreen());
+        } else {
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+          ));
+        }
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   Future<void> getAuthorComics() async {
     try {
@@ -273,7 +453,6 @@ class AuthorController extends GetxService {
         final response = await request.send();
         final respStr = await response.stream.bytesToString();
         final json = jsonDecode(respStr);
-        print(json);
 
         if (json['status'] == 'success') {
           //getx back to previous page
@@ -283,7 +462,6 @@ class AuthorController extends GetxService {
           prefs.remove('cover_image');
           priceController.clear();
           rateController.clear();
-          Get.back();
           Get.showSnackbar(GetSnackBar(
             title: "Sukses",
             message: 'Komik berhasil ditambahkan',
@@ -292,6 +470,8 @@ class AuthorController extends GetxService {
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.green,
           ));
+
+          Get.back();
         } else {
           Get.showSnackbar(GetSnackBar(
             title: "Failed",

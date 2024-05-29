@@ -133,7 +133,7 @@ class TotalCoinsWidget extends StatelessWidget {
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  '${prefs.getInt('coin').toString()} = Rp.${(prefs.getInt('coin')! * prefs.getInt('price')!).toString()}',
+                  '${prefs.getInt('coin')} = Rp.${(prefs.getInt('coin')! * prefs.getInt('price')!)}',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -239,6 +239,8 @@ class WithdrawalForm extends StatelessWidget {
   Future<void> _submitWithdrawal() async {
     await authorController.withdrawal();
     await authorController.getHistoryWithdrawal();
+    setState() {}
+    ;
   }
 }
 
@@ -271,6 +273,9 @@ class WithdrawalHistorySection extends StatelessWidget {
                   await authorController.getHistoryWithdrawal();
 
                   await profilecontroller.getCoin();
+                  // ignore: unused_element
+                  setState() {}
+                  ;
                 },
                 style: ElevatedButton.styleFrom(
                   padding:
