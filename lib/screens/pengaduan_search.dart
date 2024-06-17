@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mikami_mobile/screens/user/all_comic_screen.dart';
 import 'package:mikami_mobile/screens/auth/login_screen.dart';
 import 'package:mikami_mobile/services_api/controller/auth_service.dart';
 import 'package:mikami_mobile/services_api/controller/user_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mikami_mobile/screens/comic_detail_screen.dart';
 
-class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+class PengaduanSearch extends StatefulWidget {
+  const PengaduanSearch({super.key});
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  State<PengaduanSearch> createState() => _PengaduanSearchState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _PengaduanSearchState extends State<PengaduanSearch> {
   AuthController authcontroller = Get.put(AuthController());
   UserController usercontroller = Get.put(UserController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
@@ -31,7 +29,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           );
         } else if (snapshot.hasData && snapshot.data == true) {
-          return searchScreenContent();
+          return PengaduanSearchContent();
         } else {
           return LoginScreen();
         }
@@ -39,7 +37,7 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget searchScreenContent() {
+  Widget PengaduanSearchContent() {
     return FutureBuilder(
       future: _prefs,
       builder: (context, snapshot) {
@@ -72,8 +70,6 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Column(
                 children: [
                   buildSearchBar(),
-                  const SizedBox(height: 10),
-                  buildBrowseAllButton(),
                   const SizedBox(height: 20),
                   Expanded(
                     child: prefs.getInt('dataKomik[Max]') != 0
@@ -126,32 +122,6 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget buildBrowseAllButton() {
-  return SizedBox(
-    width: double.infinity, 
-    height: 50, 
-    child: ElevatedButton(
-      onPressed: () async {
-        Get.to(AllComicsScreen());
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        foregroundColor: lightColorScheme.primary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-      ),
-      child: const Text(
-        'Browse All Comics',
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    ),
-  );
-}
-
   Widget buildNoDataFound() {
     return Center(
       child: Container(
@@ -173,95 +143,92 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget listData(SharedPreferences prefs) {
-  return ListView.builder(
-    itemCount: prefs.getInt('dataKomik[Max]') ?? 0,
-    itemBuilder: (context, index) {
-      final int id = prefs.getInt('dataKomik[$index][id]')!;
-      final String title = prefs.getString('dataKomik[$index][title]')!;
-      final String cover = prefs.getString('dataKomik[$index][cover]')!;
-      final String description = prefs.getString('dataKomik[$index][description]')!;
+    return ListView.builder(
+      itemCount: prefs.getInt('dataKomik[Max]') ?? 0,
+      itemBuilder: (context, index) {
+        return GestureDetector(
+          onTap: () {
+            prefs.remove('selectedID');
+            prefs.remove('selectedTitle');
+            prefs.setInt('selectedID', prefs.getInt('dataKomik[$index][id]')!);
+            prefs.setString(
+                'selectedTitle', prefs.getString('dataKomik[$index][title]')!);
 
-      return GestureDetector(
-        onTap: () {
-          Get.to(() => ComicDetail(
-            id: id,
-            title: title,
-            description: description,
-            cover: cover,
-          ));
-        },
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 5.0),
-          padding: const EdgeInsets.all(10.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.grey,
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
-                  child: Image.network(
-                    cover,
-                    fit: BoxFit.cover,
+            prefs.setString(
+                'selectedCover', prefs.getString('dataKomik[$index][cover]')!);
+            Get.back();
+          },
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 5.0),
+            padding: const EdgeInsets.all(10.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: Image.network(
+                      prefs.getString('dataKomik[$index][cover]')!,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        prefs.getString('dataKomik[$index][title]') ?? '',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      'Deskripsi: $description',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
+                      const SizedBox(height: 5),
+                      Text(
+                        'Deskripsi: ${prefs.getString('dataKomik[$index][description]') ?? ''}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      prefs.getString('dataKomik[$index][genres]') ?? '',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
+                      const SizedBox(height: 5),
+                      Text(
+                        prefs.getString('dataKomik[$index][genres]') ?? '',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                '${prefs.getInt('dataKomik[$index][price]') ?? 0} Koin',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
+                const SizedBox(width: 10),
+                Text(
+                  '${prefs.getInt('dataKomik[$index][price]') ?? 0} Koin',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
-
+        );
+      },
+    );
+  }
 }

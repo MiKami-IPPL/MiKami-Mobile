@@ -12,6 +12,7 @@ import 'package:mikami_mobile/services_api/controller/profile_service.dart';
 import 'package:mikami_mobile/services_api/controller/user_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mikami_mobile/screens/comic_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -391,11 +392,41 @@ class _HomeScreenState extends State<HomeScreen> {
                               if (prefs.getInt('rekKomik[Max]') != null &&
                                   prefs.getInt('rekKomik[Max]')! > 4)
                                 for (int i = 0; i < 5; i++)
-                                  RoundedImageWithText(
-                                    imagePath:
-                                        prefs.getString('rekKomik[$i][cover]')!,
-                                    text:
-                                        prefs.getString('rekKomik[$i][title]')!,
+                                  GestureDetector(
+                                    onTap: () {
+                                      int? comicId =
+                                          prefs.getInt('rekKomik[$i][id]');
+                                      String? comicTitle = prefs
+                                          .getString('rekKomik[$i][title]');
+                                      String? comicDescription =
+                                          prefs.getString(
+                                              'rekKomik[$i][description]');
+                                      String? comicCover = prefs
+                                          .getString('rekKomik[$i][cover]');
+                                      if (comicId != null &&
+                                          comicTitle != null &&
+                                          comicCover != null &&
+                                          comicDescription != null) {
+                                        Get.to(() => ComicDetail(
+                                              id: comicId,
+                                              title: comicTitle,
+                                              description: comicDescription,
+                                              cover: comicCover,
+                                            ));
+                                      } else {
+                                        // Handle missing data error
+                                        print(
+                                            'Error: Missing data for comic at index $i');
+                                      }
+                                    },
+                                    child: RoundedImageWithText(
+                                      imagePath: prefs.getString(
+                                              'rekKomik[$i][cover]') ??
+                                          '',
+                                      text: prefs.getString(
+                                              'rekKomik[$i][title]') ??
+                                          '',
+                                    ),
                                   ),
                             ],
                           ),

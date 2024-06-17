@@ -270,6 +270,9 @@ class UserController extends GetxController {
             if (json['data'][i]['cover'] != null) {
               prefs?.setString('rekKomik[$i][cover]', json['data'][i]['cover']);
               prefs?.setString('rekKomik[$i][title]', json['data'][i]['title']);
+              prefs?.setInt('rekKomik[$i][id]', json['data'][i]['id']);
+              prefs?.setString(
+                  'rekKomik[$i][description]', json['data'][i]['description']);
             } else {
               prefs?.setString('rekKomik[$i][cover]', '');
               prefs?.setString('rekKomik[$i][title]', json['data'][i]['title']);
@@ -343,6 +346,268 @@ class UserController extends GetxController {
       }
     } catch (e) {
       print(e.toString());
+    }
+  }
+
+  Future<void> fetchAndStoreAllComics() async {
+    try {
+      var Url =
+          Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics);
+      final SharedPreferences? prefs = await _prefs;
+      var token = prefs?.getString('token');
+      if (token == null) {
+        Get.offAll(() => LoginScreen());
+        return;
+      } else {
+        var header = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        };
+
+        http.Response response = await http.get(Url, headers: header);
+        final json = jsonDecode(response.body);
+
+        if (json['status'] == 'success') {
+          // Clear old comics data
+          if (prefs?.getInt('dataKomik[Max]') != null) {
+            var j = prefs?.getInt('dataKomik[Max]');
+            for (var i = 0; i < j!; i++) {
+              prefs?.remove('dataKomik[$i][id]');
+              prefs?.remove('dataKomik[$i][title]');
+              prefs?.remove('dataKomik[$i][cover]');
+            }
+            prefs?.remove('dataKomik[Max]');
+          }
+
+          // Store new comics data
+          prefs?.setInt('dataKomik[Max]', json['data'].length);
+          for (var i = 0; i < json['data'].length; i++) {
+            prefs?.setInt('dataKomik[$i][id]', json['data'][i]['id']);
+            prefs?.setString('dataKomik[$i][title]', json['data'][i]['title']);
+            prefs?.setString('dataKomik[$i][cover]', json['data'][i]['cover']);
+          }
+        } else {
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: lightColorScheme.error,
+          ));
+        }
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> loadAllComicsFromPrefs() async {
+    final SharedPreferences prefs = await _prefs;
+    var max = prefs.getInt('dataKomik[Max]') ?? 0;
+    var comics = <Map<String, dynamic>>[];
+
+    for (var i = 0; i < max; i++) {
+      var id = prefs.getInt('dataKomik[$i][id]');
+      var title = prefs.getString('dataKomik[$i][title]');
+      var cover = prefs.getString('dataKomik[$i][cover]');
+      if (id != null && title != null && cover != null) {
+        comics.add({'id': id, 'title': title, 'cover': cover});
+      }
+    }
+
+    return comics;
+  }
+
+  Future<void> getComicDetail(int id) async {
+    try {
+      var url = Uri.parse(ApiEndPoints.baseUrl + 'comic/$id');
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setInt('comicId', id);
+      var token = prefs.getString('token');
+      if (token == null) {
+        Get.offAll(() => LoginScreen());
+      } else {
+        var headers = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        };
+        http.Response response = await http.get(url, headers: headers);
+
+        final json = jsonDecode(response.body);
+        if (json['status'] == 'success') {
+          prefs.setString('comicTitle', json['data']['title']);
+          prefs.setString('comicCover', json['data']['cover']);
+          prefs.setString('comicDescription', json['data']['description']);
+          print('Comic Title: ${json['data']['title']}');
+          print('Comic Cover: ${json['data']['cover']}');
+          print('Comic Description: ${json['data']['description']}');
+        } else {
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red, // Replace with your color scheme
+          ));
+        }
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> getChapterDetail(int comicId, int chapterId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString('token');
+
+      if (token == null) {
+        Get.offAll(() => LoginScreen());
+        return;
+      }
+
+      var url = Uri.parse(
+          '${ApiEndPoints.baseUrl}${ApiEndPoints.authEndPoints.Comics}/$comicId/chapters/$chapterId');
+
+      var headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+
+      var response = await http.get(url, headers: headers);
+      var json = jsonDecode(response.body);
+
+      if (json['status'] == 'success') {
+        var chapterDetail = json['data'];
+        prefs.setString('chapterDetail', jsonEncode(chapterDetail));
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: 'Error',
+          message: json['message'],
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: Duration(seconds: 2),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        ));
+      }
+    } catch (e) {
+      print(e);
+      Get.showSnackbar(GetSnackBar(
+        title: 'Error',
+        message: e.toString(),
+        icon: Icon(Icons.error, color: Colors.white),
+        duration: Duration(seconds: 2),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
+  Future<void> getChapters(int id) async {
+    try {
+      var url = Uri.parse(ApiEndPoints.baseUrl +
+          ApiEndPoints.authEndPoints.Comics +
+          '/$id' +
+          '/chapters');
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setInt('comicId', id);
+      var token = prefs.getString('token');
+      if (token == null) {
+        Get.offAll(() => LoginScreen());
+      } else {
+        var headers = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        };
+        http.Response response = await http.get(url, headers: headers);
+
+        final json = jsonDecode(response.body);
+        print(json);
+
+        if (json['status'] == 'success') {
+          // Clear previous chapter data
+          prefs.remove('chapters');
+
+          // Save new chapter data
+          List<String> chapterList = [];
+          for (var chapter in json['data']) {
+            String chapterData =
+                '${chapter['id']}|${chapter['title']}|${chapter['subtitle']}|${chapter['price']}|${chapter['purchased']}'; // Tambahkan purchased data di sini
+            chapterList.add(chapterData);
+          }
+          prefs.setStringList('chapters', chapterList);
+        } else {
+          Get.showSnackbar(GetSnackBar(
+            title: json['status'],
+            message: json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+          ));
+        }
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> chapterPurchase(int chapterId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString('token');
+
+      if (token == null) {
+        Get.offAll(() => LoginScreen());
+        return;
+      }
+
+      var url = Uri.parse('${ApiEndPoints.baseUrl}chapter/$chapterId/purchase');
+
+      var headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+
+      var response = await http.post(url, headers: headers);
+      var json = jsonDecode(response.body);
+
+      if (json['status'] == 'success') {
+        Get.showSnackbar(GetSnackBar(
+          title: 'Success',
+          message: 'Chapter purchased successfully',
+          icon: Icon(Icons.check_circle, color: Colors.white),
+          duration: Duration(seconds: 2),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+        ));
+      } else {
+        Get.showSnackbar(GetSnackBar(
+          title: 'Error',
+          message: json['message'],
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: Duration(seconds: 2),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        ));
+      }
+    } catch (e) {
+      print(e);
+      Get.showSnackbar(GetSnackBar(
+        title: 'Error',
+        message: e.toString(),
+        icon: Icon(Icons.error, color: Colors.white),
+        duration: Duration(seconds: 2),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+      ));
     }
   }
 }

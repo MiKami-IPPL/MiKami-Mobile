@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mikami_mobile/model/list_item_data.dart';
 import 'package:mikami_mobile/model/list_data_provider.dart';
-import 'chapter_read.dart';
+import 'comic_detail_screen.dart';
 
 class ComicFavorite extends StatelessWidget {
   const ComicFavorite({Key? key});
@@ -81,11 +81,7 @@ class ComicFavorite extends StatelessWidget {
                           trailing: PopupMenuButton<String>(
                             onSelected: (String choice) {
                               if (choice == 'Lihat Daftar Chapter') {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => const ChapterList(),
-                                  ),
-                                );
+                                
                               } else if (choice == 'Hapus Dari Favorit') {
                                 _showConfirmationDialog(context,
                                     itemData.title); // Show confirmation dialog

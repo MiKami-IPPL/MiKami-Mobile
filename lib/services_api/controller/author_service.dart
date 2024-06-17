@@ -22,52 +22,55 @@ class AuthorController extends GetxService {
   TextEditingController amountController = TextEditingController();
   TextEditingController subtitleController = TextEditingController();
 
-  Future<void> uploadChapter() async {
+  Future<void> addComic() async {
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      var token = prefs.getString('token');
-      var comicId = prefs.getInt('comicId');
+      final SharedPreferences? prefs = await _prefs;
+      var token = prefs?.getString('token');
+
       var headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': 'Bearer $token',
       };
-      var url = Uri.parse(ApiEndPoints.baseUrl +
-          ApiEndPoints.authEndPoints.Comics +
-          '/$comicId/chapters');
 
-      var image = prefs.getStringList('images');
-      if (image != null) {
+      var url =
+          Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics);
+
+      var path_cover = prefs?.getString('cover_image');
+      if (path_cover != null) {
+        File cover = File(path_cover);
         var request = http.MultipartRequest('POST', url);
-        List<File> imageList = [];
-        for (var path in image) {
-          File chapter = File(path);
-          imageList.add(chapter);
-        }
 
-        //take the files
-        for (var chapter in imageList) {
-          var multipartFile =
-              await http.MultipartFile.fromPath('images', chapter.path);
-          request.files.add(multipartFile);
-        }
+        //take the file
+        var multipartFile =
+            await http.MultipartFile.fromPath('cover', cover.path);
+
+        request.files.add(multipartFile);
+        //genreList to list<int>
+        var genreList =
+            genreIdController.text.split(',').map(int.parse).toList();
 
         request.fields['title'] = titleController.text;
-        request.fields['subtitle'] = subtitleController.text;
+        request.fields['description'] = descriptionController.text;
+        request.fields['author'] = prefs!.getString('name')!;
         request.fields['price'] = priceController.text;
+        //insert list<int> to request.fields
+        for (var i = 0; i < genreList.length; i++) {
+          request.fields['genres_id[$i]'] = genreList[i].toString();
+        }
 
         request.headers.addAll(headers);
         final response = await request.send();
         final respStr = await response.stream.bytesToString();
         final json = jsonDecode(respStr);
-        print(json);
 
         if (json['status'] == 'success') {
           //getx back to previous page
           titleController.clear();
+          descriptionController.clear();
+          genreIdController.clear();
+          prefs.remove('cover_image');
           priceController.clear();
-          subtitleController.clear();
-          prefs.remove('images');
           Get.showSnackbar(GetSnackBar(
             title: "Sukses",
             message: 'Komik berhasil ditambahkan',
@@ -76,6 +79,8 @@ class AuthorController extends GetxService {
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.green,
           ));
+
+          await Future.delayed(Duration(seconds: 1));
 
           Get.back();
         } else {
@@ -102,6 +107,265 @@ class AuthorController extends GetxService {
       print(e.toString());
     }
   }
+
+  Future<void> updateComic(int comicId, AuthorController authorController) async {
+  try {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+
+    var url = Uri.parse(ApiEndPoints.baseUrl + 'comics/$comicId/update');
+    var pathCover = prefs.getString('cover_image');
+
+    if (pathCover != null) {
+      var request = http.MultipartRequest('PUT', url);
+
+      request.headers['Authorization'] = 'Bearer $token';
+      request.headers['Accept'] = 'application/json';
+
+      // Add fields
+      request.fields['title'] = authorController.titleController.text;
+      request.fields['description'] = authorController.descriptionController.text;
+      request.fields['price'] = authorController.priceController.text;
+      request.fields['author'] = prefs.getString('name')!;
+      request.fields['rate'] = authorController.rateController.text;
+
+      // Add genres
+      var genreList = authorController.genreIdController.text.split(',').map(int.parse).toList();
+      request.fields['genres_id'] = jsonEncode(genreList);
+
+      // Add cover image
+      var multipartFile = await http.MultipartFile.fromPath('cover', pathCover);
+      request.files.add(multipartFile);
+
+      // Debugging: Print the fields being sent
+      print('Fields: ${request.fields}');
+      print('Files: ${request.files}');
+
+      var response = await request.send();
+      var responseData = await response.stream.toBytes();
+      var responseString = String.fromCharCodes(responseData);
+
+      print(responseString);
+
+      if (response.statusCode == 200) {
+        // Success logic
+        print('Comic updated successfully');
+        Get.showSnackbar(GetSnackBar(
+          title: "Success",
+          message: 'Comic updated successfully',
+          icon: Icon(Icons.check_circle, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+        ));
+      } else {
+        // Error logic
+        print('Failed to update comic');
+        var json = jsonDecode(responseString);
+        Get.showSnackbar(GetSnackBar(
+          title: "Failed",
+          message: json['message'],
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        ));
+      }
+    } else {
+      Get.showSnackbar(GetSnackBar(
+        title: "Failed",
+        message: "Choose a cover image first",
+        icon: Icon(Icons.error, color: Colors.white),
+        duration: const Duration(seconds: 5),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+      ));
+    }
+  } catch (e) {
+    print(e.toString());
+    Get.showSnackbar(GetSnackBar(
+      title: "Error",
+      message: e.toString(),
+      icon: Icon(Icons.error, color: Colors.white),
+      duration: const Duration(seconds: 5),
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red,
+    ));
+  }
+}
+
+
+  Future<void> uploadChapter() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString('token');
+      var comicId = prefs.getInt('comicId');
+      var headers = {
+        'Authorization': 'Bearer $token',
+      };
+      var url = Uri.parse(ApiEndPoints.baseUrl +
+          ApiEndPoints.authEndPoints.Comics +
+          '/$comicId/chapters');
+
+      var imagePaths = prefs.getStringList('images');
+      if (imagePaths != null && imagePaths.isNotEmpty) {
+        var request = http.MultipartRequest('POST', url);
+
+        for (var path in imagePaths) {
+          File chapter = File(path);
+          var multipartFile =
+              await http.MultipartFile.fromPath('images[]', chapter.path);
+          request.files.add(multipartFile);
+        }
+
+        request.fields['title'] = titleController.text;
+        request.fields['subtitle'] = subtitleController.text;
+        request.fields['price'] = priceController.text;
+
+        request.headers.addAll(headers);
+
+        final response = await request.send();
+        final respStr = await response.stream.bytesToString();
+        final json = jsonDecode(respStr);
+
+        if (json['status'] == 'success') {
+          titleController.clear();
+          priceController.clear();
+          subtitleController.clear();
+          prefs.remove('images');
+
+          Get.snackbar(
+            "Success",
+            'Chapter successfully added',
+            icon: Icon(Icons.check_circle, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+          );
+          await Future.delayed(Duration(seconds: 1));
+          Get.back();
+        } else {
+          Get.snackbar(
+            "Failed",
+            json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+          );
+        }
+      } else {
+        Get.snackbar(
+          "Failed",
+          "Choose cover image first",
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        );
+      }
+    } catch (e) {
+      print(e.toString());
+      Get.snackbar(
+        "Error",
+        'An error occurred while uploading the chapter',
+        icon: Icon(Icons.error, color: Colors.white),
+        duration: const Duration(seconds: 5),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+      );
+    }
+  }
+
+  Future<void> updateChapter(String chapterId) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString('token');
+
+      var url = Uri.parse(ApiEndPoints.baseUrl +'chapters/$chapterId/update');
+
+      var imagePaths = prefs.getStringList('images');
+      if (imagePaths != null && imagePaths.isNotEmpty) {
+        List<Map<String, String>> images = imagePaths.map((path) {
+          return {"image": path.split('/').last};  // Use only the file name
+        }).toList();
+
+        var requestBody = jsonEncode({
+          'title': titleController.text,
+          'subtitle': subtitleController.text,
+          'price': int.parse(priceController.text),
+          'images': images,
+        });
+
+        var response = await http.put(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: requestBody,
+        );
+
+        var json = jsonDecode(response.body);
+
+        // Debugging prints
+        print("Request URL: $url");
+        print("Request Headers: ${{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        }}");
+        print("Request Body: $requestBody");
+        print("Response: ${response.body}");
+
+        if (json['status'] == 'success') {
+          titleController.clear();
+          priceController.clear();
+          subtitleController.clear();
+          prefs.remove('images');
+
+          Get.snackbar(
+            "Success",
+            'Chapter successfully updated',
+            icon: Icon(Icons.check_circle, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+          );
+          await Future.delayed(Duration(seconds: 1));
+          Get.back();
+        } else {
+          Get.snackbar(
+            "Failed",
+            json['message'],
+            icon: Icon(Icons.error, color: Colors.white),
+            duration: const Duration(seconds: 5),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+          );
+        }
+      } else {
+        Get.snackbar(
+          "Failed",
+          "Choose cover image first",
+          icon: Icon(Icons.error, color: Colors.white),
+          duration: const Duration(seconds: 5),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        );
+      }
+    } catch (e) {
+      print(e.toString());
+      Get.snackbar(
+        "Error",
+        'An error occurred while updating the chapter',
+        icon: Icon(Icons.error, color: Colors.white),
+        duration: const Duration(seconds: 5),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+      );
+    }
+  }
+
 
   Future<void> deleteChapter(String id) async {
     try {
@@ -268,103 +532,74 @@ class AuthorController extends GetxService {
     }
   }
 
-  Future<void> updateComic(
-      int comicId, Map<String, dynamic> updatedData) async {
+  Future<void> getComics() async {
     try {
+      var Url = Uri.parse(
+          ApiEndPoints.baseUrl + "/comics");
       final SharedPreferences? prefs = await _prefs;
       var token = prefs?.getString('token');
+      if (token == null) {
+        Get.offAll(() => profileController.logout());
+      } else {
+        //get data nama profile
+        var header = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        };
+        http.Response response = await http.get(Url, headers: header);
 
-      var headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      };
-
-      var url = Uri.parse(ApiEndPoints.baseUrl +
-          ApiEndPoints.authEndPoints.Comics +
-          '/$comicId/update');
-
-      // Validate rate and price fields
-      double? rate;
-      double? price;
-      if (double.tryParse(rateController.text) != null) {
-        rate = double.parse(rateController.text);
-      }
-      if (double.tryParse(priceController.text) != null) {
-        price = double.parse(priceController.text);
-      }
-
-      if (rate == null || price == null) {
-        // Display error message if rate or price is invalid
-        Get.showSnackbar(GetSnackBar(
-          title: "Error",
-          message: 'Rate and price must be valid numbers',
-          icon: Icon(Icons.error, color: Colors.white),
-          duration: const Duration(seconds: 5),
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-        ));
-        return;
-      }
-
-      // Set rate and price in the updated data
-      updatedData['rate'] = rate;
-      updatedData['price'] = price;
-
-      http.Response response = await http.put(
-        url,
-        body: jsonEncode(updatedData),
-        headers: headers,
-      );
-
-      if (response.statusCode == 200) {
-        var json = jsonDecode(response.body);
-
+        final json = jsonDecode(response.body);
         if (json['status'] == 'success') {
-          Get.showSnackbar(GetSnackBar(
-            title: "Success",
-            message: 'Comic successfully updated',
-            icon: Icon(Icons.check_circle, color: Colors.white),
-            duration: const Duration(seconds: 5),
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-          ));
-          // Refresh the list of comics after update
-          // await getComics();
+          //check data komik max
+          if (prefs?.getInt('authKomik[Max]') != null) {
+            var j = prefs?.getInt('authKomik[Max]');
+            for (var i = 0; i < j!; i++) {
+              //id
+              prefs?.remove('authKomik[$i][id]');
+              prefs?.remove('authKomik[$i][title]');
+              prefs?.remove('authKomik[$i][description]');
+              prefs?.remove('authKomik[$i][price]');
+              prefs?.remove('authKomik[$i][genres]');
+              prefs?.remove('authKomik[$i][cover]');
+            }
+            prefs?.remove('authKomik[Max]');
+          }
+
+          prefs?.setInt('authKomik[Max]', json['data'].length);
+          for (var i = 0; i < json['data'].length; i++) {
+            //id
+            prefs?.setInt('authKomik[$i][id]', (json['data'][i]['id']));
+            prefs?.setString(
+                'authKomik[$i][title]', (json['data'][i]['title']));
+            //set cover
+            prefs?.setString(
+                'authKomik[$i][cover]', (json['data'][i]['cover']));
+            prefs?.setString('authKomik[$i][description]',
+                jsonEncode(json['data'][i]['description']));
+            prefs?.setInt('authKomik[$i][price]', (json['data'][i]['price']));
+            String genres = '';
+            for (var j = 0; j < json['data'][i]['genres'].length; j++) {
+              genres += json['data'][i]['genres'][j]['name'].toString() + ', ';
+            }
+            prefs?.setString('authKomik[$i][genres]', genres);
+          }
         } else {
-          // Handle API error response
           Get.showSnackbar(GetSnackBar(
-            title: "Error",
+            title: json['status'],
             message: json['message'],
             icon: Icon(Icons.error, color: Colors.white),
             duration: const Duration(seconds: 5),
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
+            backgroundColor: lightColorScheme.error,
           ));
         }
-      } else {
-        // Handle HTTP error response
-        Get.showSnackbar(GetSnackBar(
-          title: "Error",
-          message: 'Failed to update comic: HTTP ${response.statusCode}',
-          icon: Icon(Icons.error, color: Colors.white),
-          duration: const Duration(seconds: 5),
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-        ));
       }
     } catch (e) {
-      print("Error updating comic: $e");
-      Get.showSnackbar(GetSnackBar(
-        title: "Error",
-        message: 'An error occurred while updating the comic',
-        icon: Icon(Icons.error, color: Colors.white),
-        duration: const Duration(seconds: 5),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-      ));
+      print(e.toString());
     }
   }
+
 
   Future<String> deleteComic(int comicId, String title) async {
     try {
@@ -412,90 +647,7 @@ class AuthorController extends GetxService {
     }
   }
 
-  Future<void> addComic() async {
-    try {
-      final SharedPreferences? prefs = await _prefs;
-      var token = prefs?.getString('token');
-
-      var headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      };
-
-      var url =
-          Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndPoints.Comics);
-
-      var path_cover = prefs?.getString('cover_image');
-      if (path_cover != null) {
-        File cover = File(path_cover);
-        var request = http.MultipartRequest('POST', url);
-
-        //take the file
-        var multipartFile =
-            await http.MultipartFile.fromPath('cover', cover.path);
-
-        request.files.add(multipartFile);
-        //genreList to list<int>
-        var genreList =
-            genreIdController.text.split(',').map(int.parse).toList();
-
-        request.fields['title'] = titleController.text;
-        request.fields['description'] = descriptionController.text;
-        request.fields['author'] = prefs!.getString('name')!;
-        request.fields['price'] = priceController.text;
-        //insert list<int> to request.fields
-        for (var i = 0; i < genreList.length; i++) {
-          request.fields['genres_id[$i]'] = genreList[i].toString();
-        }
-
-        request.headers.addAll(headers);
-        final response = await request.send();
-        final respStr = await response.stream.bytesToString();
-        final json = jsonDecode(respStr);
-
-        if (json['status'] == 'success') {
-          //getx back to previous page
-          titleController.clear();
-          descriptionController.clear();
-          genreIdController.clear();
-          prefs.remove('cover_image');
-          priceController.clear();
-          rateController.clear();
-          Get.showSnackbar(GetSnackBar(
-            title: "Sukses",
-            message: 'Komik berhasil ditambahkan',
-            icon: Icon(Icons.check_circle, color: Colors.white),
-            duration: const Duration(seconds: 5),
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-          ));
-
-          Get.back();
-        } else {
-          Get.showSnackbar(GetSnackBar(
-            title: "Failed",
-            message: json['message'],
-            icon: Icon(Icons.error, color: Colors.white),
-            duration: const Duration(seconds: 5),
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-          ));
-        }
-      } else {
-        Get.showSnackbar(GetSnackBar(
-          title: "Failed",
-          message: "Chose cover image first",
-          icon: Icon(Icons.error, color: Colors.white),
-          duration: const Duration(seconds: 5),
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-        ));
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
+  
 
   Future<void> getGenre() async {
     try {

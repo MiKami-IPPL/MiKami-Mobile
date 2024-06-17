@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mikami_mobile/screens/auth/welcome_screen.dart';
 import 'package:mikami_mobile/screens/user/search_screen.dart';
+import 'package:mikami_mobile/screens/pengaduan_search.dart';
 import 'package:mikami_mobile/services_api/controller/auth_service.dart';
 import 'package:mikami_mobile/services_api/controller/user_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
@@ -69,7 +70,7 @@ class _PengaduanScreenState extends State<PengaduanScreen> {
                           hintText: 'Search Comic',
                           onSubmitted: (value) async {
                             await usercontroller.searchKomik();
-                            await Get.to(() => SearchScreen());
+                            await Get.to(() => PengaduanSearch());
                             setState(() {});
                           },
                         ),

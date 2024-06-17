@@ -1,18 +1,16 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mikami_mobile/services_api/controller/chapter_service.dart';
-import 'package:mikami_mobile/model/chapter.dart';
+import 'package:mikami_mobile/services_api/controller/author_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChapterUpdateScreen extends StatelessWidget {
-  final ChapterController _chapterService = Get.find();
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController subtitleController = TextEditingController();
-  final TextEditingController priceController = TextEditingController();
-  final int comicId;
   final String chapterId;
 
-  ChapterUpdateScreen({required this.comicId, required this.chapterId});
+  final AuthorController authorController = Get.find();
+
+  ChapterUpdateScreen({Key? key, required this.chapterId}) : super(key: key);
 
   final List<XFile> selectedImages = [];
 
@@ -21,94 +19,116 @@ class ChapterUpdateScreen extends StatelessWidget {
     selectedImages.addAll(images);
   }
 
+  Future<void> pickImages() async {
+    final ImagePicker picker = ImagePicker();
+    final List<XFile>? images = await picker.pickMultiImage();
+    if (images != null) {
+      List<String> imagePaths = images.map((image) => image.path).toList();
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setStringList('images', imagePaths);
+      setSelectedImages(images); // Update selectedImages
+      print(imagePaths);
+    }
+  }
+
+  Future<void> submitChapter() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getStringList('images') != null) {
+      final title = authorController.titleController.text;
+      print("Title: $title");
+      if (title.isNotEmpty) {
+        print("Submitting chapter update...");
+        await authorController.updateChapter(chapterId); // Use the controller to update the chapter
+      } else {
+        Get.snackbar(
+          'Error',
+          'Title field is required',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } else {
+      Get.snackbar(
+        'Error',
+        'Please pick images first',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Update Chapter'),
+        title: const Text('Update Chapter'),
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Obx(() {
-            if (_chapterService.isLoading.value) {
-              return Center(child: CircularProgressIndicator());
-            } else if (_chapterService.hasError.value) {
-              return Center(
-                child: Text(
-                  _chapterService.errorMessage.value,
-                  style: TextStyle(color: Colors.red),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Title field
+              TextFormField(
+                controller: authorController.titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Title',
+                  hintText: 'Enter chapter title',
                 ),
-              );
-            } else {
-        
-              final chapter = _chapterService.chapters.firstWhere(
-                (chapter) => chapter.id == int.parse(chapterId),
-                orElse: () => Chapter(id: 0, title: '', description: '', price: 0), 
-              );
+              ),
+              const SizedBox(height: 16),
 
-              titleController.text = chapter.title;
-              subtitleController.text = chapter.description;
-              priceController.text = chapter.price.toString();
+              // Subtitle field
+              TextFormField(
+                controller: authorController.subtitleController,
+                decoration: const InputDecoration(
+                  labelText: 'Subtitle',
+                  hintText: 'Enter chapter subtitle',
+                ),
+              ),
+              const SizedBox(height: 16),
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TextFormField(
-                    controller: titleController,
-                    decoration: InputDecoration(
-                      labelText: 'Title',
-                      hintText: 'Enter chapter title',
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: subtitleController,
-                    decoration: InputDecoration(
-                      labelText: 'Subtitle',
-                      hintText: 'Enter chapter subtitle',
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: priceController,
-                    decoration: InputDecoration(
-                      labelText: 'Price',
-                      hintText: 'Enter chapter price',
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      final ImagePicker picker = ImagePicker();
-                      final List<XFile>? images = await picker.pickMultiImage();
-                      if (images != null) {
-                        setSelectedImages(images);
-                      }
-                    },
-                    child: Text('Pick Images'),
-                  ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      int price = int.tryParse(priceController.text) ?? 0;
-                      List<String> imagePaths = selectedImages.map((image) => image.path).toList();
-                      await _chapterService.updateChapter(
-                        comicId: comicId.toString(),
-                        chapterId: chapterId,
-                        title: titleController.text,
-                        subtitle: subtitleController.text,
-                        imagePaths: imagePaths,
-                        price: price,
-                      );
-                    },
-                    child: Text('Update'),
-                  ),
-                ],
-              );
-            }
-          }),
+              // Price field
+              TextFormField(
+                controller: authorController.priceController,
+                decoration: const InputDecoration(
+                  labelText: 'Price',
+                  hintText: 'Enter chapter price',
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 16),
+
+              // Image picker button
+              ElevatedButton(
+                onPressed: pickImages,
+                child: const Text('Pick Images'),
+              ),
+              const SizedBox(height: 16),
+
+              // Display selected images
+              if (selectedImages.isNotEmpty)
+                Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: selectedImages
+                      .map((image) => Image.file(
+                            File(image.path),
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          ))
+                      .toList(),
+                ),
+
+              const SizedBox(height: 16),
+
+              // Submit button
+              ElevatedButton(
+                onPressed: submitChapter, // Call the submitChapter method
+                child: const Text('Submit Chapter'), // Change the button text
+              ),
+            ],
+          ),
         ),
       ),
     );

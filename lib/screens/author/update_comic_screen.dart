@@ -1,16 +1,22 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mikami_mobile/model/comic.dart';
+import 'package:mikami_mobile/screens/auth/login_screen.dart';
+import 'package:mikami_mobile/services_api/controller/auth_service.dart';
 import 'package:mikami_mobile/services_api/controller/author_service.dart';
 import 'package:mikami_mobile/theme/theme.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UpdateComic extends StatefulWidget {
-  final Comic comic;
+  final int comicId;
 
-  UpdateComic({required this.comic});
+  const UpdateComic({Key? key, required this.comicId}) : super(key: key);
 
   @override
   State<UpdateComic> createState() => _UpdateComicState();
@@ -27,11 +33,9 @@ class Genre {
 }
 
 class _UpdateComicState extends State<UpdateComic> {
+  final AuthorController authorController = Get.find();
+  final AuthController authController = Get.put(AuthController());
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  final AuthorController authorController =
-      Get.put<AuthorController>(AuthorController());
-  final _formKey = GlobalKey<FormState>();
-  List<Genre> _selectedGenres = [];
 
   static List<Genre> _genres = [
     Genre(id: 1, name: 'Action'),
@@ -46,189 +50,224 @@ class _UpdateComicState extends State<UpdateComic> {
     Genre(id: 10, name: 'Slice of Life'),
     Genre(id: 11, name: 'Thriller'),
   ];
+  final _items = _genres
+      .map((genre) => MultiSelectItem<Genre>(genre, genre.name))
+      .toList();
+  List<Genre> _selectedGenre = [];
+  final _formUpdateComic = GlobalKey<FormState>();
 
   @override
   void initState() {
-    // Set initial selected genres
-    _selectedGenres = [];
     super.initState();
+    _selectedGenre = _genres;
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _prefs,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return const Center(child: Text('Error'));
+    return FutureBuilder<bool>(
+      future: authController.isLogin(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data == false) {
+            return LoginScreen();
           } else {
-            SharedPreferences prefs = snapshot.data as SharedPreferences;
-            return Scaffold(
-              appBar: AppBar(
-                title: Text('Update Comic'),
-              ),
-              body: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: _formKey,
-                  child: ListView(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: TextFormField(
-                          controller: authorController.titleController,
-                          decoration: InputDecoration(
-                            labelText: 'Title',
-                            hintText: 'Title',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter title of comic';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: TextFormField(
-                          controller: authorController.descriptionController,
-                          decoration: InputDecoration(
-                            labelText: 'Description',
-                            hintText: 'Description',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter description of comic';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: TextFormField(
-                          keyboardType: TextInputType.number,
-                          controller: authorController.rateController,
-                          validator: (value) {
-                            print('Rate Value: $value');
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter rate of comic';
-                            } else if (double.tryParse(value) == null) {
-                              return 'Rate must be a number';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Rate',
-                            hintText: 'Rate',
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: TextFormField(
-                          keyboardType: TextInputType.number,
-                          controller: authorController.priceController,
-                          validator: (value) {
-                            print('Price Value: $value');
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter price of comic';
-                            } else if (double.tryParse(value) == null) {
-                              return 'Price must be a number';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Price',
-                            hintText: 'Price',
-                          ),
-                        ),
-                      ),
-                      // Cover picker
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            final ImagePicker picker = ImagePicker();
-                            final XFile? image = await picker.pickImage(
-                              source: ImageSource.gallery,
-                            );
-                            if (image != null) {
-                              prefs.setString('cover', image.path);
-                            }
-                          },
-                          child: Text('Pick Cover Image'),
-                        ),
-                      ),
+            return AddWidget();
+          }
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+  }
 
-                      // Genre picker
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: MultiSelectDialogField(
-                          items: _genres
-                              .map((genre) =>
-                                  MultiSelectItem<Genre>(genre, genre.name))
-                              .toList(),
-                          initialValue: _selectedGenres,
-                          searchable: true,
-                          title: Text("Genres"),
-                          selectedColor: lightColorScheme.primary,
-                          decoration: BoxDecoration(
-                            color: lightColorScheme.primary.withOpacity(0.1),
-                            borderRadius: BorderRadius.all(Radius.circular(40)),
-                            border: Border.all(
-                              color: lightColorScheme.primary,
-                              width: 2,
-                            ),
-                          ),
-                          buttonIcon: Icon(
-                            Icons.pets,
-                            color: lightColorScheme.primary,
-                          ),
-                          buttonText: Text(
-                            "Choose Genre",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                            ),
-                          ),
-                          onConfirm: (results) {
-                            setState(() {
-                              _selectedGenres = results!;
-                            });
-                          },
-                        ),
+  Widget AddWidget() {
+    return FutureBuilder(
+      future: _prefs,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final SharedPreferences prefs = snapshot.data as SharedPreferences;
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Update Comic'),
+              backgroundColor: lightColorScheme.primary,
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formUpdateComic,
+                child: ListView(
+                  children: [
+                    _buildTextField(
+                      controller: authorController.titleController,
+                      label: 'Title',
+                      hint: 'Enter the title of the comic',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the title of the comic';
+                        }
+                        return null;
+                      },
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'^[a-zA-Z0-9\s]+$')),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    _buildImagePicker(prefs),
+                    SizedBox(height: 20),
+                    _buildTextField(
+                      controller: authorController.descriptionController,
+                      label: 'Description',
+                      hint: 'Enter the description of the comic',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the description of the comic';
+                        }
+                        return null;
+                      },
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'^[a-zA-Z0-9\s]+$')),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    _buildTextField(
+                      controller: authorController.priceController,
+                      label: 'Price',
+                      hint: 'Enter the price of the comic',
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the price of the comic';
+                        } else if (double.tryParse(value) == null) {
+                          return 'Price must be a number';
+                        }
+                        return null;
+                      },
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'^\d+\.?\d{0,2}')),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    _buildGenreSelector(),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (_formUpdateComic.currentState!.validate()) {
+                          await authorController.updateComic(
+                            widget.comicId,
+                            authorController,
+                          );
+                        } else {
+                          Get.snackbar('Error', 'Please fill all fields');
+                        }
+                      },
+                      child: Text('Submit'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: lightColorScheme.primary,
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        textStyle: TextStyle(fontSize: 16),
                       ),
-                      // Submit button
-                      ElevatedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            // Call update comic method
-                            Map<String, dynamic> updatedData = {
-                              'title': authorController.titleController.text,
-                              'description':
-                                  authorController.descriptionController.text,
-                              'rate': authorController.rateController.text,
-                              'price': authorController.priceController.text,
-                              'genres_id': _selectedGenres
-                                  .map((genre) => genre.id)
-                                  .toList(),
-                            };
-                            await authorController.updateComic(
-                                widget.comic.id, updatedData);
-                          }
-                        },
-                        child: Text('Update'),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            );
-          }
-        });
+            ),
+          );
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    TextInputType keyboardType = TextInputType.text,
+    required String? Function(String?) validator,
+    required List<TextInputFormatter> inputFormatters,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      validator: validator,
+      inputFormatters: inputFormatters,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImagePicker(SharedPreferences prefs) {
+    return Column(
+      children: [
+        prefs.getString('cover_image') != null
+            ? Image.file(
+                File(prefs.getString('cover_image')!),
+                height: 200,
+              )
+            : Container(),
+        SizedBox(height: 10),
+        ElevatedButton.icon(
+          onPressed: () async {
+            final ImagePicker picker = ImagePicker();
+            final XFile? image =
+                await picker.pickImage(source: ImageSource.gallery);
+            if (image != null) {
+              prefs.setString('cover_image', image.path);
+              setState(() {});
+            }
+          },
+          icon: Icon(Icons.image),
+          label: Text('Pick Cover Image'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: lightColorScheme.primary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenreSelector() {
+    return MultiSelectDialogField(
+      items: _items,
+      searchable: true,
+      title: Text("Genres"),
+      selectedColor: lightColorScheme.primary,
+      decoration: BoxDecoration(
+        color: Colors.amber[100],
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+        border: Border.all(
+          color: lightColorScheme.primary,
+          width: 2,
+        ),
+      ),
+      buttonIcon: Icon(
+        Icons.category,
+        color: lightColorScheme.primary,
+      ),
+      buttonText: Text(
+        "Choose Genre",
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 16,
+        ),
+      ),
+      onConfirm: (results) {
+        _selectedGenre = results;
+        List<String> genreId = [];
+        for (var i = 0; i < _selectedGenre.length; i++) {
+          genreId.add(_selectedGenre[i].id.toString());
+        }
+        authorController.genreIdController.text = genreId.join(',');
+      },
+    );
   }
 }

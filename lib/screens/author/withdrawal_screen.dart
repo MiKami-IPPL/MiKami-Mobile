@@ -87,7 +87,7 @@ class WithdrawalWidget extends StatelessWidget {
                   const SizedBox(height: 20),
                   WithdrawalHistorySection(
                       authorController: authorController,
-                      profilecontroller: profileController,
+                      profileController: profileController,
                       prefs: prefs),
                 ],
               ),
@@ -108,6 +108,8 @@ class TotalCoinsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    int coins = prefs.getInt('coin') ?? 0;
+    int price = prefs.getInt('price') ?? 0;
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Row(
@@ -133,7 +135,7 @@ class TotalCoinsWidget extends StatelessWidget {
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  '${prefs.getInt('coin')} = Rp.${(prefs.getInt('coin')! * prefs.getInt('price')!)}',
+                  '$coins = Rp.${coins * price}',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -183,7 +185,8 @@ class WithdrawalForm extends StatelessWidget {
                 if (value == null || value.isEmpty) {
                   return 'Enter amount';
                 }
-                if (int.parse(value) > prefs.getInt('coin')!) {
+                int coinBalance = prefs.getInt('coin') ?? 0;
+                if (int.parse(value) > coinBalance) {
                   return '> Coin Balance';
                 }
                 return null;
@@ -239,20 +242,19 @@ class WithdrawalForm extends StatelessWidget {
   Future<void> _submitWithdrawal() async {
     await authorController.withdrawal();
     await authorController.getHistoryWithdrawal();
-    setState() {}
-    ;
+    Get.forceAppUpdate();
   }
 }
 
 class WithdrawalHistorySection extends StatelessWidget {
   final AuthorController authorController;
-  final ProfileController profilecontroller;
+  final ProfileController profileController;
   final SharedPreferences prefs;
 
   const WithdrawalHistorySection({
     Key? key,
     required this.authorController,
-    required this.profilecontroller,
+    required this.profileController,
     required this.prefs,
   }) : super(key: key);
 
@@ -271,11 +273,8 @@ class WithdrawalHistorySection extends StatelessWidget {
               ElevatedButton(
                 onPressed: () async {
                   await authorController.getHistoryWithdrawal();
-
-                  await profilecontroller.getCoin();
-                  // ignore: unused_element
-                  setState() {}
-                  ;
+                  await profileController.getCoin();
+                  Get.forceAppUpdate();
                 },
                 style: ElevatedButton.styleFrom(
                   padding:
@@ -308,16 +307,17 @@ class WithdrawalHistoryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    int withdrawalMax = prefs.getInt('withdrawal[Max]') ?? 0;
+    int price = prefs.getInt('price') ?? 0;
+
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: prefs.getInt('withdrawal[Max]') ?? 0,
+      itemCount: withdrawalMax,
       itemBuilder: (context, index) {
-        final amount = prefs.getInt('withdrawal[$index][amount]') ?? 0;
-        final status =
-            prefs.getString('withdrawal[$index][status]') ?? 'unknown';
-        final createdAt =
-            prefs.getString('withdrawal[$index][created_at]') ?? '';
+        int amount = prefs.getInt('withdrawal[$index][amount]') ?? 0;
+        String status = prefs.getString('withdrawal[$index][status]') ?? 'unknown';
+        String createdAt = prefs.getString('withdrawal[$index][created_at]') ?? '';
 
         Color cardColor;
         if (status == 'pending') {
@@ -333,8 +333,7 @@ class WithdrawalHistoryList extends StatelessWidget {
         return Card(
           color: cardColor,
           child: ListTile(
-            title: Text(
-                'Withdrawal Amount: Rp.${amount * (prefs.getInt('price') ?? 0)}'),
+            title: Text('Withdrawal Amount: Rp.${amount * price}'),
             subtitle: Text('Status: $status'),
             trailing: Text('Date: $createdAt'),
           ),

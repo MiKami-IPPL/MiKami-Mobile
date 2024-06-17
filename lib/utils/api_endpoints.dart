@@ -1,6 +1,6 @@
 class ApiEndPoints {
-  // static final String baseUrl = 'http://10.0.2.2:8000/api/';
-  static final String baseUrl = 'https://cc9f-36-85-33-157.ngrok-free.app/api/';
+  static final String baseUrl = 'http://10.0.2.2:8000/api/';
+  //static final String baseUrl = 'https://e8a3-36-85-33-157.ngrok-free.app/api/';
   static _AuthEndPoints authEndPoints = _AuthEndPoints();
 }
 
@@ -9,6 +9,7 @@ class _AuthEndPoints {
   final String Register = 'register';
   final String Genres = 'genre';
   final String Comics = 'comics';
+  final String ComicDetail = 'comic';
   final String TopUpCoins = 'coins/top-up';
   final String Coins = 'coins';
   final String Profile = 'profile';
@@ -23,4 +24,5 @@ class _AuthEndPoints {
   final String DeleteComic = 'comics/\$id/delete';
   final String TopupHistory = 'coins/order';
   final String ChapterByAuthor = 'comics/\$id/chapters';
+
 }
